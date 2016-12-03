@@ -1,6 +1,8 @@
 /*
     TODO:
-    
+        can I trigger an alert in certain situations? like if all my creeps are dead?
+        instead of stopping all production, have the creeps finish what they are doing and return to get more energy but don't take it
+        change the naming of the sceeps so that I do a 4 character guid instead of 16 or whatever
         make it so it counts screeps that are spawning too, so it doesn't wait until they are done
         make it so the carriers just drop energy right by the upgraders, so they don't have to wait there.
             we just need to make sure that the carriers don't go after that dropped stuff.
@@ -75,9 +77,9 @@ module.exports.loop = function () {
 		}
 		
         if(creep.memory.role == 'upgrader') {
-        // 	if(status == 'complete'){
+        	if(status == 'complete'){
         	    upgrader(creep);
-        // 	}
+        	}
         }
         
         if(creep.memory.role == 'upgradeSupplier') {

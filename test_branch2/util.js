@@ -2,7 +2,7 @@ module.exports = function (creep) {
     return {
         milesRoom: 'W11S6',
         tamsonsRoom: 'W12S5',
-        myRoom: Game.rooms['W69N14'],
+        myRoom: Game.rooms['E77S47'],
         harvestOrMoveToSource: function(creep){
             var sources = creep.room.find(FIND_SOURCES);
             var harvestReturnCode = creep.harvest(sources[0]);

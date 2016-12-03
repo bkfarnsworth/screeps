@@ -2,113 +2,137 @@ var util = require('util');
 
 module.exports = function () {
     
+    console.log();
     console.log("--------- Creep Report -------------");
     
     var status = "complete";
     var bodyPartEnergyMap = util().bodyPartEnergyMap;
+    var numberOfHarvesters = util().myRoom.find(FIND_MY_CREEPS, {
+        filter: function(creep) {
+            return creep.memory.role == 'harvester';
+        }
+    });
+
+
+
     var creepTypes = [
-        {
-            role: "dedicatedHarvester", 
-            bodyParts: [WORK,WORK,WORK,WORK,CARRY,MOVE],
-            min: 0,
-            priority: 2,
-            // stopOperation: true
-        },
-        {
-            role: "dedicatedCarrier", 
-            bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE],
-            min: 0,
-            priority: 3,
-            // stopOperation: true
-        },
-        {
-            role: "dedicatedUpgrader",
-            bodyParts: [WORK, WORK, WORK, WORK, WORK, MOVE, CARRY],
-            min: 0,
-            // stopOperation: true
-        },
-        {
-            role: "otherRoomHarvester",
-            bodyParts: [WORK, CARRY, MOVE],
-            min: 0,
-            // stopOperation: true
-        },
-        {
-            role: "harvester", 
-            bodyParts: [WORK,WORK,CARRY,MOVE,MOVE,MOVE],
-            min: 0,
-            // priority: 2,
-            stopOperation: true
-        },
+        // {
+        //     role: "dedicatedHarvester", 
+        //     bodyParts: [WORK,WORK,WORK,WORK,CARRY,MOVE],
+        //     min: 0,
+        //     priority: 2,
+        //     // stopOperation: true
+        // },
+        // {
+        //     role: "dedicatedCarrier", 
+        //     bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE],
+        //     min: 0,
+        //     priority: 3,
+        //     // stopOperation: true
+        // },
+        // {
+        //     role: "dedicatedUpgrader",
+        //     bodyParts: [WORK, WORK, WORK, WORK, WORK, MOVE, CARRY],
+        //     min: 0,
+        //     // stopOperation: true
+        // },
+        // {
+        //     role: "otherRoomHarvester",
+        //     bodyParts: [WORK, CARRY, MOVE],
+        //     min: 0,
+        //     // stopOperation: true
+        // },
+        // {
+        //     role: "harvester", 
+        //     bodyParts: [WORK,WORK,CARRY,MOVE,MOVE,MOVE],
+        //     min: 0,
+        //     // priority: 2,
+        //     // stopOperation: true
+        // },
         //cheap harvester in case all goes wrong, the spawn can make one more
         {
             role: "harvester", 
             bodyParts: [WORK,CARRY,MOVE],
-            min: 2,
+            min: 1,
             priority: 1,
+            stopOperation: true,
+            condition: numberOfHarvesters === 0
+        },
+        {
+            role: "harvester", 
+            bodyParts: [WORK,WORK,WORK,CARRY,MOVE],
+            min: 3,
+            priority: 2,
             stopOperation: true
         },
         {
             role: "upgrader", 
-            bodyParts: [WORK,CARRY,MOVE],
-            min: 1,
-            priority: 1,
+            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+            min: 2,
+            priority: 3,
             stopOperation: true
         },
         {
-            role: "extHarvester", 
+            role: "builder", 
             bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
-            min: 0,
-            // priority: 2,
-            // stopOperation: true
+            min: 2,
+            priority: 4
         },
-        {
-            role: "harvestCarrier", 
-            bodyParts: [CARRY,MOVE,MOVE,MOVE],
-            min: 0,
-            priority: 2
-        },
-        {
-            role: "milesHarvester", 
-            bodyParts: [WORK,CARRY,MOVE,MOVE],
-            min: 0
-        },
-        {
-            role: "builder",
-            bodyParts: [WORK,WORK,CARRY, CARRY ,MOVE, MOVE],
-            min: 0
-        },
-        {
-            role: "upgrader",
-            bodyParts: [WORK, WORK, WORK, WORK, MOVE, CARRY],
-            min: 0
-        },
-        {
-            role: "upgradeSupplier",
-            bodyParts: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-            min: 0
-        },
-        {
-            role: "guard",
-            bodyParts: [TOUGH, ATTACK, ATTACK, MOVE, MOVE],
-            min: 0
-        },
-        {
-            role: "attacker",
-            bodyParts: [TOUGH, RANGED_ATTACK, ATTACK, MOVE],
-            min: 0
-        },
+        // {
+        //     role: "extHarvester", 
+        //     bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+        //     min: 0,
+        //     // priority: 2,
+        //     // stopOperation: true
+        // },
+        // {
+        //     role: "harvestCarrier", 
+        //     bodyParts: [CARRY,MOVE,MOVE,MOVE],
+        //     min: 0,
+        //     priority: 2
+        // },
+        // {
+        //     role: "milesHarvester", 
+        //     bodyParts: [WORK,CARRY,MOVE,MOVE],
+        //     min: 0
+        // },
+        // {
+        //     role: "builder",
+        //     bodyParts: [WORK,WORK,CARRY, CARRY ,MOVE, MOVE],
+        //     min: 0
+        // },
+        // {
+        //     role: "upgrader",
+        //     bodyParts: [WORK, WORK, WORK, WORK, MOVE, CARRY],
+        //     min: 0
+        // },
+        // {
+        //     role: "upgradeSupplier",
+        //     bodyParts: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+        //     min: 0
+        // },
+        // {
+        //     role: "guard",
+        //     bodyParts: [TOUGH, ATTACK, ATTACK, MOVE, MOVE],
+        //     min: 0
+        // },
+        // {
+        //     role: "attacker",
+        //     bodyParts: [TOUGH, RANGED_ATTACK, ATTACK, MOVE],
+        //     min: 0
+        // },
         {
             role: "repairer",
-            bodyParts: [WORK,WORK,CARRY,MOVE],
-            min: 0
+            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+            priority: 3,
+            min: 2,
+            stopOperation: true
         },
-        {
-            role: "gladiator",
-            bodyParts: [TOUGH, ATTACK, MOVE, MOVE],
-            min: 0
-            
-        }
+        // {
+        //     role: "gladiator",
+        //     bodyParts: [TOUGH, ATTACK, MOVE, MOVE],
+        //     min: 0
+        // }
     ];
     
     var creepTypesThatNeedSpawning = [];
@@ -141,8 +165,7 @@ module.exports = function () {
             console.log(creepType.role + "s (" + energyRequired + " energy): " + creeps.length + "/" + creepType.min + ". Death in " + timeToDeath + " ticks")
         }
         
-        if(creeps.length < creepType.min){
-            // console.log(creepType.role)
+        if(creeps.length < creepType.min && creepType.condition){
             creepTypesThatNeedSpawning.push(creepType);
         }
     }
@@ -176,7 +199,10 @@ module.exports = function () {
     var creepToSpawn = creepTypesThatNeedSpawning[0];
     // console.log(creepToSpawn)
     if (creepToSpawn) {
-        Game.spawns.Spawn1.createCreep(creepToSpawn.bodyParts, creepToSpawn.role + Date.now(), {role: creepToSpawn.role});
+        var nowString = Date.now().toString();
+        var creepName = creepToSpawn.role + nowString.substr(nowString.length - 4);
+
+        Game.spawns.Spawn1.createCreep(creepToSpawn.bodyParts, creepName, {role: creepToSpawn.role});
         if(creepToSpawn.stopOperation){
             status = "incomplete";
         }

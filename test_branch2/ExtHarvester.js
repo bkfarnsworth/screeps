@@ -1,11 +1,8 @@
 module.exports = function (creep) {
     var Spawn1 = Game.spawns.Spawn1
-// 	console.log('fdasfdsa')
 	if(creep.carry.energy < creep.carryCapacity) {
-	   // console.log('fdasfdsa2')
 		var sources = creep.room.find(FIND_SOURCES);
 		if(creep.harvest(sources[0]) != OK) {
-		  //  console.log('fdasfdsa3')
             creep.moveTo(sources[0])
 		}			
 	}else {
