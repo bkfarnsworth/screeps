@@ -1,9 +1,26 @@
 /*
     TODO:
+
+        build walls around swamp paths so I don't have to walk on the swamp.  just need a way to limit how much we repair them
+
+        upgraders in both rooms
+        need granular control over which creeps are in which room
+        walls
+        repairers on the walls
+        roads
+        spawn
+        harvesters
+
+
+        really need to let them keep going if they aren't near the sources now
+
+
+        in my output, I could show what percent that creep contributing to upgrading
+        make it so it only stopsOperation if there are 2 harvesters missing or something
         can I trigger an alert in certain situations? like if all my creeps are dead?
         instead of stopping all production, have the creeps finish what they are doing and return to get more energy but don't take it
-        change the naming of the sceeps so that I do a 4 character guid instead of 16 or whatever
         make it so it counts screeps that are spawning too, so it doesn't wait until they are done
+        make it so if a creep comes to the spawn to get energy, it stays there until it is at full capacity.  It doesn't leave with a few.
         make it so the carriers just drop energy right by the upgraders, so they don't have to wait there.
             we just need to make sure that the carriers don't go after that dropped stuff.
                 fill the creeps first, and then drop it in the middle where either can get it.
@@ -15,6 +32,7 @@
 
 var creepTracker = require('CreepTracker')
 var harvester = require('harvester')
+var harvesterTwo = require('HarvesterTwo')
 var upgrader = require('Upgrader')
 var dedicatedUpgrader = require('DedicatedUpgrader')
 var guard = require('Guard')
@@ -35,21 +53,33 @@ var util = require('util');
 var otherRoomHarvester = require('OtherRoomHarvester');
 
 module.exports.loop = function () {
-    
-    var status = spawner()
-    
-    // console.log(status)
+
+    var useTracker = false;
+    var seeCPU = false;
+    var debugMode = false;
+
+        
+    console.log();
+    console.log("--------- Creep Report - new tick -------------");
+
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
+
+    var status = spawner();
     
 	for(var name in Game.creeps) {
 		var creep = Game.creeps[name];
 
+        if(seeCPU){
+            console.log('creep.memory.role: ', creep.memory.role);
+            util().printCPU(() => { console.log('main.js::66 :: ');  });
+        }
 
 		if(creep.memory.role == 'dedicatedHarvester') {
 			dedicatedHarvester(creep, status);
 		}
 		
 	    if(creep.memory.role == 'dedicatedCarrier') {
-			dedicatedCarrier(creep, status);
+            dedicatedCarrier(creep, status);
 		}
 		
 	    if(creep.memory.role == 'dedicatedUpgrader') {
@@ -60,13 +90,13 @@ module.exports.loop = function () {
 		    otherRoomHarvester(creep, status);
 		}
 		
-		
-		
-// 		console.log(creep.memory.role)
-		
 		if(creep.memory.role == 'harvester') {
 			harvester(creep);
 		}
+
+        if(creep.memory.role == 'harvesterTwo') {
+            harvesterTwo(creep);
+        }
 		
 		if(creep.memory.role == 'extHarvester') {
 			extHarvester(creep);
@@ -77,9 +107,9 @@ module.exports.loop = function () {
 		}
 		
         if(creep.memory.role == 'upgrader') {
-        	if(status == 'complete'){
+        	// if(status == 'complete'){
         	    upgrader(creep);
-        	}
+        	// }
         }
         
         if(creep.memory.role == 'upgradeSupplier') {
@@ -115,14 +145,14 @@ module.exports.loop = function () {
         }
         
 		if(creep.memory.role == 'builder') {
-		    if(status == 'complete'){
+		    // if(status == 'complete'){
 		        builder(creep);
-		    }
+		    // }
 		}
-		
-// 		creepTracker(creep);
 	}
-	
+	   
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::145 :: '); }); }   
+
 	//get total energy capacity as well
     var totalEnergyCapacity = 0;
     var totalEnergyAvailable = 0;
@@ -138,7 +168,13 @@ module.exports.loop = function () {
     
     console.log("TOTAL ENERGY: " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
     
-    tracker(totalEnergyAvailable, totalEnergyCapacity);
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::160 :: '); }); }   
+
+    if(useTracker){
+        tracker(totalEnergyAvailable, totalEnergyCapacity);
+    }
+
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
 }
 
 function getExtraEnergy(){

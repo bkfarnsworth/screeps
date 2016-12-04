@@ -2,55 +2,37 @@ var util = require('util');
 
 module.exports = function () {
     
-    console.log();
-    console.log("--------- Creep Report -------------");
-    
     var status = "complete";
     var bodyPartEnergyMap = util().bodyPartEnergyMap;
+
     var numberOfHarvesters = util().myRoom.find(FIND_MY_CREEPS, {
         filter: function(creep) {
             return creep.memory.role == 'harvester';
         }
     });
 
-
+    if(numberOfHarvesters === 0){
+        Game.notify('NO HARVESTERS', 60);
+    }
 
     var creepTypes = [
-        // {
-        //     role: "dedicatedHarvester", 
-        //     bodyParts: [WORK,WORK,WORK,WORK,CARRY,MOVE],
-        //     min: 0,
-        //     priority: 2,
-        //     // stopOperation: true
-        // },
-        // {
-        //     role: "dedicatedCarrier", 
-        //     bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE],
-        //     min: 0,
-        //     priority: 3,
-        //     // stopOperation: true
-        // },
-        // {
-        //     role: "dedicatedUpgrader",
-        //     bodyParts: [WORK, WORK, WORK, WORK, WORK, MOVE, CARRY],
-        //     min: 0,
-        //     // stopOperation: true
-        // },
-        // {
-        //     role: "otherRoomHarvester",
-        //     bodyParts: [WORK, CARRY, MOVE],
-        //     min: 0,
-        //     // stopOperation: true
-        // },
-        // {
-        //     role: "harvester", 
-        //     bodyParts: [WORK,WORK,CARRY,MOVE,MOVE,MOVE],
-        //     min: 0,
-        //     // priority: 2,
-        //     // stopOperation: true
-        // },
-        //cheap harvester in case all goes wrong, the spawn can make one more
         {
+            creepTypeId: 1,
+            role: "dedicatedCarrier", 
+            bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],
+            min: 4,
+            priority: 6,
+            // stopOperation: true
+        },
+
+        //////////// HARVESTERS
+        //cheap harvester in case all goes wrong, the spawn can make one more
+        //have two good harvester that stops operation
+        //one more that won't stop it
+        //1 harvester for the other source
+
+        {
+            creepTypeId: 10,
             role: "harvester", 
             bodyParts: [WORK,CARRY,MOVE],
             min: 1,
@@ -59,81 +41,91 @@ module.exports = function () {
             condition: numberOfHarvesters === 0
         },
         {
+            creepTypeId: 9,
             role: "harvester", 
-            bodyParts: [WORK,WORK,WORK,CARRY,MOVE],
-            min: 3,
-            priority: 2,
+            bodyParts: [WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+            min: 2,
+            priority: 1,
             stopOperation: true
         },
         {
+            creepTypeId: 3,
+            role: "harvester", 
+            bodyParts: [WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+            min: 1,
+            priority: 3
+        },
+        {
+            creepTypeId: 4,
+            role: "harvesterTwo", 
+            bodyParts: [WORK,WORK,WORK,WORK,CARRY,MOVE],
+            min: 1,
+            priority: 1,
+            stopOperation: true
+        },
+
+        //////////// UPGRADERS
+        // 1 StopOp upgrader
+        {
+            creepTypeId: 12,
             role: "upgrader", 
-            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
-            min: 2,
-            priority: 3,
-            stopOperation: true
+            bodyParts: [WORK,CARRY,CARRY,MOVE,MOVE],
+            min: 1,
+            priority: 2,
+            stopOperation: true,
+            assignedRoom: util().southRoom
         },
         {
-            role: "builder", 
-            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
-            min: 2,
-            priority: 4
+            creepTypeId: 5,
+            role: "upgrader", 
+            bodyParts: [WORK,CARRY,CARRY,MOVE,MOVE],
+            min: 1,
+            priority: 2,
+            stopOperation: true,
+            assignedRoom: util().northRoom
         },
+        // //2 normal upgraders
         // {
-        //     role: "extHarvester", 
+        //     role: "upgrader", 
         //     bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
-        //     min: 0,
-        //     // priority: 2,
-        //     // stopOperation: true
+        //     min: 5,
+        //     priority: 3
         // },
-        // {
-        //     role: "harvestCarrier", 
-        //     bodyParts: [CARRY,MOVE,MOVE,MOVE],
-        //     min: 0,
-        //     priority: 2
-        // },
-        // {
-        //     role: "milesHarvester", 
-        //     bodyParts: [WORK,CARRY,MOVE,MOVE],
-        //     min: 0
-        // },
-        // {
-        //     role: "builder",
-        //     bodyParts: [WORK,WORK,CARRY, CARRY ,MOVE, MOVE],
-        //     min: 0
-        // },
-        // {
-        //     role: "upgrader",
-        //     bodyParts: [WORK, WORK, WORK, WORK, MOVE, CARRY],
-        //     min: 0
-        // },
-        // {
-        //     role: "upgradeSupplier",
-        //     bodyParts: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-        //     min: 0
-        // },
-        // {
-        //     role: "guard",
-        //     bodyParts: [TOUGH, ATTACK, ATTACK, MOVE, MOVE],
-        //     min: 0
-        // },
-        // {
-        //     role: "attacker",
-        //     bodyParts: [TOUGH, RANGED_ATTACK, ATTACK, MOVE],
-        //     min: 0
-        // },
+
+        //////////// BUILDERS
+        //2 normal builders
         {
+            creepTypeId: 6,
+            role: "builder", 
+            bodyParts: [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
+            min: 4,
+            priority: 4,
+            assignedRoom: util().northRoom
+        },
+
+        //////////// REPAIRERS
+        {
+            creepTypeId: 7,
             role: "repairer",
             bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
             priority: 3,
-            min: 2,
-            stopOperation: true
+            min: 1,
+            stopOperation: true,
+            assignedRoom: util().northRoom
         },
-        // {
-        //     role: "gladiator",
-        //     bodyParts: [TOUGH, ATTACK, MOVE, MOVE],
-        //     min: 0
-        // }
+        {
+            creepTypeId: 8,
+            role: "repairer",
+            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE],
+            priority: 3,
+            min: 1,
+            stopOperation: true,
+            assignedRoom: util().southRoom
+        }
     ];
+
+    var nextCreepTypeId = _.max(creepTypes, 'creepTypeId').creepTypeId + 1;
+    // console.log('nextCreepTypeId: ', nextCreepTypeId);
     
     var creepTypesThatNeedSpawning = [];
     for (var creepType in creepTypes){
@@ -149,11 +141,14 @@ module.exports = function () {
         
         var roleFilterObj = {
             filter: function(creep) {
-                return creep.memory.role == creepType.role;
+                return creep.memory.role == creepType.role 
+                && creep.memory.assignedRoom === creepType.assignedRoom
+                && creep.memory.creepTypeId === creepType.creepTypeId;
             }
         }
 
         var creeps = util().myRoom.find(FIND_MY_CREEPS, roleFilterObj);
+        creeps = creeps.concat(util().northRoomRoom.find(FIND_MY_CREEPS, roleFilterObj));
         
         var otherCreeps = Memory.otherRoomCreeps;
         // creeps = creeps.concat(otherCreeps);
@@ -162,11 +157,15 @@ module.exports = function () {
         
         if(creepType.min > 0){
             var timeToDeath = _.min(creeps, 'ticksToLive').ticksToLive;
-            console.log(creepType.role + "s (" + energyRequired + " energy): " + creeps.length + "/" + creepType.min + ". Death in " + timeToDeath + " ticks")
+            var assignedRoom = creepType.assignedRoom ? ('(' + creepType.assignedRoom + ')') : '';
+            console.log(creepType.role + "s " + assignedRoom + " (" + energyRequired + " energy): " + creeps.length + "/" + creepType.min + ". Death in " + timeToDeath + " ticks. ID: " + creepType.creepTypeId )
         }
         
-        if(creeps.length < creepType.min && creepType.condition){
-            creepTypesThatNeedSpawning.push(creepType);
+        if(creepType.condition === true || _.isUndefined(creepType.condition)){
+            if(creeps.length < creepType.min){
+                creepTypesThatNeedSpawning.push(creepType);
+                continue;
+            }
         }
     }
     
@@ -202,7 +201,13 @@ module.exports = function () {
         var nowString = Date.now().toString();
         var creepName = creepToSpawn.role + nowString.substr(nowString.length - 4);
 
-        Game.spawns.Spawn1.createCreep(creepToSpawn.bodyParts, creepName, {role: creepToSpawn.role});
+        console.log('Next creep to be spawned: ', creepToSpawn.role);
+
+        Game.spawns.Spawn1.createCreep(creepToSpawn.bodyParts, creepName, {
+            role: creepToSpawn.role,
+            assignedRoom: creepToSpawn.assignedRoom,
+            creepTypeId: creepToSpawn.creepTypeId
+        });
         if(creepToSpawn.stopOperation){
             status = "incomplete";
         }
