@@ -7,7 +7,7 @@ module.exports = function (creep) {
 		}
     }else {
         var target;
-        var assignedRoom = creep.memory.assignedRoom || util().northRoom;
+        var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
         var assignedRoomRoom = Game.rooms[assignedRoom];
         
         //find the structure with the least hit points, as long as that structure is not at its max

@@ -5,7 +5,7 @@ module.exports = function (creep) {
 	var findStrategy = 'closest';
 	// var findStrategy = 'FIFO';
 
-	var assignedRoom = creep.memory.assignedRoom || util().northRoom;
+	var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
 	assignedRoom = Game.rooms[assignedRoom];
 
 	if(creep.carry.energy !== 0) {
@@ -46,7 +46,7 @@ module.exports = function (creep) {
 			}	
 		}else{
 			//we need to go into the next room
-			if(creep.room.name === util().southRoom){
+			if(creep.room.name === util().southRoomName){
 			    var exit = FIND_EXIT_TOP;
 			    creep.moveTo(creep.pos.findClosestByRange(exit));    
 			}

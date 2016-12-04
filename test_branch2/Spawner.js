@@ -5,7 +5,7 @@ module.exports = function () {
     var status = "complete";
     var bodyPartEnergyMap = util().bodyPartEnergyMap;
 
-    var numberOfHarvesters = util().myRoom.find(FIND_MY_CREEPS, {
+    var numberOfHarvesters = util().southRoom.find(FIND_MY_CREEPS, {
         filter: function(creep) {
             return creep.memory.role == 'harvester';
         }
@@ -73,7 +73,7 @@ module.exports = function () {
             min: 1,
             priority: 2,
             stopOperation: true,
-            assignedRoom: util().southRoom
+            assignedRoom: util().southRoomName
         },
         {
             creepTypeId: 5,
@@ -82,7 +82,7 @@ module.exports = function () {
             min: 1,
             priority: 2,
             stopOperation: true,
-            assignedRoom: util().northRoom
+            assignedRoom: util().northRoomName
         },
         // //2 normal upgraders
         // {
@@ -100,7 +100,7 @@ module.exports = function () {
             bodyParts: [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
             min: 4,
             priority: 4,
-            assignedRoom: util().northRoom
+            assignedRoom: util().northRoomName
         },
 
         //////////// REPAIRERS
@@ -111,7 +111,7 @@ module.exports = function () {
             priority: 3,
             min: 1,
             stopOperation: true,
-            assignedRoom: util().northRoom
+            assignedRoom: util().northRoomName
         },
         {
             creepTypeId: 8,
@@ -120,7 +120,7 @@ module.exports = function () {
             priority: 3,
             min: 1,
             stopOperation: true,
-            assignedRoom: util().southRoom
+            assignedRoom: util().southRoomName
         }
     ];
 
@@ -147,8 +147,8 @@ module.exports = function () {
             }
         }
 
-        var creeps = util().myRoom.find(FIND_MY_CREEPS, roleFilterObj);
-        creeps = creeps.concat(util().northRoomRoom.find(FIND_MY_CREEPS, roleFilterObj));
+        var creeps = util().southRoom.find(FIND_MY_CREEPS, roleFilterObj);
+        creeps = creeps.concat(util().northRoom.find(FIND_MY_CREEPS, roleFilterObj));
         
         var otherCreeps = Memory.otherRoomCreeps;
         // creeps = creeps.concat(otherCreeps);

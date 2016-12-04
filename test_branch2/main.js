@@ -156,7 +156,7 @@ module.exports.loop = function () {
 	//get total energy capacity as well
     var totalEnergyCapacity = 0;
     var totalEnergyAvailable = 0;
-    util().myRoom.find(FIND_MY_STRUCTURES).forEach(function(structure){
+    util().southRoom.find(FIND_MY_STRUCTURES).forEach(function(structure){
         if(structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN){
             totalEnergyCapacity += structure.energyCapacity;
             totalEnergyAvailable += structure.energy;
@@ -181,17 +181,17 @@ function getExtraEnergy(){
     var extraEnergy = 0;
     
     //dropped energy
-    util().myRoom.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
+    util().southRoom.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
         extraEnergy += droppedResource.amount;
     });
     
     //energy in creeps
-    util().myRoom.find(FIND_MY_CREEPS).forEach(function(creep){
+    util().southRoom.find(FIND_MY_CREEPS).forEach(function(creep){
         extraEnergy += creep.carry.energy;
     }) 
     
     //energy in the source
-    util().myRoom.find(FIND_SOURCES).forEach(function(source){
+    util().southRoom.find(FIND_SOURCES).forEach(function(source){
         // console.log(source.energy)
         extraEnergy += source.energy;
     });

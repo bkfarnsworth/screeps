@@ -84,7 +84,7 @@ function giveToCreeps(creep){
     var creepTypes = ['builder', 'upgrader', 'repairer'];
     var closestNonFullCreep = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
         filter: function(creep) {
-            return _.contains(creepTypes, creep.memory.role) && (creep.carry.energy < creep.carryCapacity * 0.7) && creep.memory.assignedRoom === util().northRoom;
+            return _.contains(creepTypes, creep.memory.role) && (creep.carry.energy < creep.carryCapacity * 0.7) && creep.memory.assignedRoom === util().northRoomName;
         }
     });
     
@@ -99,7 +99,7 @@ function giveToCreeps(creep){
     }else{
 
         //we need to go into the next room
-        if(creep.room.name === util().southRoom){
+        if(creep.room.name === util().southRoomName){
             var exit = FIND_EXIT_TOP;
             creep.moveTo(creep.pos.findClosestByRange(exit));    
         }
@@ -148,7 +148,7 @@ function getDroppedResources(creep){
 }
 
 function pickUpFromHarvester(creep){
-    var almostFullHarvesters = util().myRoom.find(FIND_MY_CREEPS, {
+    var almostFullHarvesters = util().southRoom.find(FIND_MY_CREEPS, {
         filter: function(creep) {
             return creep.memory.role == 'dedicatedHarvester' && creep.carry.energy > creep.carryCapacity * 3/4;
         }

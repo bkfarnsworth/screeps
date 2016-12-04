@@ -5,7 +5,7 @@ module.exports = function (totalEnergyAvailable, totalEnergyCapacity) {
     //was getting 19 at noon...so....so
     //22 for 3
     var util = require('util');
-    var controller = util().myRoom.controller;
+    var controller = util().southRoom.controller;
     var serverHour = new Date().getHours();
     var hour = serverHour < 7 ? serverHour + 24 - 7 : serverHour - 7;
     var minutes = new Date().getMinutes();
