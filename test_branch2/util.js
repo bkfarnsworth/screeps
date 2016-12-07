@@ -147,8 +147,9 @@ module.exports = function (creep) {
             var errCode;
             var closestEnergySource = this.getClosestEnergySource(creep, opts);
 
-            //it's a structure
-            if(closestEnergySource instanceof Structure){
+            if(closestEnergySource instanceof StructureStorage){
+                errCode = creep.withdraw(closestEnergySource, RESOURCE_ENERGY);
+            }else if(closestEnergySource instanceof Structure){
                 errCode = closestEnergySource.transferEnergy(creep);
             }else if(closestEnergySource instanceof Creep){
                 errCode = closestEnergySource.transfer(creep);
