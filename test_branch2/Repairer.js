@@ -1,11 +1,13 @@
 var util = require('util');
 
 module.exports = function (creep) {
-    if(creep.carry.energy <= 1) {
-		if(Game.spawns.Spawn1.transferEnergy(creep) == ERR_NOT_IN_RANGE) {
-			creep.moveTo(Game.spawns.Spawn1);				
-		}
-    }else {
+
+    var inAssignedRoom = util().goToAssignedRoom(creep);
+    if(!inAssignedRoom){ return; }
+
+    console.log('creep: ', creep);
+
+    util().doWorkUnlessCloseToSource(creep, ()=>{
         var target;
         var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
         var assignedRoomRoom = Game.rooms[assignedRoom];
@@ -24,7 +26,7 @@ module.exports = function (creep) {
                 creep.moveTo(target);    
             }
         }
-    }
+    });
 }
     
 //SHOULD DO WALLS FIRST

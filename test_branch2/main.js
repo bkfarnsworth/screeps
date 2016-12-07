@@ -1,5 +1,8 @@
 /*
     TODO:
+        
+    
+        //need to add the 80/20 rule to all creeps.  harvesters too.  now that things are mostly using extensions, they are getting and dropping less energy than they could be
 
         build walls around swamp paths so I don't have to walk on the swamp.  just need a way to limit how much we repair them
 
@@ -52,12 +55,11 @@ var tracker = require('Tracker');
 var util = require('util');
 var otherRoomHarvester = require('OtherRoomHarvester');
 
+var useTracker = false;
+var seeCPU = false;
+var debugMode = false;
+
 module.exports.loop = function () {
-
-    var useTracker = false;
-    var seeCPU = false;
-    var debugMode = false;
-
         
     console.log();
     console.log("--------- Creep Report - new tick -------------");
@@ -65,7 +67,8 @@ module.exports.loop = function () {
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
 
     var status = spawner();
-    
+    Game.status = status;
+
 	for(var name in Game.creeps) {
 		var creep = Game.creeps[name];
 
@@ -74,20 +77,15 @@ module.exports.loop = function () {
             util().printCPU(() => { console.log('main.js::66 :: ');  });
         }
 
-		if(creep.memory.role == 'dedicatedHarvester') {
-			dedicatedHarvester(creep, status);
-		}
+        //generic creep actions
+        if(creep.room.name === util().milesRoomName){
+            console.log('creep.name: ', creep.name);
+            util().goToRoom(util.southRoomName, creep);
+            continue;
+        }
 		
 	    if(creep.memory.role == 'dedicatedCarrier') {
-            dedicatedCarrier(creep, status);
-		}
-		
-	    if(creep.memory.role == 'dedicatedUpgrader') {
-		    dedicatedUpgrader(creep, status);            
-		}
-		
-		if(creep.memory.role == 'otherRoomHarvester'){
-		    otherRoomHarvester(creep, status);
+            dedicatedCarrier(creep);
 		}
 		
 		if(creep.memory.role == 'harvester') {
@@ -98,65 +96,44 @@ module.exports.loop = function () {
             harvesterTwo(creep);
         }
 		
-		if(creep.memory.role == 'extHarvester') {
-			extHarvester(creep);
-		}
-		
-	    if(creep.memory.role == 'harvestCarrier') {
-			harvestCarrier(creep);
-		}
-		
         if(creep.memory.role == 'upgrader') {
-        	// if(status == 'complete'){
-        	    upgrader(creep);
-        	// }
+      	    upgrader(creep);
         }
         
-        if(creep.memory.role == 'upgradeSupplier') {
-        	if(status == 'complete'){
-        	    upgradeSupplier(creep);
-        	}
+        if(creep.memory.role == 'repairer') {
+	        repairer(creep);
         }
-        
-        if(creep.memory.role == 'guard') {
-            guard(creep);
-        }
-        
-        if(creep.memory.role == 'healer') {
-            healer(creep);
-        }
-        
+
         if(creep.memory.role == 'attacker') {
             attacker(creep);
         }
         
-        if(creep.memory.role == 'gladiator') {
-            gladiator(creep);
-        }
-        
-        if(creep.memory.role == 'milesHarvester') {
-            milesHarvester(creep);
-        }
-        
-        if(creep.memory.role == 'repairer') {
-            if(status == 'complete'){
-		        repairer(creep);
-		    }
-        }
-        
 		if(creep.memory.role == 'builder') {
-		    // if(status == 'complete'){
-		        builder(creep);
-		    // }
+	        builder(creep);
 		}
 	}
 	   
     if(seeCPU){ util().printCPU(() => { console.log('main.js::145 :: '); }); }   
 
-	//get total energy capacity as well
+    printEnergy(util().southRoom);
+    printEnergy(util().northRoom);
+    
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
+}
+
+Creep.prototype.getName = function(){
+    return this.name;
+}
+
+Creep.prototype.getAssignedRoom = function(){
+    return Game.rooms[this.memory.assignedRoom] || util().southRoom;
+}
+
+function printEnergy(room){
+    //get total energy capacity as well
     var totalEnergyCapacity = 0;
     var totalEnergyAvailable = 0;
-    util().southRoom.find(FIND_MY_STRUCTURES).forEach(function(structure){
+    room.find(FIND_MY_STRUCTURES).forEach(function(structure){
         if(structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN){
             totalEnergyCapacity += structure.energyCapacity;
             totalEnergyAvailable += structure.energy;
@@ -164,34 +141,36 @@ module.exports.loop = function () {
     });
     
     //extraEnergy is energy that is dropped or in a creep, 
-    var extraEnergy = getExtraEnergy();
+    var extraEnergy = getExtraEnergy(room);
     
-    console.log("TOTAL ENERGY: " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
-    
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::160 :: '); }); }   
+    console.log("TOTAL ENERGY ("+room.name+"): " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
 
-    if(useTracker){
-        tracker(totalEnergyAvailable, totalEnergyCapacity);
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::185 :: '); }); }   
+
+    if(room === util().southRoom){
+        if(useTracker){
+            tracker(totalEnergyAvailable, totalEnergyCapacity);
+        }    
     }
-
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
+    
+    if(seeCPU){ util().printCPU(() => { console.log('main.js::192 :: '); }); }   
 }
 
-function getExtraEnergy(){
+function getExtraEnergy(room){
     var extraEnergy = 0;
     
     //dropped energy
-    util().southRoom.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
+    room.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
         extraEnergy += droppedResource.amount;
     });
     
     //energy in creeps
-    util().southRoom.find(FIND_MY_CREEPS).forEach(function(creep){
+    room.find(FIND_MY_CREEPS).forEach(function(creep){
         extraEnergy += creep.carry.energy;
     }) 
     
     //energy in the source
-    util().southRoom.find(FIND_SOURCES).forEach(function(source){
+    room.find(FIND_SOURCES).forEach(function(source){
         // console.log(source.energy)
         extraEnergy += source.energy;
     });

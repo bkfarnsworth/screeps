@@ -8,6 +8,9 @@ module.exports = function (creep) {
 	var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
 	assignedRoom = Game.rooms[assignedRoom];
 
+	var inAssignedRoom = util().goToAssignedRoom(creep);
+	if(!inAssignedRoom){ return; }
+
 	if(creep.carry.energy !== 0) {
 		//manually set sites to be done first
 		var manualTargetIds = [
@@ -46,12 +49,16 @@ module.exports = function (creep) {
 			}	
 		}else{
 			//we need to go into the next room
-			if(creep.room.name === util().southRoomName){
-			    var exit = FIND_EXIT_TOP;
-			    creep.moveTo(creep.pos.findClosestByRange(exit));    
-			}
+			// if(creep.room.name === util().southRoomName){
+			//     var exit = FIND_EXIT_TOP;
+			//     creep.moveTo(creep.pos.findClosestByRange(exit));    
+			// }
 		}
 	}else{
-	    util().getEnergyFromClosestSource(creep, 0.2, true, true)
+		util().getEnergyFromClosestSource(creep, {
+			minEnergyRatio: 0.2,
+			allowHarvesting: true, 
+			allowDedicatedCarrier: true
+		});
 	}
 }
