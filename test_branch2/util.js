@@ -123,7 +123,7 @@ module.exports = function (creep) {
             });
 
             //HARVESTING
-            if(opts.allowHarvesting && forGathering){
+            if(opts.allowHarvesting && opts.forGathering){
                 closestSource = creep.pos.findClosestByPath(FIND_SOURCES, generalRequirements);
             }
 
@@ -137,7 +137,7 @@ module.exports = function (creep) {
             var allowStructures = Game.status === 'complete';
 
             _.defaults(opts, {
-                minEnergyRatio: 0,
+                minEnergyRatio: 0.3,
                 allowHarvesting: false,//allow them to go harvet on their own
                 allowDedicatedCarrier: false,//allow them to get from a carrier
                 allowStructures: allowStructures,
@@ -179,8 +179,8 @@ module.exports = function (creep) {
                 minEnergyRatio: 1 - opts.maxEnergyRatio
             }));
 
-            console.log('creep: ', creep);
-            console.log('closestEnergyRecipient: ', closestEnergyRecipient);
+            // console.log('creep: ', creep);
+            // console.log('closestEnergyRecipient: ', closestEnergyRecipient);
 
             if(closestEnergyRecipient){
                 errCode = creep.transfer(closestEnergyRecipient, RESOURCE_ENERGY);

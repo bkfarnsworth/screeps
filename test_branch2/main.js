@@ -1,7 +1,30 @@
 /*
     TODO:
         
+            
+        //get it to send me a summary everyday of how my creeps did etc.    
+        //make it so I put flags on places that should always have construction sites or walls, and auto rebuild them
+            //make flag ranges, where everything in the range should have walls, roads, etc
+
+        //start optimizing to not exceed limit 
+            //do things in order of importance per tick
+            //minimize path finding
+
+
+        //get rid of repairers and set up towers
+
+            //only repair things that need 800
+            //attack all evil things
+            //capacity is 1000
+            //if energy is less than n (900), go fill it first
+                //that way there is a lot of energy if it needs to attack
+
+        //start doing dedicated harvesters, etc
+
+
     
+        //I should make it so it is a ratio I specify rather than specific numbers.  I say, I want 2 parts harvester, 2 parts repair, 2 parts upgrader.  And then it tiers things.  It has one of each as high priortiy, then spirals upwarda and keeps them even in the ratio.  IT'd be cool if it auto decided how powerful to make them too.  Like it keeps trying to spawn more powerful ones until it can't anymore.
+
         //need to add the 80/20 rule to all creeps.  harvesters too.  now that things are mostly using extensions, they are getting and dropping less energy than they could be
 
         build walls around swamp paths so I don't have to walk on the swamp.  just need a way to limit how much we repair them
@@ -79,7 +102,7 @@ module.exports.loop = function () {
 
         //generic creep actions
         if(creep.room.name === util().milesRoomName){
-            console.log('creep.name: ', creep.name);
+            console.log('MILES ROOM creep.name: ', creep.name);
             util().goToRoom(util.southRoomName, creep);
             continue;
         }

@@ -154,7 +154,7 @@ module.exports = function () {
             creepTypeId: 6,
             role: "builder", 
             bodyParts: [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
-            min: 1,
+            min: 3,
             priority: 8,
             assignedRoom: util().northRoomName,
             condition: northConstructionSites.length > 0
@@ -163,7 +163,7 @@ module.exports = function () {
             creepTypeId: 20,
             role: "builder", 
             bodyParts: [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
-            min: 1,
+            min: 3,
             priority: 8,
             assignedRoom: util().southRoomName,
             condition: southConstructionSites.length > 0
@@ -184,7 +184,7 @@ module.exports = function () {
             role: "repairer",
             bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],
             priority: 3,
-            min: 2,
+            min: 1,
             stopOperation: true,
             assignedRoom: util().southRoomName
         }),

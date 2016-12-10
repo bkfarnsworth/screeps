@@ -5,7 +5,7 @@ module.exports = function (creep) {
     var inAssignedRoom = util().goToAssignedRoom(creep);
     if(!inAssignedRoom){ return; }
 
-    console.log('creep: ', creep);
+    // console.log('creep: ', creep);
 
     util().doWorkUnlessCloseToSource(creep, ()=>{
         var target;
