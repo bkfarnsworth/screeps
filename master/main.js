@@ -1,72 +1,3 @@
-/*
-    TODO:
-        
-        //unit testing
-
-        //get it to send me a summary everyday of how my creeps did etc.    
-        //make it so I put flags on places that should always have construction sites or walls, and auto rebuild them
-            //make flag ranges, where everything in the range should have walls, roads, etc
-            
-            //if there is not any constructed thing there already
-            //if there is not a construction site there alredy, 
-                put a road site
-        
-        
-        need to make the priority closeness stuff...so that towers don't get starved.
-
-
-        //start optimizing to not exceed limit 
-            //do things in order of importance per tick
-            //minimize path finding
-
-
-        //make harvesters do the 80/20 rule too
-        //if there are missing any creeps, make the harvesters take from the storage first to get things going again faster.  then they can refill it.
-
-        //get rid of repairers and set up towers
-
-            //only repair things that need 800
-            //attack all evil things
-            //capacity is 1000
-            //if energy is less than n (900), go fill it first
-                //that way there is a lot of energy if it needs to attack
-
-        //start doing dedicated harvesters, etc
-
-
-    
-        //I should make it so it is a ratio I specify rather than specific numbers.  I say, I want 2 parts harvester, 2 parts repair, 2 parts upgrader.  And then it tiers things.  It has one of each as high priortiy, then spirals upwarda and keeps them even in the ratio.  IT'd be cool if it auto decided how powerful to make them too.  Like it keeps trying to spawn more powerful ones until it can't anymore.
-
-        //need to add the 80/20 rule to all creeps.  harvesters too.  now that things are mostly using extensions, they are getting and dropping less energy than they could be
-
-        build walls around swamp paths so I don't have to walk on the swamp.  just need a way to limit how much we repair them
-
-        upgraders in both rooms
-        need granular control over which creeps are in which room
-        walls
-        repairers on the walls
-        roads
-        spawn
-        harvesters
-
-
-        really need to let them keep going if they aren't near the sources now
-
-
-        in my output, I could show what percent that creep contributing to upgrading
-        make it so it only stopsOperation if there are 2 harvesters missing or something
-        can I trigger an alert in certain situations? like if all my creeps are dead?
-        instead of stopping all production, have the creeps finish what they are doing and return to get more energy but don't take it
-        make it so it counts screeps that are spawning too, so it doesn't wait until they are done
-        make it so if a creep comes to the spawn to get energy, it stays there until it is at full capacity.  It doesn't leave with a few.
-        make it so the carriers just drop energy right by the upgraders, so they don't have to wait there.
-            we just need to make sure that the carriers don't go after that dropped stuff.
-                fill the creeps first, and then drop it in the middle where either can get it.
-            have a seperate track for when things need to spawn, like go take it from the drop and put it in extensiosn.
-            if I drop it there, I can make my builders faster.
-            another idea is the fact that the expensive part of a harvester is having one...I think it would be better to have 2 at 700 than 2 at 500 because the extra 2 hundred to spawn them isn't that expensive
-
-*/
 
 var harvester = require('harvester')
 var harvesterTwo = require('HarvesterTwo')
@@ -88,34 +19,43 @@ var ConstructionManager = require('ConstructionManager');
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
+var throttleRatio = 3/4;
 
 module.exports.loop = function () {
         
-    // var a = new ConstructionManager();
-    // console.log('a.name: ', a.name);
-
     console.log();
     console.log("--------- Creep Report - new tick -------------");
+
+    if(_.random(1, 10) > throttleRatio*10){
+        console.log('SAVING CPU');
+        return;
+    }
 
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
 
     var status = spawner();
     Game.briansStatus = status;
 
+    //we could do this even less, but for now throttle it so it only happens on average every 100 ticks
+    if(_.random(1, 100) === 1){
+        var constructionManager = new ConstructionManager();
+        constructionManager.doWork();    
+    }
+
+    //TOWERS
     for(var structureKey in Game.structures) {
         var structure = Game.structures[structureKey];
 
         if(structure instanceof StructureTower){
 
             //towers go fast, so let's throttle them for now
-            var random = _.random(0, 7);// 1/8 change the tower will go
-            if(random === 1){
+            if(_.random(1, 4) === 1){
                 tower(structure);
             }
         }
     }    
 
-
+    //CREEPS
 	for(var name in Game.creeps) {
 		var creep = Game.creeps[name];
 

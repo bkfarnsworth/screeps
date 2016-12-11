@@ -10,13 +10,16 @@ module.exports = function (creep) {
             return this.southRoom.find(FIND_MY_CREEPS, filterObj)
                 .concat(this.northRoom.find(FIND_MY_CREEPS, filterObj));
         },
-        allRooms: [this.northRoom, this.southRoom],
+        getAllRooms: function(){
+            return [this.northRoom, this.southRoom];
+        },
 
         //like the room.find method but will look in all my rooms
         findInAllRooms: function(constant, opts){
             var result = [];
-            this.allRooms.forEach(room => {
-                result.push(room.find(constant, opts));
+
+            this.getAllRooms().forEach(room => {
+                result.push(...room.find(constant, opts));
             });
             return result;
         },
@@ -329,23 +332,27 @@ module.exports = function (creep) {
         },
         forEachCellInGrid: function(color, func){
 
-            // var flags = this.findInAllRooms(FIND_FLAGS, {
-            //     filter: (flag => flag.color === color);
-            // });
+            var flags = this.findInAllRooms(FIND_FLAGS, {
+                filter: flag => flag.color === color
+            });
 
-            // var cells = this.getCellsInFlagSquare(flags);
+            var top = _.min(flags, 'pos.y').pos.y;
+            var right = _.max(flags, 'pos.x').pos.x;
+            var bottom = _.max(flags, 'pos.y').pos.y;
+            var left = _.min(flags, 'pos.x').pos.x;
 
+            // console.log('top: ', top);
+            // console.log('right: ', right);
+            // console.log('bottom: ', bottom);
+            // console.log('left: ', left);
 
-
-
-
-        },
-        getCellsInFlagSquare: function(flags){
-
-            // var topLeft = _.min(flags, 'pos.')
-
-
-
+            //for each row
+            for (var y = top; y <= bottom; y++) {
+                //go through each cell
+                for (var x = left; x <= right; x++) {
+                    func(new RoomPosition(x, y, flags[0].room.name));
+                };
+            };
         },
         registerOtherRoomCreep: function(creep){
             
