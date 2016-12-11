@@ -25,9 +25,6 @@ module.exports = function (creep, sourceIndex, useStorage=true, giveToTowers=fal
         //else get it from storage to get going faster          
         }else if(useStorage){
             if(creep.withdraw(storageWithEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE){
-
-                console.log('harvester.js::34 :: ');
-
                 creep.moveTo(storageWithEnergy)
             }
         }

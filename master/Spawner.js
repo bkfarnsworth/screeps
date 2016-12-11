@@ -18,20 +18,20 @@ module.exports = function () {
     }
 
     var creepTypes = [
-        // new CreepType({
-        //     creepTypeId: 1,
-        //     role: "dedicatedCarrier", 
-        //     bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE],
-        //     min: 2,
-        //     priority: 6,
-        //     assignedRoom: util().southRoomName
-        //     // stopOperation: true
-        // }),
+        new CreepType({
+            creepTypeId: 40,
+            role: "dedicatedCarrier", 
+            bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE],
+            min: 2,
+            priority: 6,
+            assignedRoom: util().southRoomName
+            // stopOperation: true
+        }),
         new CreepType({
             creepTypeId: 1,
             role: "dedicatedCarrier", 
             bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],
-            min: 3,
+            min: 1,
             priority: 6,
             assignedRoom: util().northRoomName
             // stopOperation: true

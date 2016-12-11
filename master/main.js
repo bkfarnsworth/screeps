@@ -19,14 +19,14 @@ var ConstructionManager = require('ConstructionManager');
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 3/4;
+var throttleRatio = 0;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
         
     console.log();
     console.log("--------- Creep Report - new tick -------------");
-
-    if(_.random(1, 10) > throttleRatio*10){
+    
+    if(_.random(1, 10) <= throttleRatio*10){
         console.log('SAVING CPU');
         return;
     }
