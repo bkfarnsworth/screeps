@@ -1,6 +1,3 @@
-var constants = require('Constants');
-
-
 module.exports = function (creep) {
     
 

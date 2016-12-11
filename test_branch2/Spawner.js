@@ -116,7 +116,7 @@ module.exports = function () {
             creepTypeId: 12,
             role: "upgrader", 
             bodyParts: [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
-            min: 2,
+            min: 4,
             priority: 2,
             stopOperation: true,
             assignedRoom: util().southRoomName
@@ -125,7 +125,7 @@ module.exports = function () {
             creepTypeId: 5,
             role: "upgrader", 
             bodyParts: [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE],
-            min: 5,
+            min: 4,
             priority: 2,
             stopOperation: true,
             assignedRoom: util().northRoomName
@@ -170,24 +170,24 @@ module.exports = function () {
         }),
 
         //////////// REPAIRERS
-        new CreepType({
-            creepTypeId: 7,
-            role: "repairer",
-            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],
-            priority: 3,
-            min: 2,
-            stopOperation: true,
-            assignedRoom: util().northRoomName
-        }),
-        new CreepType({
-            creepTypeId: 8,
-            role: "repairer",
-            bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],
-            priority: 3,
-            min: 1,
-            stopOperation: true,
-            assignedRoom: util().southRoomName
-        }),
+        // new CreepType({
+        //     creepTypeId: 7,
+        //     role: "repairer",
+        //     bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],
+        //     priority: 3,
+        //     min: 2,
+        //     stopOperation: true,
+        //     assignedRoom: util().northRoomName
+        // }),
+        // new CreepType({
+        //     creepTypeId: 8,
+        //     role: "repairer",
+        //     bodyParts: [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],
+        //     priority: 3,
+        //     min: 1,
+        //     stopOperation: true,
+        //     assignedRoom: util().southRoomName
+        // }),
 
         // new CreepType({
         //     creepTypeId: 40,

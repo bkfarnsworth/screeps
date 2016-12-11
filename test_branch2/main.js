@@ -1,15 +1,27 @@
 /*
     TODO:
         
-            
+        //unit testing
+
         //get it to send me a summary everyday of how my creeps did etc.    
         //make it so I put flags on places that should always have construction sites or walls, and auto rebuild them
             //make flag ranges, where everything in the range should have walls, roads, etc
+            
+            //if there is not any constructed thing there already
+            //if there is not a construction site there alredy, 
+                put a road site
+        
+        
+        need to make the priority closeness stuff...so that towers don't get starved.
+
 
         //start optimizing to not exceed limit 
             //do things in order of importance per tick
             //minimize path finding
 
+
+        //make harvesters do the 80/20 rule too
+        //if there are missing any creeps, make the harvesters take from the storage first to get things going again faster.  then they can refill it.
 
         //get rid of repairers and set up towers
 
@@ -56,7 +68,6 @@
 
 */
 
-var creepTracker = require('CreepTracker')
 var harvester = require('harvester')
 var harvesterTwo = require('HarvesterTwo')
 var upgrader = require('Upgrader')
@@ -67,16 +78,12 @@ var builder = require('Builder')
 var spawner = require('Spawner')
 var attacker = require('Attacker')
 var repairer = require('Repairer')
-var milesHarvester = require('milesHarvester')
-var gladiator = require('Gladiator');
-var extHarvester = require('ExtHarvester')
-var upgradeSupplier = require('upgradeSupplier')
 var dedicatedHarvester = require('DedicatedHarvester')
 var dedicatedCarrier = require('DedicatedCarrier')
-var harvestCarrier = require('HarvestCarrier')
 var tracker = require('Tracker');
 var util = require('util');
-var otherRoomHarvester = require('OtherRoomHarvester');
+var tower = require('Tower');
+var ConstructionManager = require('ConstructionManager');
 
 var useTracker = false;
 var seeCPU = false;
@@ -84,13 +91,30 @@ var debugMode = false;
 
 module.exports.loop = function () {
         
+    // var a = new ConstructionManager();
+    // console.log('a.name: ', a.name);
+
     console.log();
     console.log("--------- Creep Report - new tick -------------");
 
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
 
     var status = spawner();
-    Game.status = status;
+    Game.briansStatus = status;
+
+    for(var structureKey in Game.structures) {
+        var structure = Game.structures[structureKey];
+
+        if(structure instanceof StructureTower){
+
+            //towers go fast, so let's throttle them for now
+            var random = _.random(0, 7);// 1/8 change the tower will go
+            if(random === 1){
+                tower(structure);
+            }
+        }
+    }    
+
 
 	for(var name in Game.creeps) {
 		var creep = Game.creeps[name];
