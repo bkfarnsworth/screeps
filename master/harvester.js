@@ -11,15 +11,14 @@ module.exports = function (creep, sourceIndex, useStorage=true, giveToTowers=fal
 
 	if(creep.carry.energy < creep.carryCapacity) {
 
-        // console.log('Game.briansStatus: ', Game.briansStatus);
-
-        // console.log('storageWithEnergy: ', storageWithEnergy);
-
         //if we are in a good state, (or maybe we aren't but there's no energy stored up), then harvest
         if(Game.briansStatus === 'complete' || !useStorage || !storageWithEnergy){
             var sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[sourceIndex]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[sourceIndex])
+            var errCode = creep.harvest(sources[sourceIndex]);
+            if(errCode === ERR_NOT_IN_RANGE || errCode === ERR_NOT_ENOUGH_RESOURCES) {
+                creep.moveTo(sources[sourceIndex], {
+                    reusePath: false
+                });
             }  
 
         //else get it from storage to get going faster          
@@ -30,6 +29,7 @@ module.exports = function (creep, sourceIndex, useStorage=true, giveToTowers=fal
         }
 					
 	}else {
+
         if(Game.briansStatus === 'complete' || !useStorage || !storageWithEnergy){
             util().giveEnergyToClosestRecipient(creep, {
                 allowStructures: true,

@@ -7,7 +7,7 @@ module.exports = function (creep) {
 
     // console.log('creep: ', creep);
 
-    util().doWorkUnlessCloseToSource(creep, ()=>{
+    util().gatherEnergyOr(creep, ()=>{
         var target;
         var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
         var assignedRoomRoom = Game.rooms[assignedRoom];

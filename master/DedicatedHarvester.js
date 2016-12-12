@@ -19,7 +19,7 @@ module.exports = function (creep, status) {
             filter: function(creep) {
                 // console.log('energy' + creep.energy)
                 // console.log(creep.energyCapacity)
-                return creep.memory.role == 'dedicatedCarrier';
+                return creep.memory.role == 'carrier';
             }
         });
         

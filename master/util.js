@@ -71,6 +71,35 @@ module.exports = function (creep) {
             if(callback){callback();}
             console.log('Game.cpu.getUsed(): ', Game.cpu.getUsed());
         },
+        printSelfCpu(funcName, func){
+            var tempCpu = Game.cpu.getUsed();
+            func();
+            var selfCpu = Game.cpu.getUsed() - tempCpu;
+            console.log('selfCpu: ', selfCpu);
+        },
+        trackCPU(key, start){
+            if(start){
+                _.set(Game, `trackedFuncs[${key}]`, {});
+                Game.trackedFuncs[key].startCPU = Game.cpu.getUsed();
+            }else if(!start){
+                Game.trackedFuncs[key].selfCpu = _.round(Game.cpu.getUsed() - Game.trackedFuncs[key].startCPU, 3);
+                this.printWithSpacing(key + ': ' + Game.trackedFuncs[key].selfCpu);                
+            }
+        },
+        printWithSpacing(msg){
+
+            var indexOfColon = msg.indexOf(':');
+            if(indexOfColon === -1){
+                console.log('NEED A COLON');
+                return;
+            }
+
+            while(msg.indexOf(':') != 20){
+                msg = msg.replace(':', ' :');
+            }
+
+            console.log(msg);
+        },
         needsEnergy: function(creep, code){
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);
         },
@@ -192,6 +221,9 @@ module.exports = function (creep) {
                 }else if(possibility instanceof Creep){
                     currentEnergyKey = 'carry[' + RESOURCE_ENERGY + ']';
                     potentialEnergyKey = 'carryCapacity';
+                }else if(possibility instanceof Resource){
+                    //if it's a resource, don't do any calculations
+                    return true;
                 }else{
                     currentEnergyKey = 'energy';
                     potentialEnergyKey = 'energyCapacity';
@@ -212,14 +244,13 @@ module.exports = function (creep) {
 
         getEnergyFromClosestSource: function(creep, opts={}){
 
-            var creepTypes = Game.briansStatus ? ['dedicatedCarrier', 'harvester', 'harvesterTwo'] : ['dedicatedCarrier'];
-            var allowStructures = Game.briansStatus === 'complete';
+            var creepTypes = Game.briansStatus ? ['carrier', 'harvester', 'harvesterTwo'] : ['carrier'];
 
             _.defaults(opts, {
                 minEnergyRatio: 0.3,
                 allowHarvesting: false,//allow them to go harvet on their own
-                allowDedicatedCarrier: false,//allow them to get from a carrier
-                allowStructures: allowStructures,
+                allowCarrier: false,//allow them to get from a carrier
+                allowStructures: Game.briansStatus === 'complete',
                 creepTypes: creepTypes
             });
 
@@ -272,13 +303,14 @@ module.exports = function (creep) {
 
             return errCode;
         },
-        doWorkUnlessCloseToSource: function(creep, awayFromSourceWork){
+        gatherEnergyOr: function(creep, awayFromSourceWork){
             var debugMode = false;
             var closestEnergySource = this.getClosestEnergySource(creep);
             var isCloseToEnergy = false;
+            var range = 5;
 
             if(closestEnergySource){
-                isCloseToEnergy = creep.pos.inRangeTo(closestEnergySource, 5);
+                isCloseToEnergy = creep.pos.inRangeTo(closestEnergySource, range);
             }
 
             if(isCloseToEnergy){
@@ -299,6 +331,34 @@ module.exports = function (creep) {
                 }
             }
         },
+        // depositEnergyOr(creep, awayFromSourceWork){
+        //     var debugMode = false;
+        //     var closestEnergyRecipient = this.getClosestEnergyRecipient(creep);
+        //     var isCloseToRecipient = false;
+        //     var range = 1;
+
+        //     if(closestEnergyRecipient){
+        //         isCloseToRecipient = creep.pos.inRangeTo(closestEnergyRecipient, range);
+        //     }
+
+        //     if(!isCloseToRecipient){
+        //         if(creep.carry.energy < (creep.carryCapacity * 0.9)){
+        //             if(debugMode){console.log('');}
+        //             awayFromSourceWork(creep)
+        //         }else{
+        //             if(debugMode){console.log('gather 1');}
+        //             this.getEnergyFromClosestSource(creep);
+        //         }
+        //     }else{
+        //         if(creep.carry.energy > (creep.carryCapacity * 0.1)){
+        //             if(debugMode){console.log('deposit 2');}
+        //             this.getEnergyFromClosestSource(creep);
+        //         }else{
+        //             if(debugMode){console.log('gather 2');}
+        //             awayFromSourceWork(creep);
+        //         }
+        //     }
+        // },
         getCreepsOfType: function(types=[], room){
             return room.find(FIND_MY_CREEPS, {
                 filter: (c => {
@@ -357,6 +417,39 @@ module.exports = function (creep) {
                     func(new RoomPosition(x, y, flags[0].room.name));
                 };
             };
+        },
+        forEachCellInPath: function(color, func, pathWidth=3){
+
+            if(pathWidth != 3){
+                console.log('only pathWidth: 3 is supported right now');
+                return;
+            }
+
+            //flags
+            var flags = this.findInAllRooms(FIND_FLAGS, {
+                filter: flag => flag.color === color
+            });
+            var room = flags[0].room;
+
+            //get path
+            //true = walkable, see http://support.screeps.com/hc/en-us/articles/203079011-Room#findPath
+            var pathSteps = flags[0].pos.findPathTo(flags[1], {
+                ignoreCreeps: true, //Treat squares with creeps as walkable (we want to build the road where the creeps are)
+                ignoreDestructibleStructures: false, //We want to draw the path around walls and extensions and stuff
+                ignoreRoads: true, //we want to build on the roads we are already have
+            }); 
+
+            pathSteps.forEach(step => {
+                func(new RoomPosition(step.x, step.y, room.name));
+                func(new RoomPosition(step.x+1, step.y, room.name));
+                func(new RoomPosition(step.x-1, step.y, room.name));
+                func(new RoomPosition(step.x, step.y+1, room.name));
+                func(new RoomPosition(step.x, step.y-1, room.name));
+                func(new RoomPosition(step.x+1, step.y+1, room.name));
+                func(new RoomPosition(step.x-1, step.y-1, room.name));
+                func(new RoomPosition(step.x+1, step.y-1, room.name));
+                func(new RoomPosition(step.x-1, step.y+1, room.name));
+            });
         },
         registerOtherRoomCreep: function(creep){
             

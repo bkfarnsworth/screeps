@@ -14,8 +14,8 @@ module.exports = function (creep) {
 	if(creep.carry.energy !== 0) {
 		//manually set sites to be done first
 		var manualTargetIds = [
-			'584b68bab14a695e0d9581d1',
-			'5843b041b14a695e0d8b3192',
+			'584d949fb14a695e0d983cc7',
+			'584dd20ab14a695e0d9882e7',
 			'5843b042b14a695e0d8b3194',
 			'',
 			'',
@@ -57,7 +57,7 @@ module.exports = function (creep) {
 	}else{
 		util().getEnergyFromClosestSource(creep, {
 			minEnergyRatio: 0.2,
-			allowDedicatedCarrier: true
+			allowCarrier: true
 		});
 	}
 }

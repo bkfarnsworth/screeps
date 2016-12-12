@@ -10,7 +10,7 @@ var spawner = require('Spawner')
 var attacker = require('Attacker')
 var repairer = require('Repairer')
 var dedicatedHarvester = require('DedicatedHarvester')
-var dedicatedCarrier = require('DedicatedCarrier')
+var carrier = require('Carrier')
 var tracker = require('Tracker');
 var util = require('util');
 var tower = require('Tower');
@@ -19,19 +19,20 @@ var ConstructionManager = require('ConstructionManager');
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0;//0 - never throttle, 1 - throttle 100%
+var throttleRatio = 0.1;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
         
     console.log();
     console.log("--------- Creep Report - new tick -------------");
-    
+
     if(_.random(1, 10) <= throttleRatio*10){
         console.log('SAVING CPU');
         return;
     }
 
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
+
 
     var status = spawner();
     Game.briansStatus = status;
@@ -45,24 +46,20 @@ module.exports.loop = function () {
     //TOWERS
     for(var structureKey in Game.structures) {
         var structure = Game.structures[structureKey];
-
         if(structure instanceof StructureTower){
+            var hostiles = structure.room.find(FIND_HOSTILE_CREEPS);
 
-            //towers go fast, so let's throttle them for now
-            if(_.random(1, 4) === 1){
+            //towers go fast, so if there are no hostiles let's throttle them for now
+            if(hostiles.length || _.random(1, 3) === 1){
                 tower(structure);
             }
         }
     }    
 
     //CREEPS
+    var tempCpuUsed = Game.cpu.getUsed();
 	for(var name in Game.creeps) {
 		var creep = Game.creeps[name];
-
-        if(seeCPU){
-            console.log('creep.memory.role: ', creep.memory.role);
-            util().printCPU(() => { console.log('main.js::66 :: ');  });
-        }
 
         //generic creep actions
         if(creep.room.name === util().milesRoomName){
@@ -71,8 +68,8 @@ module.exports.loop = function () {
             continue;
         }
 		
-	    if(creep.memory.role == 'dedicatedCarrier') {
-            dedicatedCarrier(creep);
+	    if(creep.memory.role == 'carrier') {
+            carrier(creep);
 		}
 		
 		if(creep.memory.role == 'harvester') {
@@ -98,6 +95,12 @@ module.exports.loop = function () {
 		if(creep.memory.role == 'builder') {
 	        builder(creep);
 		}
+
+        if(seeCPU){
+            console.log('creep.memory.role: ', creep.memory.role);
+            console.log('CPU used: ' + (Game.cpu.getUsed() - tempCpuUsed));
+            tempCpuUsed = Game.cpu.getUsed();
+        }
 	}
 	   
     if(seeCPU){ util().printCPU(() => { console.log('main.js::145 :: '); }); }   
