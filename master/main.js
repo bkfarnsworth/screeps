@@ -19,7 +19,7 @@ var ConstructionManager = require('ConstructionManager');
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0.1;//0 - never throttle, 1 - throttle 100%
+var throttleRatio = 0.3;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
         

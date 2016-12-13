@@ -24,10 +24,8 @@ module.exports = function () {
         getCreepType('carrier'),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: northConstructionSites.length > 0}),
-        getCreepType('carrier'),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: northConstructionSites.length > 0}),
-        getCreepType('carrier'),
     ]
 
     var southRoomCreepTypes = [
@@ -41,10 +39,8 @@ module.exports = function () {
         getCreepType('carrier'),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: southConstructionSites.length > 0}),
-        getCreepType('carrier'),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: southConstructionSites.length > 0}),
-        getCreepType('carrier'),
     ];
 
 
@@ -64,6 +60,7 @@ module.exports = function () {
         console.log('Room: ', i === 0 ? 'North Room' : 'South Room');
 
         room.forEach(creepType => {
+
             var roleFilterObj = {
                 filter: function(creep) {
                     return creep.memory.role == creepType.role 
@@ -72,9 +69,9 @@ module.exports = function () {
                 }
             }
 
-            var creeps = util().findInAllRooms(FIND_MY_CREEPS, roleFilterObj);
+            var matchingCreeps = util().findInAllRooms(FIND_MY_CREEPS, roleFilterObj);
 
-            if(!creeps.length && creepType.condition){
+            if(!matchingCreeps.length && creepType.condition){
                 if(!creepToSpawn || creepType.priority < creepToSpawn.priority){
                     creepToSpawn = creepType;
                 }
@@ -84,13 +81,15 @@ module.exports = function () {
             }
 
             if(printQueue){
-                if(!creeps.length && creepType.condition){
+                if(!matchingCreeps.length && creepType.condition){
                     util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
-                }else if(!creeps.length){
+                }else if(!matchingCreeps.length){
                     util().printWithSpacing(creepType.role + ': Condition not met (' + creepType.getEnergyRequired() + ')');
-                }else if(creeps.length){
-                    var timeToDeath = creeps[0].ticksToLive;
+                }else if(matchingCreeps.length){
+                    var timeToDeath = matchingCreeps[0].ticksToLive;
                     util().printWithSpacing(creepType.role + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
+                }else if(matchingCreeps.filter(c => c.spawning).length){
+                    util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
                 }
             }
         });
@@ -141,7 +140,7 @@ function getCreepType(type, opts={}){
             break;
         case 'harvesterTwo': 
             creepType.role = 'harvesterTwo';
-            creepType.bodyParts = [WORK,WORK,WORK,WORK,WORK,CARRY,MOVE,MOVE];
+            creepType.bodyParts = [WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE];
             break;
         case 'carrier': 
             creepType.role = 'carrier';
@@ -161,7 +160,12 @@ function getCreepType(type, opts={}){
 }
 
 function spawnCreep(creepTypeToSpawn){
-    console.log('Next creep to be spawned: ', creepTypeToSpawn.role);
+    if(creepTypeToSpawn){
+        console.log('Next creep to be spawned: ', creepTypeToSpawn.role);
+    }else{
+        console.log('All Screeps are spawned!');
+        return;
+    }
     var nowString = Date.now().toString();
     var creepName = creepTypeToSpawn.role + nowString.substr(nowString.length - 4);
     var energyRequired = creepTypeToSpawn.getEnergyRequired();
@@ -174,14 +178,20 @@ function spawnCreep(creepTypeToSpawn){
     var assignedSpawn = util().getSpawnForRoom(creepTypeToSpawn.assignedRoom);
 
     var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-        
-    if(errCode === ERR_NOT_ENOUGH_ENERGY){
-        errCode = Game.spawns.Spawn1.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-    }
+            
 
-    if(errCode === ERR_NOT_ENOUGH_ENERGY){
-        errCode = Game.spawns.Spawn2.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-    }
+console.log('errCode: ', errCode);
+
+    //CAN'T JUST DO ANY ERROR CODE, otherwise, it will spawn the next thing on both spawns
+    // if(errCode === ERR_NOT_ENOUGH_ENERGY){
+
+
+    //     errCode = Game.spawns.Spawn1.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
+    // }
+
+    // if(errCode === ERR_NOT_ENOUGH_ENERGY){
+    //     errCode = Game.spawns.Spawn2.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
+    // }
 } 
 
 function CreepType(opts){

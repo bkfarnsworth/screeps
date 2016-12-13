@@ -6,7 +6,7 @@ module.exports = function (creep, status, roomToGetEnergyFrom) {
     if(!inAssignedRoom){ return; }
         
     util().gatherEnergyOr(creep, function(){
-        util().giveEnergyToClosestRecipient(creep, {
+        util().giveEnergyToBestRecipient(creep, {
             maxEnergyRatio: 0.7,
             allowTowers: false,
             allowStorage: false,
