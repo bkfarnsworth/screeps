@@ -104,12 +104,14 @@ module.exports = function (creep) {
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);
         },
         getClosestStructure: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+            return creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: function(structure){
+
                     var isSpawn = structure.structureType === STRUCTURE_SPAWN;
                     var isExtension = structure.structureType === STRUCTURE_EXTENSION;
                     var isStorage = structure.structureType === STRUCTURE_STORAGE;
-                    var isStructure = isSpawn || isExtension || isStorage ;
+                    var isContainer = structure.structureType === STRUCTURE_CONTAINER;
+                    var isStructure = isSpawn || isExtension || isStorage || isContainer;
                     return isStructure && filter(structure);
                 }
             });
@@ -165,7 +167,7 @@ module.exports = function (creep) {
                 var currentEnergyKey;
                 var potentialEnergyKey;
 
-                if(possibility instanceof StructureStorage){
+                if(possibility instanceof StructureStorage || possibility instanceof StructureContainer) {
                     currentEnergyKey = 'store[' + RESOURCE_ENERGY + ']';
                     potentialEnergyKey = 'storeCapacity';
                 }else if(possibility instanceof Creep){
@@ -182,7 +184,7 @@ module.exports = function (creep) {
             }
 
             var structureFilter = (s) => {
-                return !opts.allowStorage ? !(s instanceof StructureStorage) && generalRequirements(s) : generalRequirements(s);
+                return !opts.allowStorage ? !(s instanceof StructureStorage || s instanceof StructureContainer) && generalRequirements(s) : generalRequirements(s);
             }
 
             closestStructure = opts.allowStructures ? this.getClosestStructure(creep, structureFilter) : null;
@@ -266,7 +268,7 @@ module.exports = function (creep) {
 
             // console.log('closestEnergySource: ', closestEnergySource);
 
-            if(possibility instanceof StructureStorage || possibility instanceof StructureContainer){
+            if(closestEnergySource instanceof StructureStorage || closestEnergySource instanceof StructureContainer){
                 errCode = creep.withdraw(closestEnergySource, RESOURCE_ENERGY);
             }else if(closestEnergySource instanceof Structure){
                 errCode = closestEnergySource.transferEnergy(creep);
@@ -415,7 +417,7 @@ module.exports = function (creep) {
         getStorageWithEnergy(creep){
             var storages = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return s.structureType === STRUCTURE_STORAGE
+                    return s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER
                 }
             });
 
