@@ -26,14 +26,16 @@ module.exports = function () {
         getCreepType('builder', {condition: northConstructionSites.length > 0}),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: northConstructionSites.length > 0}),
+        getCreepType('upgrader', {condition: northConstructionSites.length === 0}),
+        getCreepType('upgrader', {condition: northConstructionSites.length === 0}),
     ]
 
     var southRoomCreepTypes = [
         getCreepType('backUpHarvester', {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}),
         getCreepType('harvester', {stopOperation: true}),
         getCreepType('harvester', {stopOperation: true}),
-        getCreepType('harvesterTwo', {stopOperation: true}),
         getCreepType('harvester', {stopOperation: true}),
+        getCreepType('superHarvesterTwo', {stopOperation: true}),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: southConstructionSites.length > 0}),
         getCreepType('carrier'),
@@ -41,6 +43,8 @@ module.exports = function () {
         getCreepType('builder', {condition: southConstructionSites.length > 0}),
         getCreepType('upgrader'),
         getCreepType('builder', {condition: southConstructionSites.length > 0}),
+        getCreepType('upgrader', {condition: southConstructionSites.length === 0}),
+        getCreepType('upgrader', {condition: southConstructionSites.length === 0}),
     ];
 
 
@@ -134,6 +138,10 @@ function getCreepType(type, opts={}){
             creepType.role = 'harvester';
             creepType.bodyParts = [WORK,CARRY,MOVE];
             break;
+        case 'superHarvesterTwo': 
+            creepType.role = 'harvesterTwo';
+            creepType.bodyParts = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+            break;
         case 'harvester': 
             creepType.role = 'harvester';
             creepType.bodyParts = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
@@ -180,7 +188,7 @@ function spawnCreep(creepTypeToSpawn){
     var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
             
 
-console.log('errCode: ', errCode);
+    // console.log('errCode: ', errCode);
 
     //CAN'T JUST DO ANY ERROR CODE, otherwise, it will spawn the next thing on both spawns
     // if(errCode === ERR_NOT_ENOUGH_ENERGY){

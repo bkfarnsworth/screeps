@@ -150,7 +150,7 @@ module.exports = function (creep) {
         getBestEnergyRecipient: function(creep, opts = {}){
 
             _.defaults(opts, {
-                maxEnergyRatio: 1,
+                maxEnergyRatio: 0.7,
                 creepTypes: [],
                 allowStructures: true,
                 allowStorage: true
@@ -357,7 +357,8 @@ module.exports = function (creep) {
             var closestEnergyRecipient = this.getBestEnergyRecipient(creep, {
                 allowStructures: opts.giveToStructures,
                 allowTowers: opts.giveToTowers,
-                allowStorage:   opts.giveToStorage
+                allowStorage:   opts.giveToStorage,
+                maxEnergyRatio: 0.7
             });
             var source = creep.room.find(FIND_SOURCES)[opts.sourceIndex];
             var recipientIsCloserThanSource = false;
