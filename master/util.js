@@ -189,13 +189,16 @@ module.exports = function (creep) {
 
             closestStructure = opts.allowStructures ? this.getClosestStructure(creep, structureFilter) : null;
             closestCreep = this.getClosestCreep(creep, generalRequirements, opts);
-            closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestTower(creep) : null;
+            closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestTower(creep, generalRequirements) : null;
 
             var possibilities = _.compact([closestStructure, closestCreep, closestTower]);
             var best = creep.pos.findClosestByPath(possibilities);
 
-            //fill towers first
-            if(opts.allowTowers && closestTower && closestTower.energy < 900){
+
+            //////// priority rules that override closest
+
+            //make sure tower always stays at at least 700
+            if(opts.allowTowers && closestTower && closestTower.energy < 700){
                 best = closestTower;
             }
 
@@ -349,7 +352,7 @@ module.exports = function (creep) {
                 giveToStorage: true,
             });
 
-            var storageWithEnergy = this.getStorageWithEnergy(creep);
+            var storageWithEnergy = this.getClosestStorageWithEnergy(creep);
             opts.takeFromStorage = Game.briansStatus === 'incomplete' && opts.takeFromStorage && storageWithEnergy;
             opts.giveToStorage = Game.briansStatus === 'complete' && opts.giveToStorage;
 
@@ -366,9 +369,6 @@ module.exports = function (creep) {
             if(closestEnergyRecipient && source){
                 recipientIsCloserThanSource = creep.pos.findClosestByPath([closestEnergyRecipient, source]) === closestEnergyRecipient;
             }
-
-            // console.log('closestEnergyRecipient: ', closestEnergyRecipient);
-
 
             if(recipientIsCloserThanSource){
                 if(creep.carry.energy > (creep.carryCapacity * 0.1)){
@@ -410,23 +410,18 @@ module.exports = function (creep) {
             })
         },
         getEnergyFromStorage(creep){
-            var storageWithEnergy = this.getStorageWithEnergy(creep)
+            var storageWithEnergy = this.getClosestStorageWithEnergy(creep)
             if(creep.withdraw(storageWithEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE){
                 creep.moveTo(storageWithEnergy)
             }
         },
-        getStorageWithEnergy(creep){
-            var storages = creep.room.find(FIND_STRUCTURES, {
+        getClosestStorageWithEnergy(creep){
+            return creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER
+                    return (s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER) 
+                    && s.store[RESOURCE_ENERGY] > 0;
                 }
             });
-
-            if(storages.length && storages[0].store[RESOURCE_ENERGY] > 0){
-                return storages[0];
-            }else{
-                return null;
-            }
         },
         bodyPartEnergyMap: {
             MOVE: 50,
