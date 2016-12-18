@@ -16,15 +16,16 @@ module.exports = function (tower) {
         var hitsBelowThreshold = (struct.hits < (struct.hitsMax - 800) && !(struct instanceof StructureWall));
 
         //treat walls special...don't keep going forever
-        var isWallBelowWallThreshold = struct instanceof StructureWall && struct.hits < 100000;
+        var isWallBelowWallThreshold = struct instanceof StructureWall && struct.hits < 2000000;
 
         return hitsBelowThreshold || isWallBelowWallThreshold;
     };
 
 
-    if(hostileCreeps.length){
-        tower.attack(hostileCreeps[0]);
-    }else if(creepsToHeal.length){
+    // if(hostileCreeps.length && false){
+        // tower.attack(hostileCreeps[0]);
+    //}
+    if(creepsToHeal.length){
         tower.heal(creepsToHeal[0])
     }else{
         var structures = tower.room.find(FIND_STRUCTURES, {
