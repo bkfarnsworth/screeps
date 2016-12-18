@@ -98,7 +98,7 @@ module.exports.loop = function () {
 
         if(seeCPU){
             console.log('creep.memory.role: ', creep.memory.role);
-            console.log('CPU used: ' + (Game.cpu.getUsed() - tempCpuUsed));
+            console.log('CPU used: ' + _.round(Game.cpu.getUsed() - tempCpuUsed, 2));
             tempCpuUsed = Game.cpu.getUsed();
         }
 	}
