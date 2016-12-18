@@ -213,7 +213,7 @@ module.exports = function (creep) {
                 allowStructures: true
             });
 
-            if(Game.briansStatus === 'incomplete'){
+            if(creep.room.status === 'incomplete'){
                 return this.getNoEnergySpot(creep);
             }
 
@@ -256,13 +256,13 @@ module.exports = function (creep) {
 
         getEnergyFromBestSource: function(creep, opts={}){
 
-            var creepTypes = Game.briansStatus ? ['carrier', 'harvester', 'harvesterTwo'] : ['carrier'];
+            var creepTypes = creep.room.status ? ['carrier', 'harvester', 'harvesterTwo'] : ['carrier'];
 
             _.defaults(opts, {
                 minEnergyRatio: 0.3,
                 allowHarvesting: false,//allow them to go harvet on their own
                 allowCarrier: false,//allow them to get from a carrier
-                allowStructures: Game.briansStatus === 'complete',
+                allowStructures: creep.room.status === 'complete',
                 creepTypes: creepTypes
             });
 
@@ -295,7 +295,7 @@ module.exports = function (creep) {
                 creepTypes: ['builder', 'upgrader', 'repairer'],
                 allowStructures: false,
                 allowStorage: true,
-                allowTowers: Game.briansStatus === 'complete'
+                allowTowers: creep.room.status === 'complete'
             });
 
             var errCode;
@@ -353,8 +353,8 @@ module.exports = function (creep) {
             });
 
             var storageWithEnergy = this.getClosestStorageWithEnergy(creep);
-            opts.takeFromStorage = Game.briansStatus === 'incomplete' && opts.takeFromStorage && storageWithEnergy;
-            opts.giveToStorage = Game.briansStatus === 'complete' && opts.giveToStorage;
+            opts.takeFromStorage = creep.room.status === 'incomplete' && opts.takeFromStorage && storageWithEnergy;
+            opts.giveToStorage = creep.room.status === 'complete' && opts.giveToStorage;
 
             var debugMode = false;
             var closestEnergyRecipient = this.getBestEnergyRecipient(creep, {
@@ -450,6 +450,50 @@ module.exports = function (creep) {
         },
         returnAllFilter: function(){
             return true;
+        },
+        printEnergy(room){
+            //get total energy capacity as well
+            var totalEnergyCapacity = 0;
+            var totalEnergyAvailable = 0;
+            room.find(FIND_MY_STRUCTURES).forEach(function(structure){
+                if(structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN){
+                    totalEnergyCapacity += structure.energyCapacity;
+                    totalEnergyAvailable += structure.energy;
+                }
+            });
+            
+            //extraEnergy is energy that is dropped or in a creep, 
+            var extraEnergy = this.getExtraEnergy(room);
+            
+            console.log("TOTAL ENERGY ("+room.name+"): " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
+
+            if(room === this.southRoom){
+                // if(useTracker){
+                    // tracker(totalEnergyAvailable, totalEnergyCapacity);
+                // }    
+            }
+            
+        },
+        getExtraEnergy(room){
+            var extraEnergy = 0;
+            
+            //dropped energy
+            room.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
+                extraEnergy += droppedResource.amount;
+            });
+            
+            //energy in creeps
+            room.find(FIND_MY_CREEPS).forEach(function(creep){
+                extraEnergy += creep.carry.energy;
+            }) 
+            
+            //energy in the source
+            room.find(FIND_SOURCES).forEach(function(source){
+                // console.log(source.energy)
+                extraEnergy += source.energy;
+            });
+            
+            return extraEnergy;
         },
         forEachCellInGrid: function(color, func){
 

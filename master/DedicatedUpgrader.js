@@ -6,7 +6,7 @@ module.exports = function (creep, status) {
     // console.log('fdsafdsa1')
     
     var upgradeCode;
-    if(status === 'complete'){
+    if(creep.room.status === 'complete'){
         upgradeCode = creep.upgradeController(creep.room.controller);
     }
     

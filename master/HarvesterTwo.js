@@ -5,6 +5,6 @@ module.exports = function (creep) {
 	harvester(creep, {
 		sourceIndex: 1, 
 		useStorage: false,
-		giveToTowers: Game.briansStatus === 'complete'
+		giveToTowers: creep.room.status === 'complete'
 	});
 }

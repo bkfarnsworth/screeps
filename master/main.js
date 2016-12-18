@@ -34,8 +34,7 @@ module.exports.loop = function () {
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
 
 
-    var status = spawner();
-    Game.briansStatus = status;
+    spawner();
 
     //we could do this even less, but for now throttle it so it only happens on average every 100 ticks
     if(_.random(1, 100) === 1){
@@ -105,8 +104,7 @@ module.exports.loop = function () {
 	   
     if(seeCPU){ util().printCPU(() => { console.log('main.js::145 :: '); }); }   
 
-    printEnergy(util().southRoom);
-    printEnergy(util().northRoom);
+
     
     if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
 }
@@ -119,51 +117,3 @@ Creep.prototype.getAssignedRoom = function(){
     return Game.rooms[this.memory.assignedRoom] || util().southRoom;
 }
 
-function printEnergy(room){
-    //get total energy capacity as well
-    var totalEnergyCapacity = 0;
-    var totalEnergyAvailable = 0;
-    room.find(FIND_MY_STRUCTURES).forEach(function(structure){
-        if(structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN){
-            totalEnergyCapacity += structure.energyCapacity;
-            totalEnergyAvailable += structure.energy;
-        }
-    });
-    
-    //extraEnergy is energy that is dropped or in a creep, 
-    var extraEnergy = getExtraEnergy(room);
-    
-    console.log("TOTAL ENERGY ("+room.name+"): " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
-
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::185 :: '); }); }   
-
-    if(room === util().southRoom){
-        if(useTracker){
-            tracker(totalEnergyAvailable, totalEnergyCapacity);
-        }    
-    }
-    
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::192 :: '); }); }   
-}
-
-function getExtraEnergy(room){
-    var extraEnergy = 0;
-    
-    //dropped energy
-    room.find(FIND_DROPPED_ENERGY).forEach(function(droppedResource){
-        extraEnergy += droppedResource.amount;
-    });
-    
-    //energy in creeps
-    room.find(FIND_MY_CREEPS).forEach(function(creep){
-        extraEnergy += creep.carry.energy;
-    }) 
-    
-    //energy in the source
-    room.find(FIND_SOURCES).forEach(function(source){
-        // console.log(source.energy)
-        extraEnergy += source.energy;
-    });
-    
-    return extraEnergy;
-}

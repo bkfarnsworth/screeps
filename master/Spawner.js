@@ -4,8 +4,6 @@ module.exports = function () {
         
     var printQueue = true;
 
-    var status = "complete";
-
     var northConstructionSites = util().northRoom.find(FIND_MY_CONSTRUCTION_SITES);
     var southConstructionSites = util().southRoom.find(FIND_MY_CONSTRUCTION_SITES);
 
@@ -58,52 +56,52 @@ module.exports = function () {
         ct.priority = priority;
     });
 
-    var creepToSpawn;
     [northRoomCreepTypes, southRoomCreepTypes].forEach((room, i) => {
         console.log();
         console.log('Room: ', i === 0 ? 'North Room' : 'South Room');
 
-        room.forEach(creepType => {
+        var spawn = util().getSpawnForRoom(room[0].assignedRoom);
+        var actualRoom = i === 0 ? util().northRoom : util().southRoom;
+        var creepsThatNeedSpawning = room.filter(creepType => creepType.needsSpawning());
 
-            var roleFilterObj = {
-                filter: function(creep) {
-                    return creep.memory.role == creepType.role 
-                    && creep.memory.assignedRoom === creepType.assignedRoom
-                    && creep.memory.priority === creepType.priority;
-                }
-            }
+        //assume it's sorted by priority
 
-            var matchingCreeps = util().findInAllRooms(FIND_MY_CREEPS, roleFilterObj);
+        //spawn the top priority one, else if spawning, do the next highest one
+        var creepToSpawn;
+        if(spawn.spawning){
+            creepToSpawn = creepsThatNeedSpawning[1];
+        }else{
+            creepToSpawn = creepsThatNeedSpawning[0];
+        }
 
-            if(!matchingCreeps.length && creepType.condition){
-                if(!creepToSpawn || creepType.priority < creepToSpawn.priority){
-                    creepToSpawn = creepType;
-                }
-                if(creepType.stopOperation){
-                    status = 'incomplete';
-                }
-            }
+        if(creepToSpawn && creepToSpawn.stopOperation){
+            actualRoom.status = 'incomplete';
+        }else{
+            actualRoom.status = 'complete';
+        }
 
-            if(printQueue){
-                if(!matchingCreeps.length && creepType.condition){
+        spawnCreep(creepToSpawn);
+
+        if(printQueue){
+            room.forEach(creepType => {
+                if(creepType.needsSpawning() && creepType.condition){
                     util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
-                }else if(!matchingCreeps.length){
+                }else if(!creepType.condition){
                     util().printWithSpacing(creepType.role + ': Condition not met (' + creepType.getEnergyRequired() + ')');
-                }else if(matchingCreeps.length){
-                    var timeToDeath = matchingCreeps[0].ticksToLive;
+                }else if(!creepType.needsSpawning()){
+                    var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
                     util().printWithSpacing(creepType.role + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
-                }else if(matchingCreeps.filter(c => c.spawning).length){
+                }else{
                     util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
                 }
-            }
-        });
+            });
+        }
+
+        console.log('STATUS: ' + actualRoom.status);
+
+        util().printEnergy(actualRoom);
     });
 
-    spawnCreep(creepToSpawn);
-
-    console.log('STATUS: ' + status);
-    
-    return status;
 }   
 
 function getNumberOfHarvesters(roomDirection){
@@ -213,6 +211,23 @@ function CreepType(opts){
     this.stopOperation = opts.stopOperation;
     return this;
 }
+
+CreepType.prototype.getMatchingCreeps = function(){
+
+    var roleFilter = (creep) => {
+        return creep.memory.role == this.role 
+        && creep.memory.assignedRoom === this.assignedRoom
+        && creep.memory.priority === this.priority;
+    }
+
+    //cache result
+    this._matchingCreeps = this._matchingCreeps || util().findInAllRooms(FIND_MY_CREEPS, {filter: roleFilter});
+    return this._matchingCreeps;
+}
+
+CreepType.prototype.needsSpawning = function() {
+    return !this.getMatchingCreeps().length && this.condition;
+};
 
 CreepType.prototype.getEnergyRequired = function() {
     var bodyPartEnergyMap = util().bodyPartEnergyMap;
