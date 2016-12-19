@@ -11,14 +11,11 @@ module.exports = function (tower) {
     });
 
     var bestTowerTarget = (struct) => {
-
         //so we aren't wasting any of the tower's 800 repair
-        var hitsBelowThreshold = (struct.hits < (struct.hitsMax - 800) && !(struct instanceof StructureWall));
+        var hitsBelowStructureMax = struct.hits < struct.hitsMax - 800;
+        var hitsBelowSpecifiedMax = struct.hits < 2000000;
 
-        //treat walls special...don't keep going forever
-        var isWallBelowWallThreshold = struct instanceof StructureWall && struct.hits < 2000000;
-
-        return hitsBelowThreshold || isWallBelowWallThreshold;
+        return hitsBelowStructureMax && hitsBelowSpecifiedMax;
     };
 
 
