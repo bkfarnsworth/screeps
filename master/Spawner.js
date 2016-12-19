@@ -1,4 +1,5 @@
 var util = require('util');
+var CreepType = require('CreepType');
 
 module.exports = function () {
         
@@ -11,39 +12,43 @@ module.exports = function () {
     //     Game.notify('NO HARVESTERS', 60);
     // }
 
+
     var northRoomCreepTypes = [
-        getCreepType('backUpHarvester', {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}),
-        getCreepType('harvester', {stopOperation: true}),
-        getCreepType('harvesterTwo', {stopOperation: true}),
-        getCreepType('harvester', {stopOperation: true}),
-        getCreepType('harvesterTwo', {stopOperation: true}),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: northConstructionSites.length > 0}),
-        getCreepType('carrier'),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: northConstructionSites.length > 0}),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: northConstructionSites.length > 0}),
-        getCreepType('upgrader', {condition: northConstructionSites.length === 0}),
-        getCreepType('upgrader', {condition: northConstructionSites.length === 0}),
+        CreepType.factory('backUpHarvester', 'backUpHarvester', util().northRoom, {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}),
+        CreepType.factory('harvester1', 'harvester', util().northRoom, {stopOperation: true}),
+        CreepType.factory('harvesterTwo1', 'harvesterTwo', util().northRoom, {stopOperation: true}),
+        CreepType.factory('harvester2', 'harvester', util().northRoom, {stopOperation: true}),
+        CreepType.factory('harvesterTwo2', 'harvesterTwo', util().northRoom, {stopOperation: true}),
+        CreepType.factory('guard1', 'guard', util().northRoom),
+        CreepType.factory('upgrader1', 'upgrader', util().northRoom),
+        CreepType.factory('builder1', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
+        CreepType.factory('carrier1', 'carrier', util().northRoom),
+        CreepType.factory('upgrader2', 'upgrader', util().northRoom),
+        CreepType.factory('builder2', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
+        CreepType.factory('upgrader2', 'upgrader', util().northRoom),
+        CreepType.factory('builder3', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
+        CreepType.factory('upgrader3', 'upgrader', util().northRoom, {condition: northConstructionSites.length === 0}),
+        CreepType.factory('upgrader4', 'upgrader', util().northRoom, {condition: northConstructionSites.length === 0}),
     ]
 
     var southRoomCreepTypes = [
-        getCreepType('backUpHarvester', {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}),
-        getCreepType('harvester', {stopOperation: true}),
-        getCreepType('harvester', {stopOperation: true}),
-        getCreepType('harvester', {stopOperation: true}),
-        getCreepType('superHarvesterTwo', {stopOperation: true}),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: southConstructionSites.length > 0}),
-        getCreepType('carrier'),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: southConstructionSites.length > 0}),
-        getCreepType('upgrader'),
-        getCreepType('builder', {condition: southConstructionSites.length > 0}),
-        getCreepType('upgrader', {condition: southConstructionSites.length === 0}),
-        getCreepType('upgrader', {condition: southConstructionSites.length === 0}),
+        CreepType.factory('backUpHarvester', 'backUpHarvester', util().northRoom, {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}),
+        CreepType.factory('harvester1', 'harvester', util().southRoom, {stopOperation: true}),
+        CreepType.factory('harvester2', 'harvester', util().southRoom, {stopOperation: true}),
+        CreepType.factory('harvester3', 'harvester', util().southRoom, {stopOperation: true}),
+        CreepType.factory('superHarvesterTwo', 'superHarvesterTwo', util().southRoom, {stopOperation: true}),
+        CreepType.factory('guard1', 'guard', util().southRoom),
+        CreepType.factory('upgrader1', 'upgrader', util().southRoom),
+        CreepType.factory('builder1', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
+        CreepType.factory('carrier1', 'carrier', util().southRoom),
+        CreepType.factory('upgrader2', 'upgrader', util().southRoom),
+        CreepType.factory('builder2', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
+        CreepType.factory('upgrader2', 'upgrader', util().southRoom),
+        CreepType.factory('builder3', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
+        CreepType.factory('upgrader3', 'upgrader', util().southRoom, {condition: southConstructionSites.length === 0}),
+        CreepType.factory('upgrader4', 'upgrader', util().southRoom, {condition: southConstructionSites.length === 0}),
     ];
+
 
 
     northRoomCreepTypes.forEach((ct, priority) => {
@@ -119,52 +124,6 @@ function getNumberOfHarvesters(roomDirection){
     }).length;
 }
 
-function getCreepType(type, opts={}){
-
-    _.defaults(opts, {
-        condition: true,
-        stopOperation: false
-    });
-
-    var creepType = new CreepType({
-        condition: opts.condition,
-        stopOperation: opts.stopOperation
-    });
-
-    switch(type){
-        case 'backUpHarvester':
-            creepType.role = 'harvester';
-            creepType.bodyParts = [WORK,CARRY,MOVE];
-            break;
-        case 'superHarvesterTwo': 
-            creepType.role = 'harvesterTwo';
-            creepType.bodyParts = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
-            break;
-        case 'harvester': 
-            creepType.role = 'harvester';
-            creepType.bodyParts = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
-            break;
-        case 'harvesterTwo': 
-            creepType.role = 'harvesterTwo';
-            creepType.bodyParts = [WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE];
-            break;
-        case 'carrier': 
-            creepType.role = 'carrier';
-            creepType.bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
-            break;
-        case 'upgrader': 
-            creepType.role = 'upgrader';
-            creepType.bodyParts = [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE];
-            break;
-        case 'builder': 
-            creepType.role = 'builder';
-            creepType.bodyParts = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE];
-            break;
-    }
-
-    return creepType;
-}
-
 function spawnCreep(creepTypeToSpawn){
     if(creepTypeToSpawn){
         console.log('Next creep to be spawned: ', creepTypeToSpawn.role);
@@ -172,64 +131,21 @@ function spawnCreep(creepTypeToSpawn){
         console.log('All Screeps are spawned!');
         return;
     }
-    var nowString = Date.now().toString();
-    var creepName = creepTypeToSpawn.role + nowString.substr(nowString.length - 4);
+
+    var creepName = creepTypeToSpawn.name;
     var energyRequired = creepTypeToSpawn.getEnergyRequired();
     var memoryOpts = {
         role: creepTypeToSpawn.role,
-        assignedRoom: creepTypeToSpawn.assignedRoom,
-        priority: creepTypeToSpawn.priority
+        assignedRoom: creepTypeToSpawn.assignedRoom
     }
 
     var assignedSpawn = util().getSpawnForRoom(creepTypeToSpawn.assignedRoom);
 
     var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-            
 
-    // console.log('errCode: ', errCode);
-
-    //CAN'T JUST DO ANY ERROR CODE, otherwise, it will spawn the next thing on both spawns
-    // if(errCode === ERR_NOT_ENOUGH_ENERGY){
-
-
-    //     errCode = Game.spawns.Spawn1.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-    // }
-
-    // if(errCode === ERR_NOT_ENOUGH_ENERGY){
-    //     errCode = Game.spawns.Spawn2.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
-    // }
+    if(errCode === ERR_NAME_EXISTS){
+        //then delete it from memory
+        delete Memory.creeps[creepName];
+    }
 } 
 
-function CreepType(opts){
-    this.creepTypeId = opts.creepTypeId;
-    this.role = opts.role;
-    this.bodyParts = opts.bodyParts;
-    this.min = opts.min;
-    this.priority = opts.priority;
-    this.assignedRoom = opts.assignedRoom;
-    this.condition = opts.condition;
-    this.stopOperation = opts.stopOperation;
-    return this;
-}
-
-CreepType.prototype.getMatchingCreeps = function(){
-
-    var roleFilter = (creep) => {
-        return creep.memory.role == this.role 
-        && creep.memory.assignedRoom === this.assignedRoom
-        && creep.memory.priority === this.priority;
-    }
-
-    //cache result
-    this._matchingCreeps = this._matchingCreeps || util().findInAllRooms(FIND_MY_CREEPS, {filter: roleFilter});
-    return this._matchingCreeps;
-}
-
-CreepType.prototype.needsSpawning = function() {
-    return !this.getMatchingCreeps().length && this.condition;
-};
-
-CreepType.prototype.getEnergyRequired = function() {
-    var bodyPartEnergyMap = util().bodyPartEnergyMap;
-    return _.sum(this.bodyParts.map(bp => bodyPartEnergyMap[bp.toString().toUpperCase()]));
-};

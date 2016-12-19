@@ -7,13 +7,13 @@ var guard = require('Guard')
 var healer = require('Healer')
 var builder = require('Builder')
 var spawner = require('Spawner')
-var attacker = require('Attacker')
 var repairer = require('Repairer')
 var dedicatedHarvester = require('DedicatedHarvester')
 var carrier = require('Carrier')
 var tracker = require('Tracker');
 var util = require('util');
 var tower = require('Tower');
+var Guard = require('Guard');
 var ConstructionManager = require('ConstructionManager');
 
 var useTracker = false;
@@ -66,7 +66,7 @@ module.exports.loop = function () {
             util().goToRoom(util.southRoomName, creep);
             continue;
         }
-		
+
 	    if(creep.memory.role == 'carrier') {
             carrier(creep);
 		}
@@ -87,8 +87,9 @@ module.exports.loop = function () {
 	        repairer(creep);
         }
 
-        if(creep.memory.role == 'attacker') {
-            attacker(creep);
+        if(creep.memory.role == 'guard') {
+            var guard = new Guard(creep);
+            guard.doWork();
         }
         
 		if(creep.memory.role == 'builder') {

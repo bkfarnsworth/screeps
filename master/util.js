@@ -94,7 +94,7 @@ module.exports = function (creep) {
                 return;
             }
 
-            while(msg.indexOf(':') != 20){
+            while(msg.indexOf(':') < 20){
                 msg = msg.replace(':', ' :');
             }
 
