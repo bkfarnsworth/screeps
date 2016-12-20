@@ -361,7 +361,7 @@ module.exports = function (creep) {
                 allowStructures: opts.giveToStructures,
                 allowTowers: opts.giveToTowers,
                 allowStorage:   opts.giveToStorage,
-                maxEnergyRatio: 0.7
+                maxEnergyRatio: 0.9 
             });
             var source = creep.room.find(FIND_SOURCES)[opts.sourceIndex];
             var recipientIsCloserThanSource = false;
@@ -369,6 +369,12 @@ module.exports = function (creep) {
             if(closestEnergyRecipient && source){
                 recipientIsCloserThanSource = creep.pos.findClosestByPathUsingCache([closestEnergyRecipient, source]) === closestEnergyRecipient;
             }
+
+            // if(creep.name === 'harvester3(E77S47)'){
+            //     console.log('closestEnergyRecipient: ', closestEnergyRecipient);
+            //     console.log('source.pos: ', source.pos);
+            //     console.log('recipientIsCloserThanSource: ', recipientIsCloserThanSource);
+            // }
 
             if(recipientIsCloserThanSource){
                 if(creep.carry.energy > (creep.carryCapacity * 0.1)){
@@ -573,7 +579,7 @@ module.exports = function (creep) {
             var cachePropertyString = `pathsHash[${start.x}][${start.y}][${end.x}][${end.y}]`;
 
             //CLEAR CACHE!!!!!!!!!!!!
-            // delete _.get(Memory, 'pathsHash');
+            // delete Memory.pathsHash;
 
             var path;
             if(opts.useCache){
@@ -593,6 +599,10 @@ module.exports = function (creep) {
             }else{
                 myGlobal.cacheMisses++;
                 path = start.findPathTo(end);
+            }
+
+            if(typeof path === 'string'){
+                path = Room.deserializePath(path);
             }
 
             return path;
@@ -619,6 +629,11 @@ module.exports = function (creep) {
                 //clean up dead creeps
                 this.cleanDeadCreepsFromMemory(Memory.otherRoomCreeps);
             }
+        },
+        printObject(obj){
+            _.forOwn(obj, function(value, key) {
+              console.log(key + ': ' + value);
+            });
         }
     }   
 }

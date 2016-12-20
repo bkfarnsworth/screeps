@@ -132,20 +132,36 @@ Creep.prototype.getAssignedRoom = function(){
 
 Creep.prototype.moveToUsingCache = function(target){
 
+    var validErrCodes = [ERR_NOT_FOUND, ERR_NO_PATH];
     var path = util().getPath(this, target);
     var errCode = this.moveByPath(path);
+    var obstacles = path[0] ? this.room.lookAt(path[0].x, path[0].y) : [];
+    var creepIsInTheWay = Boolean(obstacles.find(o => o.type === 'creep'));
 
     //if the path doesn't work for some reason, just calculate it without the cache
-    var validErrCodes = [ERR_NOT_FOUND, ERR_NO_PATH];
-    if(_.contains(validErrCodes, errCode)){
+    if(_.contains(validErrCodes, errCode) || creepIsInTheWay){
         path = util().getPath(this, target, {useCache: false});
         this.moveByPath(path);
     }
+
+    // if(this.name === 'harvester3(E77S47)'){
+    //  console.log('this: ', this);
+    //  // console.log('path[0]: ', path[0]);
+    //  util().printObject(path[0]);   
+    //  // console.log('Room.deserializePath(path): ', Room.deserializePath(path).length);
+    //  console.log('target: ', target);
+    //  console.log('target.energy: ', target.energy);
+    //  console.log('target.pos: ', target.pos);
+    //  console.log('errCode: ', errCode);
+    //  console.log('target.id: ', target.id);
+    // }
 
     return errCode;
 }
 
 RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts={}){
+
+    var bufferAmount = 0;
 
     //take care of two method types
     var objects;
@@ -167,8 +183,22 @@ RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts=
     });
 
     if(objectPathPairs.length){
+
+        //the thing that happens is this:
+        //it will find that A is equal to B.  But sometimes A will be the "closest" and sometimes B will be the "closest"
+        //if we always return the first alphabetically in those cases, it will be deterministic
+
+        //get the closest
         var min = _.min(objectPathPairs, 'path.length');
-        return min.object;
+
+        //gather the ones that are within 3 steps of each other
+        var closeToMin = objectPathPairs.filter(opp => opp.path.length - min.path.length <= bufferAmount);
+
+        //if they are that close, just pick the first one (BY ALPHABETICAL ORDER), so we deterministically always pick the same one
+        var possibleTargets = closeToMin
+        _.sortBy(possibleTargets, 'id');
+
+        return possibleTargets[0].object;
     }else{
         return null;
     }
