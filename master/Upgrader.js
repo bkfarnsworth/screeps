@@ -18,7 +18,7 @@ module.exports = function (creep) {
 
 				// console.log('moving to controller');
 
-				creep.moveTo(creep.room.controller);    
+				creep.moveToUsingCache(creep.room.controller);    
 		}
 	});
 }

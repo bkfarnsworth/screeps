@@ -46,13 +46,13 @@ module.exports = function (creep) {
 			};
 
 			if(creep.build(target) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(target);					
+				creep.moveToUsingCache(target);					
 			}	
 		}else{
 			//we need to go into the next room
 			// if(creep.room.name === util().southRoomName){
 			//     var exit = FIND_EXIT_TOP;
-			//     creep.moveTo(creep.pos.findClosestByRange(exit));    
+			//     creep.moveToUsingCache(creep.pos.findClosestByRange(exit));    
 			// }
 		}
 	}else{

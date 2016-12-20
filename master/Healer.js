@@ -7,7 +7,7 @@ module.exports = function (creep) {
     });
     if(target) {
         if(creep.heal(target) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(target);
+            creep.moveToUsingCache(target);
         }
     }
     

@@ -4,7 +4,7 @@ module.exports = function (creep, opts={}) {
 
     _.defaults(opts, {
         sourceIndex: 0,
-        takeFromStorage: true,
+        takeFromStorage: false,
         giveToTowers: false
     });
 

@@ -1,5 +1,26 @@
-module.exports = function (totalEnergyAvailable, totalEnergyCapacity) {
+module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
     
+    _.defaults(opts, {
+        cpuTracker: true
+    }); 
+
+    ///////// CPU TRACKER
+    if(opts.cpuTracker){
+        if(!Memory.cpuTracker){
+            Memory.cpuTracker = {
+                averageCPUPerTick: 0
+            };
+        }else{
+            var decayFactor = 0.9;
+            Memory.cpuTracker.averageCPUPerTick *= decayFactor;
+            Memory.cpuTracker.averageCPUPerTick += (Game.cpu.getUsed() * (1 - decayFactor));
+        }
+
+        console.log('AVERAGE CPU: ' + _.round(Memory.cpuTracker.averageCPUPerTick, 2));
+    }
+
+    return; //for now
+
     //TODO: do the decaying average for energy
     
     //was getting 19 at noon...so....so

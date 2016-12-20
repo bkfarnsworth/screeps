@@ -6,7 +6,7 @@ module.exports = function (creep, status) {
     
     if(!isNextToSource(creep, sources[0])){
         
-        creep.moveTo(sources[0]);     
+        creep.moveToUsingCache(sources[0]);     
         
     // if(code == ERR_NOT_IN_RANGE || code == ERR_NOT_ENOUGH_RESOURCES) {
        

@@ -1,3 +1,8 @@
+myGlobal = {
+    cacheHits: 0,
+    cacheMisses: 0
+};
+
 
 var harvester = require('harvester')
 var harvesterTwo = require('HarvesterTwo')
@@ -19,7 +24,8 @@ var ConstructionManager = require('ConstructionManager');
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0.3;//0 - never throttle, 1 - throttle 100%
+var throttleRatio = 0;//0 - never throttle, 1 - throttle 100%
+
 
 module.exports.loop = function () {
         
@@ -108,6 +114,12 @@ module.exports.loop = function () {
 
     
     if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
+
+    console.log('cache %: ', _.round(myGlobal.cacheHits / (myGlobal.cacheHits + myGlobal.cacheMisses), 2));
+
+    util().printCPU()
+
+    tracker();
 }
 
 Creep.prototype.getName = function(){
@@ -118,3 +130,48 @@ Creep.prototype.getAssignedRoom = function(){
     return Game.rooms[this.memory.assignedRoom] || util().southRoom;
 }
 
+Creep.prototype.moveToUsingCache = function(target, opts={}){
+    var errCode = this.moveByPath(util().getPath(this, target), opts);
+
+    //if the path doesn't work for some reason, recalculate it
+    if(errCode === ERR_NOT_FOUND){
+        this.moveByPath(util().getPath(this, target, {
+            bustCache: true
+        }), opts);
+    }
+
+    return errCode;
+}
+
+RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts={}){
+
+    //take care of two method types
+    var objects;
+    var type;
+    if(_.isArray(typeOrArray)){
+        objects = typeOrArray;
+    }else{
+        type = typeOrArray;
+        objects = this.getRoom().find(typeOrArray, opts);
+    }
+
+    var objectPathPairs = [];
+    objects.forEach(object => {
+        var path = util().getPath(this, object, {serialize: false});
+        objectPathPairs.push({
+            object: object,
+            path: path
+        });
+    });
+
+    if(objectPathPairs.length){
+        var min = _.min(objectPathPairs, 'path.length');
+        return min.object;
+    }else{
+        return null;
+    }
+}
+
+RoomPosition.prototype.getRoom = function(){
+    return Game.rooms[this.roomName];
+}

@@ -45,19 +45,19 @@ module.exports = function (creep) {
             if(roomName === this.northRoomName && creep.room !== this.northRoom){
                 // console.log('going to north room');
                 var exit = FIND_EXIT_TOP;
-                creep.moveTo(creep.pos.findClosestByRange(exit));
+                creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
                 return false;
             }else if(roomName === this.southRoomName && creep.room !== this.southRoom){
                 if(creep.room.name === this.milesRoomName){
                     console.log('util.js::31 :: ');
                     // console.log('going to south room from miles room');
                     var exit = FIND_EXIT_LEFT;
-                    creep.moveTo(creep.pos.findClosestByRange(exit));
+                    creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
                     return false;
                 }else if(creep.room.name === this.northRoomName){
                     // console.log('going to north room from south room');
                     var exit = FIND_EXIT_BOTTOM;
-                    creep.moveTo(creep.pos.findClosestByRange(exit));
+                    creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
                     return false;
                 }
             }else{
@@ -104,7 +104,7 @@ module.exports = function (creep) {
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);
         },
         getClosestStructure: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            return creep.pos.findClosestByPathUsingCache(FIND_STRUCTURES, {
                 filter: function(structure){
 
                     var isSpawn = structure.structureType === STRUCTURE_SPAWN;
@@ -127,7 +127,7 @@ module.exports = function (creep) {
                 creepTypes: []
             });
 
-            var closestCreep = creep.pos.findClosestByPath(FIND_MY_CREEPS, {
+            var closestCreep = creep.pos.findClosestByPathUsingCache(FIND_MY_CREEPS, {
                 filter: (c) => {
                     return opts.creepTypes.includes(c.memory.role) && filter(c);    
                 }
@@ -136,12 +136,12 @@ module.exports = function (creep) {
             return closestCreep;
         },
         getClosestSource: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPath(FIND_SOURCES, {
+            return creep.pos.findClosestByPathUsingCache(FIND_SOURCES, {
                 filter: filter
             });
         },
         getClosestTower: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+            return creep.pos.findClosestByPathUsingCache(FIND_MY_STRUCTURES, {
                 filter: (s) => {
                     return s.structureType === STRUCTURE_TOWER && filter(s);
                 }
@@ -192,7 +192,7 @@ module.exports = function (creep) {
             closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestTower(creep, generalRequirements) : null;
 
             var possibilities = _.compact([closestStructure, closestCreep, closestTower]);
-            var best = creep.pos.findClosestByPath(possibilities);
+            var best = creep.pos.findClosestByPathUsingCache(possibilities);
 
 
             //////// priority rules that override closest
@@ -251,7 +251,7 @@ module.exports = function (creep) {
             closestSource = opts.allowHarvesting ? this.getClosestSource(creep, generalRequirements): null;
 
             var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource]);
-            return creep.pos.findClosestByPath(possibilities);
+            return creep.pos.findClosestByPathUsingCache(possibilities);
         },
 
         getEnergyFromBestSource: function(creep, opts={}){
@@ -284,7 +284,7 @@ module.exports = function (creep) {
             }
 
             if(errCode == ERR_NOT_IN_RANGE) {
-                creep.moveTo(closestEnergySource);              
+                creep.moveToUsingCache(closestEnergySource);              
             }
 
     		return errCode;
@@ -307,7 +307,7 @@ module.exports = function (creep) {
             errCode = creep.transfer(recipient, RESOURCE_ENERGY);
 
             if(errCode == ERR_NOT_IN_RANGE) {
-                creep.moveTo(recipient);              
+                creep.moveToUsingCache(recipient);              
             }
 
             return errCode;
@@ -367,7 +367,7 @@ module.exports = function (creep) {
             var recipientIsCloserThanSource = false;
 
             if(closestEnergyRecipient && source){
-                recipientIsCloserThanSource = creep.pos.findClosestByPath([closestEnergyRecipient, source]) === closestEnergyRecipient;
+                recipientIsCloserThanSource = creep.pos.findClosestByPathUsingCache([closestEnergyRecipient, source]) === closestEnergyRecipient;
             }
 
             if(recipientIsCloserThanSource){
@@ -399,7 +399,7 @@ module.exports = function (creep) {
             var sources = creep.room.find(FIND_SOURCES);
             var errCode = creep.harvest(sources[opts.sourceIndex]);
             if(errCode === ERR_NOT_IN_RANGE || errCode === ERR_NOT_ENOUGH_RESOURCES) {
-                creep.moveTo(sources[opts.sourceIndex]);
+                creep.moveToUsingCache(sources[opts.sourceIndex]);
             } 
         },
         getCreepsOfType: function(types=[], room){
@@ -412,11 +412,11 @@ module.exports = function (creep) {
         getEnergyFromStorage(creep){
             var storageWithEnergy = this.getClosestStorageWithEnergy(creep)
             if(creep.withdraw(storageWithEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE){
-                creep.moveTo(storageWithEnergy)
+                creep.moveToUsingCache(storageWithEnergy)
             }
         },
         getClosestStorageWithEnergy(creep){
-            return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            return creep.pos.findClosestByPathUsingCache(FIND_STRUCTURES, {
                 filter: (s) => {
                     return (s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER) 
                     && s.store[RESOURCE_ENERGY] > 0;
@@ -551,6 +551,44 @@ module.exports = function (creep) {
                 func(new RoomPosition(step.x+1, step.y-1, room.name));
                 func(new RoomPosition(step.x-1, step.y+1, room.name));
             });
+        },
+        getPath(start, end, opts={}){
+            //schema
+            // pathsByStartAndEndIds.startX.startY.endX.endY
+
+            _.defaults(opts, {
+                serialize: true,
+                bustCache: false
+            });
+
+
+            if(!(start instanceof RoomPosition)){
+                start = start.pos;
+            }
+
+            if(!(end instanceof RoomPosition)){
+                end = end.pos;
+            }
+
+            var cachePropertyString = `pathsHash[${start.x}][${start.y}][${end.x}][${end.y}]`;
+
+            //CLEAR CACHE!!!!!!!!!!!!
+            // delete _.get(Memory, 'pathsHash');
+
+            var path = _.get(Memory, cachePropertyString);
+            if(!path || opts.bustCache){
+                myGlobal.cacheMisses++;
+                path = start.findPathTo(end, {serialize: true});
+                _.set(Memory, cachePropertyString, path);
+            }else{
+                myGlobal.cacheHits++;
+            }
+
+            if(!opts.serialize){
+                path = Room.deserializePath(path);
+            }
+
+            return path;
         },
         registerOtherRoomCreep: function(creep){
             

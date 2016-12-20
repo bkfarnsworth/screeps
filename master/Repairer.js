@@ -23,7 +23,7 @@ module.exports = function (creep) {
 
         if(target) {
             if(creep.repair(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);    
+                creep.moveToUsingCache(target);    
             }
         }
     });
@@ -45,7 +45,7 @@ function getBetterTarget(currentTarget, structure, creep){
 
     //if it is equal to the currentTarget we already have, make sure it's closer
     if(structure.hits === currentTarget.hits){
-        var closestStructure = creep.pos.findClosestByPath(_.compact([currentTarget, structure]));
+        var closestStructure = creep.pos.findClosestByPathUsingCache(_.compact([currentTarget, structure]));
         return closestStructure;
     }
 

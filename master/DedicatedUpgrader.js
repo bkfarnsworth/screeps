@@ -15,7 +15,7 @@ module.exports = function (creep, status) {
 	if(creep.room.controller) {
         if(upgradeCode != OK) {
             // console.log('fdsafdsa')
-            creep.moveTo(creep.room.controller);    
+            creep.moveToUsingCache(creep.room.controller);    
         }
 	}			
 }
