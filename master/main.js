@@ -130,14 +130,16 @@ Creep.prototype.getAssignedRoom = function(){
     return Game.rooms[this.memory.assignedRoom] || util().southRoom;
 }
 
-Creep.prototype.moveToUsingCache = function(target, opts={}){
-    var errCode = this.moveByPath(util().getPath(this, target), opts);
+Creep.prototype.moveToUsingCache = function(target){
 
-    //if the path doesn't work for some reason, recalculate it
-    if(errCode === ERR_NOT_FOUND){
-        this.moveByPath(util().getPath(this, target, {
-            bustCache: true
-        }), opts);
+    var path = util().getPath(this, target);
+    var errCode = this.moveByPath(path);
+
+    //if the path doesn't work for some reason, just calculate it without the cache
+    var validErrCodes = [ERR_NOT_FOUND, ERR_NO_PATH];
+    if(_.contains(validErrCodes, errCode)){
+        path = util().getPath(this, target, {useCache: false});
+        this.moveByPath(path);
     }
 
     return errCode;
@@ -157,7 +159,7 @@ RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts=
 
     var objectPathPairs = [];
     objects.forEach(object => {
-        var path = util().getPath(this, object, {serialize: false});
+        var path = util().getPath(this, object);
         objectPathPairs.push({
             object: object,
             path: path

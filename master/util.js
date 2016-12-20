@@ -557,8 +557,8 @@ module.exports = function (creep) {
             // pathsByStartAndEndIds.startX.startY.endX.endY
 
             _.defaults(opts, {
-                serialize: true,
-                bustCache: false
+                bustCache: false,
+                useCache: true
             });
 
 
@@ -575,17 +575,24 @@ module.exports = function (creep) {
             //CLEAR CACHE!!!!!!!!!!!!
             // delete _.get(Memory, 'pathsHash');
 
-            var path = _.get(Memory, cachePropertyString);
-            if(!path || opts.bustCache){
-                myGlobal.cacheMisses++;
-                path = start.findPathTo(end, {serialize: true});
-                _.set(Memory, cachePropertyString, path);
+            var path;
+            if(opts.useCache){
+                path = _.get(Memory, cachePropertyString);
+                if(!path || opts.bustCache){
+                    myGlobal.cacheMisses++;
+                    //get the path, here are the different flags you can pass:
+                    //http://support.screeps.com/hc/en-us/articles/203079011-Room#findPath 
+                    path = start.findPathTo(end, {
+                        serialize: true,
+                        ignoreCreeps: true
+                    });
+                    _.set(Memory, cachePropertyString, path);
+                }else{
+                    myGlobal.cacheHits++;
+                }
             }else{
-                myGlobal.cacheHits++;
-            }
-
-            if(!opts.serialize){
-                path = Room.deserializePath(path);
+                myGlobal.cacheMisses++;
+                path = start.findPathTo(end);
             }
 
             return path;
