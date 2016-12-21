@@ -1,4 +1,4 @@
-var util = require('util')
+var util = require('util');
 
 // module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
 var Tracker = function(){
@@ -13,7 +13,7 @@ Tracker.prototype.track = function(opts={}) {
         gclToNextLevel: false,
         averageGcl: false,
         averageSourceDepletionRatio: false,
-        cachePercent: false
+        cachePercent: false,
     }); 
 
     console.log();
@@ -21,8 +21,41 @@ Tracker.prototype.track = function(opts={}) {
 
     this.trackCaching(opts);
     this.trackGcl(opts);
+    this.trackControllers(opts);
     this.trackCpu(opts);
     this.trackSources(opts);
+    this.trackSecondsPerTick(opts);
+}
+
+Tracker.prototype.trackSecondsPerTick = function(opts){
+    var averageSecondsPerTick = trackWithDecayUsingPrevious({
+        key: 'averageSecondsPerTick',
+        previousKey: 'previousTickSeconds',
+        currentValue: Date.now() / 1000, //get the number seconds elapsed since 1970 or whatever
+        decayFactor: 0.9
+    });
+
+    console.log('averageSecondsPerTick: ', _.round(averageSecondsPerTick, 2));
+}
+
+Tracker.prototype.trackControllers = function(opts){
+
+    util().getAllRooms().forEach(room => {
+
+        var averageUpgrade = trackWithDecayUsingPrevious({
+            key: 'averageUpgradePerTick' + room.name,
+            previousKey: 'previousTickUpgrade' + room.name,
+            currentValue: room.controller.progress,
+            decayFactor: 0.999
+        });
+
+        console.log('Average Upgrade ('+room.name+'): ', _.round(averageUpgrade, 2));
+
+        printEstimatedTimeRemaining({
+            average: averageUpgrade,
+            remainingProgress: room.controller.progressTotal - room.controller.progress
+        });
+    });
 }
 
 Tracker.prototype.trackCaching = function(opts){
@@ -62,7 +95,6 @@ Tracker.prototype.trackSources = function(opts){
 }
 
 Tracker.prototype.trackGcl = function(opts){
-    /////////GCL TRACKER
     var averageGcl = trackWithDecayUsingPrevious({
         key: 'averageGCLPerTick',
         previousKey: 'previousTickGcl',
@@ -133,6 +165,28 @@ function trackWithDecay(opts={}){
 
     return Memory[opts.key];
 }
+
+function printEstimatedTimeRemaining(opts={}){
+
+    _.defaults(opts, {
+        average: undefined,
+        remainingProgress: undefined
+    });
+
+    //average convert to how many ticks we need
+    var neededTicks = opts.remainingProgress / opts.average;
+
+    //convert to seconds -> minutes -> hours
+    var hours = (neededTicks * Memory.averageSecondsPerTick) / 60 / 60;
+    var days = hours / 24;
+
+    if(hours > 24){
+        console.log(`Estimated time to next upgrade: ${_.round(days, 2)} days`);
+    }else{
+        console.log(`Estimated time to next upgrade: ${_.round(hours, 2)} hours`);
+    }
+}
+
 
 function roundToTwoPlaces(number){
     return parseFloat(number.toFixed(2));
@@ -234,25 +288,6 @@ Tracker.prototype.otherTracking = function(opts){
         Memory.energyTracker.averageEnergyCapacity = parseFloat(Memory.energyTracker.averageEnergyCapacity.toFixed(2))
         
         console.log('AVG ENERGY AVAILABLE: ' + Memory.energyTracker.averageEnergyAvailable)
-    }
-
-    //////// CONTROLLER TRACKER
-    if(!Memory.controllerTracker){
-        Memory.controllerTracker = {
-            averagePointsPerTick: 0,
-            currentTotal: 0
-        };
-    }else{
-        var decayFactor = 0.9;
-        var previousTickTotal = Memory.controllerTracker.currentTotal || controller.progress;
-        var currentTickUpgradePoints = controller.progress - previousTickTotal;
-    
-        Memory.controllerTracker.averagePointsPerTick *= decayFactor;
-        Memory.controllerTracker.averagePointsPerTick += (currentTickUpgradePoints * (1 - decayFactor));
-        Memory.controllerTracker.currentTotal = controller.progress;
-        
-        //round
-        Memory.controllerTracker.averagePointsPerTick = parseFloat(Memory.controllerTracker.averagePointsPerTick.toFixed(2))
     }
 }
 
