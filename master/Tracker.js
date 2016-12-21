@@ -12,23 +12,34 @@ Tracker.prototype.track = function(opts={}) {
         averageCpu: false,
         gclToNextLevel: false,
         averageGcl: false,
-        averageSourceDepletionRatio: false
+        averageSourceDepletionRatio: false,
+        cachePercent: false
     }); 
 
     console.log();
     console.log('-- Tracking --');
 
+    this.trackCaching(opts);
     this.trackGcl(opts);
     this.trackCpu(opts);
     this.trackSources(opts);
 }
 
+Tracker.prototype.trackCaching = function(opts){
+    if(opts.cachePercent){
+        console.log('cache %: ', _.round(myGlobal.cacheHits / (myGlobal.cacheHits + myGlobal.cacheMisses), 2));
+    }
+}
+
 Tracker.prototype.trackSources = function(opts){
 
-    //ideal would be 3000 energy in exactly 300 ticks
-    console.log('Ideal ADR (Average Depletion Ratio) is 0.1 (harvesting 3000 energy in 300 ticks)');
-
     if(opts.averageSourceDepletionRatio){
+        //ideal would be 3000 energy in exactly 300 ticks
+        console.log('Ideal ADR (Average Depletion Ratio) is 0.1 (harvesting 3000 energy in 300 ticks)');
+        console.log('< 0.1 = not harvesting fast enough');
+        console.log('> 0.1 = harvesting too fast');
+        console.log('Try to get each above 0.1');
+
         var sources = util().findInAllRooms(FIND_SOURCES);
         sources.forEach(s => {
 
@@ -40,7 +51,7 @@ Tracker.prototype.trackSources = function(opts){
                 avgDepletionRatio = trackWithDecay({
                     key: key,
                     value: s.ticksToRegeneration / s.energy,
-                    decayFactor: 0.99
+                    decayFactor: 0.999
                 });
             }
 
@@ -56,7 +67,7 @@ Tracker.prototype.trackGcl = function(opts){
         key: 'averageGCLPerTick',
         previousKey: 'previousTickGcl',
         currentValue: Game.gcl.progress,
-        decayFactor: 0.99
+        decayFactor: 0.999
     });
 
     if(opts.gclToNextLevel){
@@ -72,7 +83,7 @@ Tracker.prototype.trackCpu = function(opts){
     var averageCpu = trackWithDecay({
         key: 'averageCPUPerTick',
         value: Game.cpu.getUsed(),
-        decayFactor: 0.99
+        decayFactor: 0.999
     });
 
     if(opts.currentCpu){
@@ -90,7 +101,7 @@ function trackWithDecayUsingPrevious(opts={}){
         key: '',
         previousKey: '',
         currentValue: '',
-        decayFactor: 0.99
+        decayFactor: 0.999
     });
 
     var avg;
@@ -110,7 +121,7 @@ function trackWithDecay(opts={}){
     _.defaults(opts, {
         key: '',
         value: '',
-        decayFactor: 0.99
+        decayFactor: 0.999
     });
 
     if(_.isUndefined(Memory[opts.key])){

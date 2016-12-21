@@ -3,7 +3,6 @@ myGlobal = {
     cacheMisses: 0
 };
 
-
 var harvester = require('harvester')
 var harvesterTwo = require('HarvesterTwo')
 var upgrader = require('Upgrader')
@@ -126,17 +125,13 @@ module.exports.loop = function () {
     
     if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
 
-    console.log();
-    console.log('cache %: ', _.round(myGlobal.cacheHits / (myGlobal.cacheHits + myGlobal.cacheMisses), 2));
-
     var tracker = new Tracker();
     tracker.track({
        averageCpu: true,
        averageGcl: true,
-       averageSourceDepletionRatio: true
+       averageSourceDepletionRatio: true,
+       cachePercent: true
     });
-
-
 }
 
 Creep.prototype.getName = function(){
