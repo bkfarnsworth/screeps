@@ -1,28 +1,42 @@
-module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
+// module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
+var Tracker = function(){
+    return this;
+}
+
+Tracker.prototype.track = function(opts={}) {
     
     _.defaults(opts, {
-        cpuTracker: true
+        currentCpu: false,
+        averageCpu: false,
+        gclToNextLevel: false,
+        averageGcl: false 
     }); 
 
+    console.log();
+    console.log('-- Tracking --');
+
     /////////GCL TRACKER
-    // console.log('Game.gcl.progress: ', Game.gcl.progress);
-    // console.log('Game.gcl.progressTotal: ', Game.gcl.progressTotal);
-    // console.log('GCL to next level: ' + (Game.gcl.progressTotal - Game.gcl.progress));
+    var averageGcl = trackWithDecayUsingPrevious('averageGCLPerTick', 'previousTickGcl', Game.gcl.progress, 0.99);
+
+    if(opts.gclToNextLevel){
+        console.log('GCL to next level: ' + _.round(Game.gcl.progressTotal - Game.gcl.progress, 2));
+    }
+
+    if(opts.averageGcl){
+        console.log('Average GCL: ', _.round(averageGcl, 2));
+    }
 
     ///////// CPU TRACKER
-    if(opts.cpuTracker){
-        if(!Memory.cpuTracker){
-            Memory.cpuTracker = {
-                averageCPUPerTick: 0
-            };
-        }else{
-            var decayFactor = 0.99;
-            Memory.cpuTracker.averageCPUPerTick *= decayFactor;
-            Memory.cpuTracker.averageCPUPerTick += (Game.cpu.getUsed() * (1 - decayFactor));
-        }
+    var averageCpu = trackWithDecay('averageCPUPerTick', Game.cpu.getUsed(), 0.99)
 
-        console.log('AVERAGE CPU: ' + _.round(Memory.cpuTracker.averageCPUPerTick, 2));
+    if(opts.currentCpu){
+        console.log('Current CPU: ', _.round(Game.cpu.getUsed(), 2));
     }
+
+    if(opts.averageCpu){
+        console.log('Average CPU: ', _.round(averageCpu, 2));
+    }
+
 
     return; //for now
 
@@ -144,6 +158,29 @@ module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
 
 }
 
+function trackWithDecayUsingPrevious(key, previousKey, currentValue, decayFactor){
+    var avg;
+    if(!_.isUndefined(Memory[previousKey])){
+        avg = trackWithDecay(key, currentValue - Memory[previousKey], decayFactor);
+    }
+    Memory[previousKey] = currentValue
+    return avg || Memory[previousKey];
+}
+
+function trackWithDecay(key, value, decayFactor){
+
+    if(_.isUndefined(Memory[key])){
+        Memory[key] = 0;
+    }else{
+        Memory[key] *= decayFactor;
+        Memory[key] += (value * (1 - decayFactor));
+    }
+
+    return Memory[key];
+}
+
 function roundToTwoPlaces(number){
     return parseFloat(number.toFixed(2));
 }
+
+module.exports = Tracker;
