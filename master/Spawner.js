@@ -19,7 +19,6 @@ module.exports = function () {
         { name: 'harvesterTwo1',      role: 'harvesterTwo',       config: {stopOperation: true}},
         { name: 'harvester2',         role: 'harvester',          config: {stopOperation: true}},
         { name: 'harvesterTwo2',      role: 'harvesterTwo',       config: {stopOperation: true}},
-        { name: 'guard1',             role: 'guard' },
         { name: 'upgrader1',          role: 'upgrader', },
         { name: 'builder1',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
         { name: 'carrier1',           role: 'carrier', },
@@ -28,7 +27,9 @@ module.exports = function () {
         { name: 'upgrader2',          role: 'upgrader', },
         { name: 'builder3',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
         { name: 'upgrader3',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
-        { name: 'upgrader4',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}}
+        { name: 'upgrader4',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
+        { name: 'upgrader5',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
+        { name: 'upgrader6',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}}
     ]
 
     var southRoomCreepTypes = [ 
@@ -37,7 +38,6 @@ module.exports = function () {
         { name: 'harvester2',         role: 'harvester',          config: {stopOperation: true}},
         { name: 'harvester3',         role: 'harvester',          config: {stopOperation: true}},
         { name: 'superHarvesterTwo',  role: 'superHarvesterTwo',  config: {stopOperation: true}},
-        { name: 'guard1',             role: 'guard'},
         // { name: 'melee1',          role: 'meleeAttacker'}, 
         { name: 'upgrader1',          role: 'upgrader'},
         { name: 'builder1',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
@@ -48,6 +48,8 @@ module.exports = function () {
         { name: 'builder3',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
         { name: 'upgrader3',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
         { name: 'upgrader4',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
+        { name: 'upgrader5',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
+        { name: 'upgrader6',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
     ];
 
 
@@ -64,13 +66,13 @@ module.exports = function () {
         return creepType;
     });
 
-    [northRoomCreepTypes, southRoomCreepTypes].forEach((room, i) => {
+    [northRoomCreepTypes, southRoomCreepTypes].forEach((creepList, i) => {
         console.log();
         console.log('Room: ', i === 0 ? 'North Room' : 'South Room');
 
-        var spawn = util().getSpawnForRoom(room[0].assignedRoom);
+        var spawn = util().getSpawnForRoom(creepList[0].assignedRoom);
         var actualRoom = i === 0 ? util().northRoom : util().southRoom;
-        var creepsThatNeedSpawning = room.filter(creepType => creepType.needsSpawning());
+        var creepsThatNeedSpawning = creepList.filter(creepType => creepType.needsSpawning());
 
         //assume it's sorted by priority
 
@@ -91,12 +93,13 @@ module.exports = function () {
         spawnCreep(creepToSpawn);
 
         if(printQueue){
-            room.forEach((creepType, index) => {
-                var printedSpawningCreep = false;//just keep track and mark the next highest priority as spawning
+            var printedSpawningCreep = false;//just keep track and mark the next highest priority as spawning
+            creepList.forEach((creepType, index) => {
 
                 if(creepType.needsSpawning() && creepType.condition){
                     if(spawn.spawning && !printedSpawningCreep){
                         util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
+                        printedSpawningCreep = true;
                     }else{
                         util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
                     }

@@ -15,7 +15,7 @@ var spawner = require('Spawner')
 var repairer = require('Repairer')
 var dedicatedHarvester = require('DedicatedHarvester')
 var carrier = require('Carrier')
-var tracker = require('Tracker');
+var Tracker = require('Tracker');
 var util = require('util');
 var tower = require('Tower');
 var Guard = require('Guard');
@@ -33,10 +33,11 @@ module.exports.loop = function () {
     console.log();
     console.log("--------- Creep Report - new tick -------------");
 
-    if(_.random(1, 10) <= throttleRatio*10){
-        console.log('SAVING CPU');
-        return;
-    }
+
+    // if(_.random(1, 10) <= throttleRatio*10){
+    //     console.log('SAVING CPU');
+    //     return;
+    // }
 
     if(seeCPU){ util().printCPU(() => { console.log('main.js::59 :: '); }); }   
 
@@ -124,9 +125,13 @@ module.exports.loop = function () {
     console.log();
     console.log('cache %: ', _.round(myGlobal.cacheHits / (myGlobal.cacheHits + myGlobal.cacheMisses), 2));
 
-    util().printCPU()
-
-    tracker();
+    var tracker = new Tracker();
+    tracker.track({
+       currentCpu: true,
+       averageCpu: true,
+       gclToNextLevel: false,
+       averageGcl: true 
+    });
 }
 
 Creep.prototype.getName = function(){

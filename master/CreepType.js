@@ -55,15 +55,15 @@ CreepType.factory = function(name, type, room, opts={}){
             break;
         case 'carrier': 
             creepType.role = 'carrier';
-            creepType.bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
+            creepType.bodyParts = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
             break;
         case 'upgrader': 
             creepType.role = 'upgrader';
-            creepType.bodyParts = [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE];
+            creepType.bodyParts = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
             break;
         case 'builder': 
             creepType.role = 'builder';
-            creepType.bodyParts = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE];
+            creepType.bodyParts = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
             break;
     }
 
