@@ -20,6 +20,7 @@ var util = require('util');
 var tower = require('Tower');
 var Guard = require('Guard');
 var ConstructionManager = require('ConstructionManager');
+var MeleeAttacker = require('MeleeAttacker');
 
 var useTracker = false;
 var seeCPU = false;
@@ -67,11 +68,11 @@ module.exports.loop = function () {
 		var creep = Game.creeps[name];
 
         //generic creep actions
-        if(creep.room.name === util().milesRoomName){
-            console.log('MILES ROOM creep.name: ', creep.name);
-            util().goToRoom(util.southRoomName, creep);
-            continue;
-        }
+        // if(creep.room.name === util().milesRoomName){
+        //     console.log('MILES ROOM creep.name: ', creep.name);
+        //     util().goToRoom(util.southRoomName, creep);
+        //     continue;
+        // }
 
 	    if(creep.memory.role == 'carrier') {
             carrier(creep);
@@ -97,6 +98,11 @@ module.exports.loop = function () {
             var guard = new Guard(creep);
             guard.doWork();
         }
+
+        if(creep.memory.role == 'meleeAttacker') {
+            var meleeAttacker = new MeleeAttacker(creep);
+            meleeAttacker.doWork();
+        }
         
 		if(creep.memory.role == 'builder') {
 	        builder(creep);
@@ -115,6 +121,7 @@ module.exports.loop = function () {
     
     if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
 
+    console.log();
     console.log('cache %: ', _.round(myGlobal.cacheHits / (myGlobal.cacheHits + myGlobal.cacheMisses), 2));
 
     util().printCPU()

@@ -1,11 +1,12 @@
 module.exports = function (creep) {
     return {
         milesRoomName: 'E78S47',
-        tamsonsRoom: 'W12S5',
         northRoomName: 'E77S46',
         southRoomName: 'E77S47',
         southRoom: Game.rooms['E77S47'],
         northRoom: Game.rooms['E77S46'],
+        milesRoom: Game.rooms['E78S47'],
+        milesUsername: 'Nephite135',
         findMyCreeps: function(filterObj){
             return this.southRoom.find(FIND_MY_CREEPS, filterObj)
                 .concat(this.northRoom.find(FIND_MY_CREEPS, filterObj));
@@ -302,6 +303,16 @@ module.exports = function (creep) {
             var closestEnergyRecipient = this.getBestEnergyRecipient(creep, opts);
 
             return this.giveEnergyToRecipient(creep, closestEnergyRecipient);
+        },
+        findHostiles(room, opts={}){
+
+            _.defaults(opts, {
+                usersToIgnore: [this.milesUsername]
+            });
+
+            return room.find(FIND_HOSTILE_CREEPS, opts).filter(hostile => {
+                return !_.contains(opts.usersToIgnore, hostile.owner.username);
+            });
         },
         giveEnergyToRecipient(creep, recipient){
             errCode = creep.transfer(recipient, RESOURCE_ENERGY);

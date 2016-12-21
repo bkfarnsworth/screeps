@@ -41,6 +41,10 @@ CreepType.factory = function(name, type, room, opts={}){
             creepType.role = 'guard';
             creepType.bodyParts = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
             break;
+        case 'meleeAttacker': 
+            creepType.role = 'meleeAttacker';
+            creepType.bodyParts = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
+            break;
         case 'harvester': 
             creepType.role = 'harvester';
             creepType.bodyParts = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];

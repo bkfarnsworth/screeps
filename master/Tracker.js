@@ -4,6 +4,11 @@ module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
         cpuTracker: true
     }); 
 
+    /////////GCL TRACKER
+    // console.log('Game.gcl.progress: ', Game.gcl.progress);
+    // console.log('Game.gcl.progressTotal: ', Game.gcl.progressTotal);
+    // console.log('GCL to next level: ' + (Game.gcl.progressTotal - Game.gcl.progress));
+
     ///////// CPU TRACKER
     if(opts.cpuTracker){
         if(!Memory.cpuTracker){

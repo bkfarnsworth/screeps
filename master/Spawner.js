@@ -14,6 +14,9 @@ module.exports = function () {
 
 
     var northRoomCreepTypes = [
+        // {
+        //     name: 
+        // }
         CreepType.factory('backUpHarvester', 'backUpHarvester', util().northRoom, {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}),
         CreepType.factory('harvester1', 'harvester', util().northRoom, {stopOperation: true}),
         CreepType.factory('harvesterTwo1', 'harvesterTwo', util().northRoom, {stopOperation: true}),
@@ -38,6 +41,7 @@ module.exports = function () {
         CreepType.factory('harvester3', 'harvester', util().southRoom, {stopOperation: true}),
         CreepType.factory('superHarvesterTwo', 'superHarvesterTwo', util().southRoom, {stopOperation: true}),
         CreepType.factory('guard1', 'guard', util().southRoom),
+        // CreepType.factory('melee1', 'meleeAttacker', util().southRoom),
         CreepType.factory('upgrader1', 'upgrader', util().southRoom),
         CreepType.factory('builder1', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
         CreepType.factory('carrier1', 'carrier', util().southRoom),
@@ -53,12 +57,10 @@ module.exports = function () {
 
     northRoomCreepTypes.forEach((ct, priority) => {
         ct.assignedRoom = util().northRoomName;
-        ct.priority = priority;
     });
 
     southRoomCreepTypes.forEach((ct, priority) => {
         ct.assignedRoom = util().southRoomName;
-        ct.priority = priority;
     });
 
     [northRoomCreepTypes, southRoomCreepTypes].forEach((room, i) => {
