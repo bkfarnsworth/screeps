@@ -618,6 +618,18 @@ module.exports = function (creep) {
 
             return path;
         },
+        runFromInvader(creep){
+            var hostiles = this.findHostiles(creep.room);
+            var inRange;
+            if(hostiles.length){
+                inRange = creep.pos.inRangeTo(hostiles[0], 5);
+                if(hostiles.length && inRange){
+                    creep.moveToUsingCache(creep.room.getSafeAreaFromInvaders());
+                }
+            }
+
+            return hostiles.length && inRange;
+        },
         registerOtherRoomCreep: function(creep){
             
 

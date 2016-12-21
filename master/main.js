@@ -75,6 +75,10 @@ module.exports.loop = function () {
         //     continue;
         // }
 
+        if(util().runFromInvader(creep)){
+            continue;
+        }
+
 	    if(creep.memory.role == 'carrier') {
             carrier(creep);
 		}
@@ -127,11 +131,12 @@ module.exports.loop = function () {
 
     var tracker = new Tracker();
     tracker.track({
-       currentCpu: true,
        averageCpu: true,
-       gclToNextLevel: false,
-       averageGcl: true 
+       averageGcl: true,
+       averageSourceDepletionRatio: true
     });
+
+
 }
 
 Creep.prototype.getName = function(){
@@ -218,4 +223,25 @@ RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts=
 
 RoomPosition.prototype.getRoom = function(){
     return Game.rooms[this.roomName];
+}
+
+Room.prototype.getSafeAreaFromInvaders = function(){
+    if(this === util().northRoom){
+        return new RoomPosition(6, 24, this.name);
+    }else if(this === util().southRoom){
+        return new RoomPosition(21, 19, this.name);
+    }
+}
+
+Source.prototype.getFriendlyName = function(){
+    switch(this.id){
+        case '5836b91a8b8b9619519f334c':
+            return 'South - Right Side'
+        case '5836b91a8b8b9619519f334b':
+            return 'South - Left Side'
+        case '5836b91a8b8b9619519f3347':
+            return 'North - North Side'
+        case '5836b91a8b8b9619519f3346':
+            return 'North - South Side'
+    }
 }

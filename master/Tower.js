@@ -19,12 +19,15 @@ module.exports = function (tower) {
     };
 
 
-    // if(hostileCreeps.length && false){
-        // tower.attack(hostileCreeps[0]);
-    //}
-    if(creepsToHeal.length){
+    //if one invader, the tower can handle that
+    if(hostileCreeps.length === 1){
+        tower.attack(hostileCreeps[0]);
+
+    }else if(creepsToHeal.length){
         tower.heal(creepsToHeal[0])
-    }else{
+
+    //if more than 1 invader, just set the tower healing the walls, becasue you might not be able to kill them
+    }else if(hostileCreeps.length === 0 || hostileCreeps.length > 1){
         var structures = tower.room.find(FIND_STRUCTURES, {
             filter: bestTowerTarget
         });
