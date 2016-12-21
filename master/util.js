@@ -260,7 +260,7 @@ module.exports = function (creep) {
             var creepTypes = creep.room.status ? ['carrier', 'harvester', 'harvesterTwo'] : ['carrier'];
 
             _.defaults(opts, {
-                minEnergyRatio: 0.3,
+                minEnergyRatio: 0,
                 allowHarvesting: false,//allow them to go harvet on their own
                 allowCarrier: false,//allow them to get from a carrier
                 allowStructures: creep.room.status === 'complete',
