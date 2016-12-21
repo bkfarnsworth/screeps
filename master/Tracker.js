@@ -11,7 +11,7 @@ module.exports = function (totalEnergyAvailable, totalEnergyCapacity, opts={}) {
                 averageCPUPerTick: 0
             };
         }else{
-            var decayFactor = 0.9;
+            var decayFactor = 0.99;
             Memory.cpuTracker.averageCPUPerTick *= decayFactor;
             Memory.cpuTracker.averageCPUPerTick += (Game.cpu.getUsed() * (1 - decayFactor));
         }

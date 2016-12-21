@@ -88,16 +88,20 @@ module.exports = function () {
         spawnCreep(creepToSpawn);
 
         if(printQueue){
-            room.forEach(creepType => {
+            room.forEach((creepType, index) => {
+                var printedSpawningCreep = false;//just keep track and mark the next highest priority as spawning
+
                 if(creepType.needsSpawning() && creepType.condition){
-                    util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
+                    if(spawn.spawning && !printedSpawningCreep){
+                        util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
+                    }else{
+                        util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
+                    }
                 }else if(!creepType.condition){
                     util().printWithSpacing(creepType.role + ': Condition not met (' + creepType.getEnergyRequired() + ')');
                 }else if(!creepType.needsSpawning()){
                     var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
                     util().printWithSpacing(creepType.role + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
-                }else{
-                    util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
                 }
             });
         }
