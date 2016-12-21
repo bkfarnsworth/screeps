@@ -14,53 +14,54 @@ module.exports = function () {
 
 
     var northRoomCreepTypes = [
-        // {
-        //     name: 
-        // }
-        CreepType.factory('backUpHarvester', 'backUpHarvester', util().northRoom, {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}),
-        CreepType.factory('harvester1', 'harvester', util().northRoom, {stopOperation: true}),
-        CreepType.factory('harvesterTwo1', 'harvesterTwo', util().northRoom, {stopOperation: true}),
-        CreepType.factory('harvester2', 'harvester', util().northRoom, {stopOperation: true}),
-        CreepType.factory('harvesterTwo2', 'harvesterTwo', util().northRoom, {stopOperation: true}),
-        CreepType.factory('guard1', 'guard', util().northRoom),
-        CreepType.factory('upgrader1', 'upgrader', util().northRoom),
-        CreepType.factory('builder1', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
-        CreepType.factory('carrier1', 'carrier', util().northRoom),
-        CreepType.factory('upgrader2', 'upgrader', util().northRoom),
-        CreepType.factory('builder2', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
-        CreepType.factory('upgrader2', 'upgrader', util().northRoom),
-        CreepType.factory('builder3', 'builder', util().northRoom, {condition: northConstructionSites.length > 0}),
-        CreepType.factory('upgrader3', 'upgrader', util().northRoom, {condition: northConstructionSites.length === 0}),
-        CreepType.factory('upgrader4', 'upgrader', util().northRoom, {condition: northConstructionSites.length === 0}),
+        { name: 'backUpHarvester', role: 'backUpHarvester', config: {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}},
+        { name: 'harvester1', role: 'harvester', config: {stopOperation: true}},
+        { name: 'harvesterTwo1', role: 'harvesterTwo', config: {stopOperation: true}},
+        { name: 'harvester2', role: 'harvester', config: {stopOperation: true}},
+        { name: 'harvesterTwo2', role: 'harvesterTwo', config: {stopOperation: true}},
+        { name: 'guard1', role: 'guard' },
+        { name: 'upgrader1', role: 'upgrader', },
+        { name: 'builder1', role: 'builder', config: {condition: northConstructionSites.length > 0}},
+        { name: 'carrier1', role: 'carrier', },
+        { name: 'upgrader2', role: 'upgrader', },
+        { name: 'builder2', role: 'builder', config: {condition: northConstructionSites.length > 0}},
+        { name: 'upgrader2', role: 'upgrader', },
+        { name: 'builder3', role: 'builder', config: {condition: northConstructionSites.length > 0}},
+        { name: 'upgrader3', role: 'upgrader', config: {condition: northConstructionSites.length === 0}},
+        { name: 'upgrader4', role: 'upgrader', config: {condition: northConstructionSites.length === 0}}
     ]
 
-    var southRoomCreepTypes = [
-        CreepType.factory('backUpHarvester', 'backUpHarvester', util().northRoom, {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}),
-        CreepType.factory('harvester1', 'harvester', util().southRoom, {stopOperation: true}),
-        CreepType.factory('harvester2', 'harvester', util().southRoom, {stopOperation: true}),
-        CreepType.factory('harvester3', 'harvester', util().southRoom, {stopOperation: true}),
-        CreepType.factory('superHarvesterTwo', 'superHarvesterTwo', util().southRoom, {stopOperation: true}),
-        CreepType.factory('guard1', 'guard', util().southRoom),
-        // CreepType.factory('melee1', 'meleeAttacker', util().southRoom),
-        CreepType.factory('upgrader1', 'upgrader', util().southRoom),
-        CreepType.factory('builder1', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
-        CreepType.factory('carrier1', 'carrier', util().southRoom),
-        CreepType.factory('upgrader2', 'upgrader', util().southRoom),
-        CreepType.factory('builder2', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
-        CreepType.factory('upgrader2', 'upgrader', util().southRoom),
-        CreepType.factory('builder3', 'builder', util().southRoom, {condition: southConstructionSites.length > 0}),
-        CreepType.factory('upgrader3', 'upgrader', util().southRoom, {condition: southConstructionSites.length === 0}),
-        CreepType.factory('upgrader4', 'upgrader', util().southRoom, {condition: southConstructionSites.length === 0}),
+    var southRoomCreepTypes = [ 
+        { name: 'backUpHarvester', role: 'backUpHarvester', config: {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}},
+        { name: 'harvester1', role: 'harvester', config: {stopOperation: true}},
+        { name: 'harvester2', role: 'harvester', config: {stopOperation: true}},
+        { name: 'harvester3', role: 'harvester', config: {stopOperation: true}},
+        { name: 'superHarvesterTwo', role: 'superHarvesterTwo', config: {stopOperation: true}},
+        { name: 'guard1', role: 'guard'},
+        // { name: 'melee1', role: 'meleeAttacker'}, 
+        { name: 'upgrader1', role: 'upgrader'},
+        { name: 'builder1', role: 'builder', config: {condition: southConstructionSites.length > 0}},
+        { name: 'carrier1', role: 'carrier'}, 
+        { name: 'upgrader2', role: 'upgrader'}, 
+        { name: 'builder2', role: 'builder', config: {condition: southConstructionSites.length > 0}},
+        { name: 'upgrader2', role: 'upgrader'}, 
+        { name: 'builder3', role: 'builder', config: {condition: southConstructionSites.length > 0}},
+        { name: 'upgrader3', role: 'upgrader', config: {condition: southConstructionSites.length === 0}},
+        { name: 'upgrader4', role: 'upgrader', config: {condition: southConstructionSites.length === 0}},
     ];
 
 
 
-    northRoomCreepTypes.forEach((ct, priority) => {
-        ct.assignedRoom = util().northRoomName;
+    northRoomCreepTypes = northRoomCreepTypes.map(ct => {
+        var creepType = CreepType.factory(ct.name, ct.role, util().northRoom, ct.config);
+        creepType.assignedRoom = util().northRoomName;
+        return creepType;
     });
 
-    southRoomCreepTypes.forEach((ct, priority) => {
-        ct.assignedRoom = util().southRoomName;
+    southRoomCreepTypes = southRoomCreepTypes.map(ct => {
+        var creepType = CreepType.factory(ct.name, ct.role, util().southRoom, ct.config);
+        creepType.assignedRoom = util().southRoomName;
+        return creepType;
     });
 
     [northRoomCreepTypes, southRoomCreepTypes].forEach((room, i) => {
