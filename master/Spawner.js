@@ -94,16 +94,11 @@ module.exports = function () {
         spawnCreep(creepToSpawn);
 
         if(printQueue){
-            var printedSpawningCreep = false;//just keep track and mark the next highest priority as spawning
             creepList.forEach((creepType, index) => {
-
-                if(creepType.needsSpawning() && creepType.condition){
-                    if(spawn.spawning && !printedSpawningCreep){
-                        util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
-                        printedSpawningCreep = true;
-                    }else{
-                        util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
-                    }
+                if(creepType.isSpawning()){
+                    util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
+                }else if(creepType.needsSpawning() && creepType.condition){
+                    util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
                 }else if(!creepType.condition){
                     util().printWithSpacing(creepType.role + ': Condition not met (' + creepType.getEnergyRequired() + ')');
                 }else if(!creepType.needsSpawning()){

@@ -87,6 +87,10 @@ CreepType.prototype.getMatchingCreeps = function(){
     return this._matchingCreeps;
 }
 
+CreepType.prototype.isSpawning = function() {
+    return this.getMatchingCreeps().length && this.getMatchingCreeps()[0].spawning;
+};
+
 CreepType.prototype.needsSpawning = function() {
     return !this.getMatchingCreeps().length && this.condition;
 };

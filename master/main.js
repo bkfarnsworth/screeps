@@ -63,6 +63,11 @@ module.exports.loop = function () {
         }
     }    
 
+    //LINKS
+    // var westLink = Game.structures['585b6ab33962b71d57030d66'];
+    // var eastLink = Game.structures['585b6ab33962b71d57030d66'];
+    // westLink.transferEnergy(eastLink);
+
     //CREEPS
     var tempCpuUsed = Game.cpu.getUsed();
 	for(var name in Game.creeps) {

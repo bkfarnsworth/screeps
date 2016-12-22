@@ -123,7 +123,8 @@ module.exports = function (creep) {
                     var isExtension = structure.structureType === STRUCTURE_EXTENSION;
                     var isStorage = structure.structureType === STRUCTURE_STORAGE;
                     var isContainer = structure.structureType === STRUCTURE_CONTAINER;
-                    var isStructure = isSpawn || isExtension || isStorage || isContainer;
+                    var isLink = structure.structureType === STRUCTURE_LINK;
+                    var isStructure = isSpawn || isExtension || isStorage || isContainer || isLink;
                     return isStructure && filter(structure);
                 }
             });
@@ -307,7 +308,8 @@ module.exports = function (creep) {
                 creepTypes: ['builder', 'upgrader', 'repairer'],
                 allowStructures: false,
                 allowStorage: true,
-                allowTowers: creep.room.status === 'complete'
+                allowTowers: creep.room.status === 'complete',
+                allowLink: creep.room.status === 'complete'
             });
 
             var errCode;
