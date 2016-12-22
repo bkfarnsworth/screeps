@@ -41,6 +41,10 @@ CreepType.factory = function(name, type, room, opts={}){
             creepType.role = 'guard';
             creepType.bodyParts = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
             break;
+        case 'demoman': 
+            creepType.role = 'demoman';
+            creepType.bodyParts = [TOUGH,TOUGH,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK];
+            break;
         case 'meleeAttacker': 
             creepType.role = 'meleeAttacker';
             creepType.bodyParts = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
@@ -79,7 +83,7 @@ CreepType.prototype.getMatchingCreeps = function(){
     }
 
     //cache result
-    this._matchingCreeps = this._matchingCreeps || util().findInAllRooms(FIND_MY_CREEPS, {filter: roleFilter});
+    this._matchingCreeps = this._matchingCreeps || util().findMyCreeps({filter: roleFilter.bind(this)});
     return this._matchingCreeps;
 }
 

@@ -40,6 +40,7 @@ module.exports = function () {
         { name: 'superHarvesterTwo',  role: 'superHarvesterTwo',  config: {stopOperation: true}},
         // { name: 'melee1',          role: 'meleeAttacker'}, 
         { name: 'upgrader1',          role: 'upgrader'},
+        { name: 'demoman1',           role: 'demoman'},
         { name: 'builder1',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
         { name: 'carrier1',           role: 'carrier'}, 
         { name: 'upgrader2',          role: 'upgrader'}, 

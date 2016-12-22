@@ -2,7 +2,7 @@ var util = require('util');
 
 module.exports = function (tower) {
 
-    var hostileCreeps = tower.room.find(FIND_HOSTILE_CREEPS);
+    var hostileCreeps = util().findHostiles(tower.room)
 
     var creepsToHeal = tower.room.find(FIND_MY_CREEPS, {
         filter: function(creep) {

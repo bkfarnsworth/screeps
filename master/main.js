@@ -20,6 +20,7 @@ var tower = require('Tower');
 var Guard = require('Guard');
 var ConstructionManager = require('ConstructionManager');
 var MeleeAttacker = require('MeleeAttacker');
+var Demoman = require('Demoman');
 
 var useTracker = false;
 var seeCPU = false;
@@ -106,6 +107,11 @@ module.exports.loop = function () {
         if(creep.memory.role == 'meleeAttacker') {
             var meleeAttacker = new MeleeAttacker(creep);
             meleeAttacker.doWork();
+        }
+
+        if(creep.memory.role == 'demoman') {
+            var demoman = new Demoman(creep);
+            demoman.doWork();
         }
         
 		if(creep.memory.role == 'builder') {

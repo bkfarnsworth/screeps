@@ -1,20 +1,18 @@
 module.exports = function (creep) {
     return {
         milesRoomName: 'E78S47',
+        teaSkittlesRoomName: 'E78S46',
         northRoomName: 'E77S46',
         southRoomName: 'E77S47',
         southRoom: Game.rooms['E77S47'],
         northRoom: Game.rooms['E77S46'],
-        milesRoom: Game.rooms['E78S47'],
         milesUsername: 'Nephite135',
         findMyCreeps: function(filterObj){
-            return this.southRoom.find(FIND_MY_CREEPS, filterObj)
-                .concat(this.northRoom.find(FIND_MY_CREEPS, filterObj));
+            return _.values(Game.creeps).filter(filterObj.filter);
         },
         getAllRooms: function(){
             return [this.northRoom, this.southRoom];
         },
-
         //like the room.find method but will look in all my rooms
         findInAllRooms: function(constant, opts){
             var result = [];
@@ -42,13 +40,17 @@ module.exports = function (creep) {
         },
         goToRoom: function(roomName, creep){
 
+            if(roomName === creep.room.name){
+                return true;
+            }
+
             // var debugMode = true;
-            if(roomName === this.northRoomName && creep.room !== this.northRoom){
+            if(roomName === this.northRoomName){
                 // console.log('going to north room');
                 var exit = FIND_EXIT_TOP;
                 creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
                 return false;
-            }else if(roomName === this.southRoomName && creep.room !== this.southRoom){
+            }else if(roomName === this.southRoomName){
                 if(creep.room.name === this.milesRoomName){
                     console.log('util.js::31 :: ');
                     // console.log('going to south room from miles room');
@@ -60,6 +62,15 @@ module.exports = function (creep) {
                     var exit = FIND_EXIT_BOTTOM;
                     creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
                     return false;
+                }
+            }else if(roomName === this.teaSkittlesRoomName){
+                var inMilesRoom = this.goToRoom(this.milesRoomName, creep);
+                creep.moveToUsingCache(creep.pos.findClosestByRange(FIND_EXIT_TOP));
+            }else if(roomName === this.milesRoomName){
+                if(creep.room.name === this.northRoomName){
+                    this.goToRoom(this.southRoomName, creep);
+                }else if(creep.room.name === this.southRoomName){
+                    var errCode = creep.moveToUsingCache(creep.pos.findClosestByRange(FIND_EXIT_RIGHT));
                 }
             }else{
                 return true;
