@@ -2,10 +2,13 @@ module.exports = function (creep) {
     return {
         milesRoomName: 'E78S47',
         teaSkittlesRoomName: 'E78S46',
+        farNorthRoomName: 'E77S44',
+        scaryInvaderRoomName: 'E76S45',
         northRoomName: 'E77S46',
         southRoomName: 'E77S47',
         southRoom: Game.rooms['E77S47'],
         northRoom: Game.rooms['E77S46'],
+        farNorthRoom: Game.rooms['E77S44'],
         milesUsername: 'Nephite135',
         findMyCreeps: function(filterObj){
             return _.values(Game.creeps).filter(filterObj.filter);
@@ -35,46 +38,99 @@ module.exports = function (creep) {
             }else if(roomName === this.northRoomName){
                 return Game.spawns.Spawn2;
             }else{
-                return Game.spawns.Spawn1;
+                return Game.spawns.Spawn2;
             }
         },
         goToRoom: function(roomName, creep){
+
+
+
+
+            // return 
+
+
+
+
+
+
+            if(roomName === this.farNorthRoomName){
+                console.log('creep: ', creep);
+                console.log('creep.room.name: ', creep.room.name);
+            }
 
             if(roomName === creep.room.name){
                 return true;
             }
 
-            // var debugMode = true;
-            if(roomName === this.northRoomName){
-                // console.log('going to north room');
-                var exit = FIND_EXIT_TOP;
-                creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
-                return false;
-            }else if(roomName === this.southRoomName){
-                if(creep.room.name === this.milesRoomName){
-                    console.log('util.js::31 :: ');
-                    // console.log('going to south room from miles room');
-                    var exit = FIND_EXIT_LEFT;
-                    creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
-                    return false;
-                }else if(creep.room.name === this.northRoomName){
-                    // console.log('going to north room from south room');
-                    var exit = FIND_EXIT_BOTTOM;
-                    creep.moveToUsingCache(creep.pos.findClosestByRange(exit));
-                    return false;
-                }
-            }else if(roomName === this.teaSkittlesRoomName){
-                var inMilesRoom = this.goToRoom(this.milesRoomName, creep);
-                creep.moveToUsingCache(creep.pos.findClosestByRange(FIND_EXIT_TOP));
-            }else if(roomName === this.milesRoomName){
-                if(creep.room.name === this.northRoomName){
-                    this.goToRoom(this.southRoomName, creep);
-                }else if(creep.room.name === this.southRoomName){
-                    var errCode = creep.moveToUsingCache(creep.pos.findClosestByRange(FIND_EXIT_RIGHT));
-                }
+            var route = Game.map.findRoute(creep.room.name, roomName);
+
+            // route.forEach(r => {
+            //     console.log('r.exit: ', r.exit);
+            // });
+
+
+
+            // creep.moveTo(new RoomPosition(8, 40, 'E77S44'))
+            var exit = creep.pos.findClosestByPathUsingCache(route[0].exit);
+
+            console.log('exit: ', exit);
+            var somePosition = new RoomPosition(29, 1, 'E76S46')
+            var somePosition2 = new RoomPosition(11, 37, 'E77S45')
+
+
+            console.log('route.room: ', route.room);
+            console.log('this.scaryInvaderRoomName: ', this.scaryInvaderRoomName);
+
+            if(creep.room.name === 'E76S46' && !creep.pos.isEqualTo(somePosition)){
+                console.log('1');
+
+
+                creep.moveToUsingCache(somePosition);
+            }else if(creep.room.name === this.scaryInvaderRoomName){
+
+                console.log('2');
+
+                var ignoreGrids = [
+                    COLOR_GREY,
+                    COLOR_WHITE
+                ];
+
+                var avoidPositions = []
+                ignoreGrids.forEach(grid => {
+                    this.forEachCellInGrid(grid, cell => {
+                        // console.log('cell: ', cell);
+                        avoidPositions.push(cell);
+                    }, creep);
+                });
+
+                creep.moveTo(exit, {
+                    avoid: avoidPositions
+                });
+
+
+            }else if(creep.room.name === 'E77S45' && creep.pos.y > somePosition2.y){
+                console.log('4');
+                creep.moveTo(somePosition2);
             }else{
-                return true;
+
+                console.log('3');
+
+                var rCode = creep.moveTo(exit)
+                if(rCode === -5 || rCode === -2){
+
+                    if(_.random(0, 1) === 1){
+                        creep.move(RIGHT)
+                    }else{
+                        creep.move(BOTTOM)
+                    }
+                }
+                console.log('rCode: ', rCode);
             }
+
+
+
+
+            return false;
         },
         goToAssignedRoom: function(creep){
             return this.goToRoom(creep.getAssignedRoom().name, creep);
@@ -336,9 +392,17 @@ module.exports = function (creep) {
 
             return errCode;
         },
-        gatherEnergyOr: function(creep, awayFromSourceWork){
-            var debugMode = false;
-            var closestEnergySource = this.getBestEnergySource(creep);
+        gatherEnergyOr: function(creep, awayFromSourceWork, opts={}){
+
+            _.defaults(opts, {
+                allowHarvesting: false
+            });
+
+
+            var debugMode = true;
+            var closestEnergySource = this.getBestEnergySource(creep, opts);
+
+
             var isCloseToEnergy = false;
             var range = 5;
 
@@ -349,7 +413,7 @@ module.exports = function (creep) {
             if(isCloseToEnergy){
                 if(creep.carry.energy < (creep.carryCapacity * 0.9)){
                     if(debugMode){console.log('gather 1');}
-                    this.getEnergyFromBestSource(creep);
+                    this.getEnergyFromBestSource(creep, opts);
                 }else{
                     if(debugMode){console.log('deposit 1');}
                     awayFromSourceWork(creep)
@@ -360,7 +424,7 @@ module.exports = function (creep) {
                     awayFromSourceWork(creep);
                 }else{
                     if(debugMode){console.log('gather 2');}
-                    this.getEnergyFromBestSource(creep);
+                    this.getEnergyFromBestSource(creep, opts);
                 }
             }
         },
@@ -525,11 +589,17 @@ module.exports = function (creep) {
             
             return extraEnergy;
         },
-        forEachCellInGrid: function(color, func){
+        forEachCellInGrid: function(color, func, creep){
 
             var flags = this.findInAllRooms(FIND_FLAGS, {
                 filter: flag => flag.color === color
             });
+
+            if(creep){
+                flags = creep.room.find(FIND_FLAGS, {
+                    filter: flag => flag.color === color
+                });
+            }
 
             var top = _.min(flags, 'pos.y').pos.y;
             var right = _.max(flags, 'pos.x').pos.x;

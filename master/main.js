@@ -21,6 +21,7 @@ var Guard = require('Guard');
 var ConstructionManager = require('ConstructionManager');
 var MeleeAttacker = require('MeleeAttacker');
 var Demoman = require('Demoman');
+var Claimer = require('Claimer');
 
 var useTracker = false;
 var seeCPU = false;
@@ -29,6 +30,9 @@ var throttleRatio = 0;//0 - never throttle, 1 - throttle 100%
 
 
 module.exports.loop = function () {
+
+
+    PathFinder.use(false);
         
     console.log();
     console.log("--------- Creep Report - new tick -------------");
@@ -50,6 +54,15 @@ module.exports.loop = function () {
         constructionManager.doWork();    
     }
 
+
+    //ROOMS
+    //for each room, activate safe mode if someone comes in
+    var hostilesInFarNorth = util().findHostiles(util().farNorthRoom);
+    if(hostilesInFarNorth.length){
+        var controller = Game.structures['5836b91a8b8b9619519f3341'];
+        controller.activateSafeMode();
+    }
+
     //TOWERS
     for(var structureKey in Game.structures) {
         var structure = Game.structures[structureKey];
@@ -64,9 +77,9 @@ module.exports.loop = function () {
     }    
 
     //LINKS
-    // var westLink = Game.structures['585b6ab33962b71d57030d66'];
-    // var eastLink = Game.structures['585b6ab33962b71d57030d66'];
-    // westLink.transferEnergy(eastLink);
+    var westLink = Game.structures['585b6ab33962b71d57030d66'];
+    var eastLink = Game.structures['585b75504b207b74496d64b5'];
+    var errCode = westLink.transferEnergy(eastLink);
 
     //CREEPS
     var tempCpuUsed = Game.cpu.getUsed();
@@ -99,7 +112,11 @@ module.exports.loop = function () {
         if(creep.memory.role == 'upgrader') {
       	    upgrader(creep);
         }
-        
+
+        if(creep.memory.role == 'claimer') {
+            Claimer(creep);
+        }
+
         if(creep.memory.role == 'repairer') {
 	        repairer(creep);
         }

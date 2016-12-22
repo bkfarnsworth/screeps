@@ -5,6 +5,7 @@ module.exports = function () {
         
     var printQueue = true;
 
+    var farNorthConstructionSites = util().farNorthRoom.find(FIND_MY_CONSTRUCTION_SITES);
     var northConstructionSites = util().northRoom.find(FIND_MY_CONSTRUCTION_SITES);
     var southConstructionSites = util().southRoom.find(FIND_MY_CONSTRUCTION_SITES);
 
@@ -12,6 +13,10 @@ module.exports = function () {
     //     Game.notify('NO HARVESTERS', 60);
     // }
 
+    var farNorthRoomCreepTypes = [ 
+        { name: 'upgrader1',          role: 'upgrader',           config: {stopOperation: true}},
+        { name: 'builder1',           role: 'builder',            config: {stopOperation: true, condition: farNorthConstructionSites.length > 0}},
+    ];
 
     var northRoomCreepTypes = [
         { name: 'backUpHarvester',    role: 'backUpHarvester',    config: {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}},
@@ -19,7 +24,10 @@ module.exports = function () {
         { name: 'harvesterTwo1',      role: 'harvesterTwo',       config: {stopOperation: true}},
         { name: 'harvester2',         role: 'harvester',          config: {stopOperation: true}},
         { name: 'harvesterTwo2',      role: 'harvesterTwo',       config: {stopOperation: true}},
-        { name: 'upgrader1',          role: 'upgrader', },
+        { name: 'upgrader1',          role: 'upgrader'},
+        // { name: 'claimer1',           role: 'claimer', config: {stopOperation: true}},
+        // { name: 'claimer2',           role: 'claimer', config: {stopOperation: true}},
+        // { name: 'claimer3',           role: 'claimer', config: {stopOperation: true}},
         { name: 'builder1',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
         { name: 'carrier1',           role: 'carrier', },
         { name: 'upgrader2',          role: 'upgrader', },
@@ -29,7 +37,7 @@ module.exports = function () {
         { name: 'upgrader3',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
         { name: 'upgrader4',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
         { name: 'upgrader5',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
-        { name: 'upgrader6',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}}
+        // { name: 'upgrader6',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}}
     ]
 
     var southRoomCreepTypes = [ 
@@ -40,7 +48,7 @@ module.exports = function () {
         { name: 'superHarvesterTwo',  role: 'superHarvesterTwo',  config: {stopOperation: true}},
         // { name: 'melee1',          role: 'meleeAttacker'}, 
         { name: 'upgrader1',          role: 'upgrader'},
-        { name: 'demoman1',           role: 'demoman'},
+        // { name: 'demoman1',           role: 'demoman'},
         { name: 'builder1',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
         { name: 'carrier1',           role: 'carrier'}, 
         { name: 'upgrader2',          role: 'upgrader'}, 
@@ -53,7 +61,11 @@ module.exports = function () {
         { name: 'upgrader6',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
     ];
 
-
+    farNorthRoomCreepTypes = farNorthRoomCreepTypes.map(ct => {
+        var creepType = CreepType.factory(ct.name, ct.role, util().farNorthRoom, ct.config);
+        creepType.assignedRoom = util().farNorthRoomName;
+        return creepType;
+    });
 
     northRoomCreepTypes = northRoomCreepTypes.map(ct => {
         var creepType = CreepType.factory(ct.name, ct.role, util().northRoom, ct.config);
@@ -67,12 +79,22 @@ module.exports = function () {
         return creepType;
     });
 
-    [northRoomCreepTypes, southRoomCreepTypes].forEach((creepList, i) => {
+    [farNorthRoomCreepTypes, northRoomCreepTypes, southRoomCreepTypes].forEach((creepList, i) => {
         console.log();
-        console.log('Room: ', i === 0 ? 'North Room' : 'South Room');
+
+        var actualRoom;
+        if(i === 0){
+            console.log('Far North Room');
+            actualRoom = util().farNorthRoom;
+        }else if(i === 1){
+            console.log('North Room');
+            actualRoom = util().northRoom;
+        }else if(i === 2){
+            console.log('South Room');
+            actualRoom = util().southRoom;
+        }
 
         var spawn = util().getSpawnForRoom(creepList[0].assignedRoom);
-        var actualRoom = i === 0 ? util().northRoom : util().southRoom;
         var creepsThatNeedSpawning = creepList.filter(creepType => creepType.needsSpawning());
 
         //assume it's sorted by priority
@@ -89,6 +111,9 @@ module.exports = function () {
             actualRoom.status = 'incomplete';
         }else{
             actualRoom.status = 'complete';
+            if(util().farNorthRoom.status === 'incomplete'){
+                util().northRoom.status = 'incomplete';
+            }
         }
 
         spawnCreep(creepToSpawn);
@@ -146,6 +171,11 @@ function spawnCreep(creepTypeToSpawn){
     }
 
     var assignedSpawn = util().getSpawnForRoom(creepTypeToSpawn.assignedRoom);
+
+    //we already put a default else where
+    if(!assignedSpawn){
+        assignedSpawn = util().getSpawnForRoom(util().northRoomName);
+    }
 
     var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
 

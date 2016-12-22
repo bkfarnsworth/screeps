@@ -20,5 +20,5 @@ module.exports = function (creep) {
 
 				creep.moveToUsingCache(creep.room.controller);    
 		}
-	});
+	}, {allowHarvesting: true});
 }

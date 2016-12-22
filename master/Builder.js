@@ -58,7 +58,8 @@ module.exports = function (creep) {
 	}else{
 		util().getEnergyFromBestSource(creep, {
 			minEnergyRatio: 0.2,
-			allowCarrier: true
+			allowCarrier: true,
+			allowHarvesting: true
 		});
 	}
 }
