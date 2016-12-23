@@ -43,52 +43,18 @@ module.exports = function (creep) {
         },
         goToRoom: function(roomName, creep){
 
-
-
-
-            // return 
-
-
-
-
-
-
-            if(roomName === this.farNorthRoomName){
-                console.log('creep: ', creep);
-                console.log('creep.room.name: ', creep.room.name);
-            }
-
             if(roomName === creep.room.name){
                 return true;
             }
 
             var route = Game.map.findRoute(creep.room.name, roomName);
-
-            // route.forEach(r => {
-            //     console.log('r.exit: ', r.exit);
-            // });
-
-
-
-            // creep.moveTo(new RoomPosition(8, 40, 'E77S44'))
             var exit = creep.pos.findClosestByPathUsingCache(route[0].exit);
-
-            console.log('exit: ', exit);
             var somePosition = new RoomPosition(29, 1, 'E76S46')
             var somePosition2 = new RoomPosition(11, 37, 'E77S45')
 
-
-            console.log('route.room: ', route.room);
-            console.log('this.scaryInvaderRoomName: ', this.scaryInvaderRoomName);
-
             if(creep.room.name === 'E76S46' && !creep.pos.isEqualTo(somePosition)){
-                console.log('1');
-
-
                 creep.moveToUsingCache(somePosition);
             }else if(creep.room.name === this.scaryInvaderRoomName){
-
-                console.log('2');
 
                 var ignoreGrids = [
                     COLOR_GREY,
@@ -107,28 +73,18 @@ module.exports = function (creep) {
                     avoid: avoidPositions
                 });
 
-
             }else if(creep.room.name === 'E77S45' && creep.pos.y > somePosition2.y){
-                console.log('4');
                 creep.moveTo(somePosition2);
             }else{
-
-                console.log('3');
-
                 var rCode = creep.moveTo(exit)
                 if(rCode === -5 || rCode === -2){
-
                     if(_.random(0, 1) === 1){
                         creep.move(RIGHT)
                     }else{
                         creep.move(BOTTOM)
                     }
                 }
-                console.log('rCode: ', rCode);
             }
-
-
-
 
             return false;
         },
@@ -394,15 +350,13 @@ module.exports = function (creep) {
         },
         gatherEnergyOr: function(creep, awayFromSourceWork, opts={}){
 
+            var debugMode = false;
+
             _.defaults(opts, {
                 allowHarvesting: false
             });
 
-
-            var debugMode = true;
             var closestEnergySource = this.getBestEnergySource(creep, opts);
-
-
             var isCloseToEnergy = false;
             var range = 5;
 
