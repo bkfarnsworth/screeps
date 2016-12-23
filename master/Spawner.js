@@ -14,8 +14,8 @@ module.exports = function () {
     // }
 
     //farNorthRoom
-    var farNorthUpgraderBodyParts     = [WORK,CARRY,MOVE];
-    var farNorthBuilderBodyParts      = [WORK,CARRY,MOVE];
+    var farNorthUpgraderBodyParts       = [WORK,CARRY,MOVE];
+    var farNorthBuilderBodyParts        = [WORK,CARRY,MOVE];
     var farNorthHarvesterBodyParts      = [WORK,CARRY,MOVE];
 
     //north and south rooms
@@ -41,13 +41,30 @@ module.exports = function () {
                 bodyParts: farNorthHarvesterBodyParts
             },
             { 
+                name: 'harvesterTwo1',
+                role: 'harvesterTwo',           
+                stopOperation: true,
+                bodyParts: farNorthHarvesterBodyParts
+            },
+            { 
                 name: 'upgrader1',
                 role: 'upgrader',           
                 stopOperation: true,
                 bodyParts: farNorthUpgraderBodyParts
             },
             { 
+                name: 'upgrader2',
+                role: 'upgrader',           
+                bodyParts: farNorthUpgraderBodyParts
+            },
+            { 
                 name: 'builder1',
+                role: 'builder',            
+                condition: farNorthConstructionSites.length > 0,
+                bodyParts: farNorthBuilderBodyParts
+            },
+            { 
+                name: 'builder2',
                 role: 'builder',            
                 condition: farNorthConstructionSites.length > 0,
                 bodyParts: farNorthBuilderBodyParts

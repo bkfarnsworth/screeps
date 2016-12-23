@@ -54,8 +54,8 @@ module.exports.loop = function () {
         constructionManager.doWork();    
     }   
 
-    //every 10k ticks, clear the paths hash
-    if(_.random(1, 10000) === 1){
+    //every n ticks, clear the paths hash
+    if(_.random(1, 2000) === 1){
         delete Memory.pathsHash;
     }
 
