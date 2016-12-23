@@ -11,9 +11,12 @@ Tracker.prototype.track = function(opts={}) {
         currentCpu: false,
         averageCpu: false,
         gclToNextLevel: false,
+        upgradeToNextLevel: false,
+        aveargeUpgrade: false,
         averageGcl: false,
         averageSourceDepletionRatio: false,
         cachePercent: false,
+        averageSecondsPerTick: false
     }); 
 
     console.log();
@@ -35,7 +38,9 @@ Tracker.prototype.trackSecondsPerTick = function(opts){
         decayFactor: 0.9
     });
 
-    console.log('averageSecondsPerTick: ', _.round(averageSecondsPerTick, 2));
+    if(opts.averageSecondsPerTick){
+        console.log('averageSecondsPerTick: ', _.round(averageSecondsPerTick, 2));
+    }
 }
 
 Tracker.prototype.trackControllers = function(opts){
@@ -49,12 +54,16 @@ Tracker.prototype.trackControllers = function(opts){
             decayFactor: 0.999
         });
 
-        console.log('Average Upgrade ('+room.name+'): ', _.round(averageUpgrade, 2));
+        if(opts.averageUpgrade){
+            console.log('Average Upgrade ('+room.name+'): ', _.round(averageUpgrade, 2));
+        }
 
-        printEstimatedTimeRemaining({
-            average: averageUpgrade,
-            remainingProgress: room.controller.progressTotal - room.controller.progress
-        });
+        if(opts.upgradeToNextLevel){
+            printEstimatedTimeRemaining({
+                average: averageUpgrade,
+                remainingProgress: room.controller.progressTotal - room.controller.progress
+            });    
+        }
     });
 }
 

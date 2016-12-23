@@ -26,7 +26,7 @@ module.exports = function (creep) {
 		if(errCode == ERR_NOT_IN_RANGE) {
 			creep.moveToUsingCache(creep.room.controller);    
 		}
-
+		
 		//if we alrady claimed it, start upgrading it
 		// if(errCode !== 0){
 		// 	creep.upgradeController(creep.room.controller)

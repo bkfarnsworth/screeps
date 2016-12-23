@@ -155,10 +155,15 @@ module.exports.loop = function () {
 
     var tracker = new Tracker();
     tracker.track({
-       averageCpu: true,
-       averageGcl: true,
-       averageSourceDepletionRatio: true,
-       cachePercent: true
+        currentCpu: false,
+        averageCpu: true,
+        gclToNextLevel: false,
+        averageGcl: false,
+        upgradeToNextLevel: false,
+        aveargeUpgrade: false,
+        averageSourceDepletionRatio: false,
+        cachePercent: false,
+        averageSecondsPerTick: false
     });
 }
 
