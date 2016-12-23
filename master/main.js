@@ -52,8 +52,12 @@ module.exports.loop = function () {
     if(_.random(1, 100) === 1){
         var constructionManager = new ConstructionManager();
         constructionManager.doWork();    
-    }
+    }   
 
+    //every 10k ticks, clear the paths hash
+    if(_.random(1, 10000) === 1){
+        delete Memory.pathsHash;
+    }
 
     //ROOMS
     //for each room, activate safe mode if someone comes in
@@ -79,7 +83,12 @@ module.exports.loop = function () {
     //LINKS
     var westLink = Game.structures['585b6ab33962b71d57030d66'];
     var eastLink = Game.structures['585b75504b207b74496d64b5'];
-    var errCode = westLink.transferEnergy(eastLink);
+    var southLink = Game.structures['585cc390713f5c3c7a62662b'];
+    if(_.random(0, 1) === 1){
+        westLink.transferEnergy(eastLink);
+    }else{
+        westLink.transferEnergy(southLink);
+    }
 
     //CREEPS
     var tempCpuUsed = Game.cpu.getUsed();
@@ -147,23 +156,17 @@ module.exports.loop = function () {
         }
 	}
 	   
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::145 :: '); }); }   
-
-
-    
-    if(seeCPU){ util().printCPU(() => { console.log('main.js::163 :: '); }); }   
-
     var tracker = new Tracker();
     tracker.track({
-        currentCpu: false,
+        currentCpu: true,
         averageCpu: true,
-        gclToNextLevel: false,
-        averageGcl: false,
-        upgradeToNextLevel: false,
-        aveargeUpgrade: false,
-        averageSourceDepletionRatio: false,
-        cachePercent: false,
-        averageSecondsPerTick: false
+        gclToNextLevel: true,
+        averageGcl: true,
+        upgradeToNextLevel: true,
+        averageUpgrade: true,
+        averageSourceDepletionRatio: true,
+        cachePercent: true,
+        averageSecondsPerTick: true
     });
 }
 
@@ -271,5 +274,9 @@ Source.prototype.getFriendlyName = function(){
             return 'North - North Side'
         case '5836b91a8b8b9619519f3346':
             return 'North - South Side'
+        case '5836b91a8b8b9619519f333f':
+            return 'Far North - North Side'
+        case '5836b91a8b8b9619519f3340':
+            return 'Far North - South Side'
     }
 }

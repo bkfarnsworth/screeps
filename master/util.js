@@ -14,7 +14,7 @@ module.exports = function (creep) {
             return _.values(Game.creeps).filter(filterObj.filter);
         },
         getAllRooms: function(){
-            return [this.northRoom, this.southRoom];
+            return [this.farNorthRoom, this.northRoom, this.southRoom];
         },
         //like the room.find method but will look in all my rooms
         findInAllRooms: function(constant, opts){
@@ -30,6 +30,8 @@ module.exports = function (creep) {
                 return new RoomPosition(36, 31, room);
             }else if(room === this.northRoom){
                 return new RoomPosition(1, 23, room);
+            }else if(room === this.farNorthRoom){
+                return new RoomPosition(23, 35, room);
             }
         },
         getSpawnForRoom: function(roomName){
@@ -37,8 +39,8 @@ module.exports = function (creep) {
                 return Game.spawns.Spawn1;
             }else if(roomName === this.northRoomName){
                 return Game.spawns.Spawn2;
-            }else{
-                return Game.spawns.Spawn2;
+            }else if(roomName === this.farNorthRoomName){
+                return Game.spawns.Spawn3;           
             }
         },
         goToRoom: function(roomName, creep){

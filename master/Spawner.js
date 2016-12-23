@@ -13,89 +13,241 @@ module.exports = function () {
     //     Game.notify('NO HARVESTERS', 60);
     // }
 
-    var farNorthRoomCreepTypes = [ 
-        { name: 'upgrader1',          role: 'upgrader',           config: {stopOperation: true}},
-        { name: 'builder1',           role: 'builder',            config: {stopOperation: true, condition: farNorthConstructionSites.length > 0}},
-    ];
+    //farNorthRoom
+    var farNorthUpgraderBodyParts     = [WORK,CARRY,MOVE];
+    var farNorthBuilderBodyParts      = [WORK,CARRY,MOVE];
+    var farNorthHarvesterBodyParts      = [WORK,CARRY,MOVE];
 
-    var northRoomCreepTypes = [
-        { name: 'backUpHarvester',    role: 'backUpHarvester',    config: {condition: getNumberOfHarvesters('north') === 0, stopOperation: true}},
-        { name: 'harvester1',         role: 'harvester',          config: {stopOperation: true}},
-        { name: 'harvesterTwo1',      role: 'harvesterTwo',       config: {stopOperation: true}},
-        { name: 'harvester2',         role: 'harvester',          config: {stopOperation: true}},
-        { name: 'harvesterTwo2',      role: 'harvesterTwo',       config: {stopOperation: true}},
-        { name: 'upgrader1',          role: 'upgrader'},
-        // { name: 'claimer1',           role: 'claimer', config: {stopOperation: true}},
-        // { name: 'claimer2',           role: 'claimer', config: {stopOperation: true}},
-        // { name: 'claimer3',           role: 'claimer', config: {stopOperation: true}},
-        { name: 'builder1',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
-        { name: 'carrier1',           role: 'carrier', },
-        { name: 'upgrader2',          role: 'upgrader', },
-        { name: 'builder2',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
-        { name: 'upgrader2',          role: 'upgrader', },
-        { name: 'builder3',           role: 'builder',            config: {condition: northConstructionSites.length > 0}},
-        { name: 'upgrader3',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
-        { name: 'upgrader4',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
-        { name: 'upgrader5',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}},
-        // { name: 'upgrader6',          role: 'upgrader',           config: {condition: northConstructionSites.length === 0}}
-    ]
+    //north and south rooms
+    var backUpHarvesterBodyParts      = [WORK,CARRY,MOVE];
+    var guardBodyParts                = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
+    var demomanBodyParts              = [TOUGH,TOUGH,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK];
+    var meleeAttackerBodyParts        = [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH];
+    var claimerBodyParts              = [MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,CARRY,CARRY,HEAL];
+    var harvesterBodyParts            = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+    var harvesterTwoBodyParts         = [WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE];
+    var superHarvesterTwoBodyParts    = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+    var carrierBodyParts              = [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+    var upgraderBodyParts             = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+    var builderBodyParts              = [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
 
-    var southRoomCreepTypes = [ 
-        { name: 'backUpHarvester',    role: 'backUpHarvester',    config: {condition: getNumberOfHarvesters('south') === 0, stopOperation: true}},
-        { name: 'harvester1',         role: 'harvester',          config: {stopOperation: true}},
-        { name: 'harvester2',         role: 'harvester',          config: {stopOperation: true}},
-        { name: 'harvester3',         role: 'harvester',          config: {stopOperation: true}},
-        { name: 'superHarvesterTwo',  role: 'superHarvesterTwo',  config: {stopOperation: true}},
-        // { name: 'melee1',          role: 'meleeAttacker'}, 
-        { name: 'upgrader1',          role: 'upgrader'},
-        // { name: 'demoman1',           role: 'demoman'},
-        { name: 'builder1',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
-        { name: 'carrier1',           role: 'carrier'}, 
-        { name: 'upgrader2',          role: 'upgrader'}, 
-        { name: 'builder2',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
-        { name: 'upgrader2',          role: 'upgrader'}, 
-        { name: 'builder3',           role: 'builder',            config: {condition: southConstructionSites.length > 0}},
-        { name: 'upgrader3',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
-        { name: 'upgrader4',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
-        { name: 'upgrader5',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
-        { name: 'upgrader6',          role: 'upgrader',           config: {condition: southConstructionSites.length === 0}},
-    ];
+    var farNorthRoom = {
+        room: util().farNorthRoom,
+        creepTypes: [ 
+            { 
+                name: 'harvester1',
+                role: 'harvester',           
+                stopOperation: true,
+                bodyParts: farNorthHarvesterBodyParts
+            },
+            { 
+                name: 'upgrader1',
+                role: 'upgrader',           
+                stopOperation: true,
+                bodyParts: farNorthUpgraderBodyParts
+            },
+            { 
+                name: 'builder1',
+                role: 'builder',            
+                condition: farNorthConstructionSites.length > 0,
+                bodyParts: farNorthBuilderBodyParts
+            }
+        ]
+    };
 
-    farNorthRoomCreepTypes = farNorthRoomCreepTypes.map(ct => {
-        var creepType = CreepType.factory(ct.name, ct.role, util().farNorthRoom, ct.config);
-        creepType.assignedRoom = util().farNorthRoomName;
-        return creepType;
-    });
+    var northRoom = {
+        room: util().northRoom,
+        creepTypes: [
+            { 
+                name: 'backUpHarvester',    
+                role: 'harvester',    
+                condition: getNumberOfHarvesters('north') === 0,
+                stopOperation: true,
+                bodyParts: backUpHarvesterBodyParts
+            },
+            { 
+                name: 'harvester1',
+                role: 'harvester',          
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'harvesterTwo1',
+                role: 'harvesterTwo',       
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'harvester2',
+                role: 'harvester',          
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'harvesterTwo2',
+                role: 'harvesterTwo',       
+                stopOperation: true,
+                bodyParts: harvesterTwoBodyParts
+            },
+            { 
+                name: 'upgrader1',
+                role: 'upgrader',
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'builder1',
+                role: 'builder',            
+                condition: northConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'carrier1',
+                role: 'carrier', 
+                bodyParts: carrierBodyParts
+            },
+            { 
+                name: 'upgrader2',
+                role: 'upgrader', 
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'builder2',
+                role: 'builder',            
+                condition: northConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'builder3',
+                role: 'builder',            
+                condition: northConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'upgrader3',
+                role: 'upgrader',           
+                condition: northConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'upgrader4',
+                role: 'upgrader',           
+                condition: northConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'upgrader5',
+                role: 'upgrader',           
+                condition: northConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            }
+        ]
+    }
 
-    northRoomCreepTypes = northRoomCreepTypes.map(ct => {
-        var creepType = CreepType.factory(ct.name, ct.role, util().northRoom, ct.config);
-        creepType.assignedRoom = util().northRoomName;
-        return creepType;
-    });
+    var southRoom = {
+        room: util().southRoom,
+        creepTypes: [ 
+            { 
+                name: 'backUpHarvester',
+                role: 'harvester',    
+                condition: getNumberOfHarvesters('south') === 0, 
+                stopOperation: true,
+                bodyParts: backUpHarvesterBodyParts
+            },
+            { 
+                name: 'harvester1',
+                role: 'harvester',          
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'harvester2',
+                role: 'harvester',          
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'harvester3',
+                role: 'harvester',          
+                stopOperation: true,
+                bodyParts: harvesterBodyParts
+            },
+            { 
+                name: 'superHarvesterTwo',
+                role: 'harvesterTwo',  
+                stopOperation: true,
+                bodyParts: superHarvesterTwoBodyParts
+            },
+            { 
+                name: 'upgrader1',
+                role: 'upgrader',
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'builder1',
+                role: 'builder',            
+                condition: southConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'carrier1',
+                role: 'carrier',
+                bodyParts: carrierBodyParts
+            },    
+            { 
+                name: 'upgrader2',
+                role: 'upgrader',
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'builder2',
+                role: 'builder',            
+                condition: southConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'upgrader3',
+                role: 'upgrader',
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'builder3',
+                role: 'builder',            
+                condition: southConstructionSites.length > 0,
+                bodyParts: builderBodyParts
+            },
+            { 
+                name: 'upgrader4',
+                role: 'upgrader',           
+                condition: southConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'upgrader5',
+                role: 'upgrader',           
+                condition: southConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            },
+            { 
+                name: 'upgrader6',
+                role: 'upgrader',           
+                condition: southConstructionSites.length === 0,
+                bodyParts: upgraderBodyParts
+            }
+        ]
+    };
 
-    southRoomCreepTypes = southRoomCreepTypes.map(ct => {
-        var creepType = CreepType.factory(ct.name, ct.role, util().southRoom, ct.config);
-        creepType.assignedRoom = util().southRoomName;
-        return creepType;
-    });
-
-    [farNorthRoomCreepTypes, northRoomCreepTypes, southRoomCreepTypes].forEach((creepList, i) => {
+    [farNorthRoom, northRoom, southRoom].forEach(roomSchema => {
         console.log();
+        console.log('Room: ' + roomSchema.room.name);
 
-        var actualRoom;
-        if(i === 0){
-            console.log('Far North Room');
-            actualRoom = util().farNorthRoom;
-        }else if(i === 1){
-            console.log('North Room');
-            actualRoom = util().northRoom;
-        }else if(i === 2){
-            console.log('South Room');
-            actualRoom = util().southRoom;
-        }
+        roomSchema.creepTypes = roomSchema.creepTypes.map(ct => {
+            ct.assignedRoom = roomSchema.room.name;
+            ct.name = ct.name + '(' + roomSchema.room.name + ')';
+            return new CreepType(ct);
+        });
 
-        var spawn = util().getSpawnForRoom(creepList[0].assignedRoom);
-        var creepsThatNeedSpawning = creepList.filter(creepType => creepType.needsSpawning());
+        var spawn = util().getSpawnForRoom(roomSchema.room.name);
+        var creepsThatNeedSpawning = roomSchema.creepTypes.filter(creepType => creepType.needsSpawning());
 
         //assume it's sorted by priority
 
@@ -108,34 +260,33 @@ module.exports = function () {
         }
 
         if(creepToSpawn && creepToSpawn.stopOperation){
-            actualRoom.status = 'incomplete';
+            roomSchema.room.status = 'incomplete';
         }else{
-            actualRoom.status = 'complete';
-            if(util().farNorthRoom.status === 'incomplete'){
-                util().northRoom.status = 'incomplete';
-            }
+            roomSchema.room.status = 'complete';
         }
 
-        spawnCreep(creepToSpawn);
+        if(creepToSpawn){
+            spawnCreep(creepToSpawn);
+        }
 
         if(printQueue){
-            creepList.forEach((creepType, index) => {
+            roomSchema.creepTypes.forEach(creepType => {
                 if(creepType.isSpawning()){
-                    util().printWithSpacing(creepType.role + ': Spawning (' + creepType.getEnergyRequired() + ')');
+                    util().printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
                 }else if(creepType.needsSpawning() && creepType.condition){
-                    util().printWithSpacing(creepType.role + ': Queued (' + creepType.getEnergyRequired() + ')');
+                    util().printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
                 }else if(!creepType.condition){
-                    util().printWithSpacing(creepType.role + ': Condition not met (' + creepType.getEnergyRequired() + ')');
+                    util().printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
                 }else if(!creepType.needsSpawning()){
                     var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
-                    util().printWithSpacing(creepType.role + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
+                    util().printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
                 }
             });
         }
 
-        console.log('STATUS: ' + actualRoom.status);
+        console.log('STATUS: ' + roomSchema.room.status);
 
-        util().printEnergy(actualRoom);
+        util().printEnergy(roomSchema.room);
     });
 
 }   
@@ -156,6 +307,11 @@ function getNumberOfHarvesters(roomDirection){
 }
 
 function spawnCreep(creepTypeToSpawn){
+
+    if(!creepTypeToSpawn.role){
+        console.log('Spawner.js::336 :: ');
+    }
+
     if(creepTypeToSpawn){
         console.log('Next creep to be spawned: ', creepTypeToSpawn.role);
     }else{
@@ -178,6 +334,11 @@ function spawnCreep(creepTypeToSpawn){
     }
 
     var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
+
+
+    console.log('creepName: ', creepName);
+
+    console.log('errCode: ', errCode);
 
     if(errCode === ERR_NAME_EXISTS){
         //then delete it from memory

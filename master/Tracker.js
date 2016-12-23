@@ -12,7 +12,7 @@ Tracker.prototype.track = function(opts={}) {
         averageCpu: false,
         gclToNextLevel: false,
         upgradeToNextLevel: false,
-        aveargeUpgrade: false,
+        averageUpgrade: false,
         averageGcl: false,
         averageSourceDepletionRatio: false,
         cachePercent: false,
