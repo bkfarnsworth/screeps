@@ -55,7 +55,7 @@ module.exports.loop = function () {
     }   
 
     //every n ticks, clear the paths hash
-    if(_.random(1, 2000) === 1){
+    if(_.random(1, 500) === 1){
         delete Memory.pathsHash;
     }
 
@@ -89,6 +89,17 @@ module.exports.loop = function () {
     }else{
         westLink.transferEnergy(southLink);
     }
+
+    //NORTH ROOM LINKS
+    var fromLink = Game.structures['585dc5f78d7270785de7f890'];
+    var toLink1 = Game.structures['585dcc14d79a7fc4614ee0c0'];
+    var toLink2 = Game.structures['585dd6639d25db137ae10956'];
+    if(_.random(0, 1) === 1){
+        fromLink.transferEnergy(toLink1);
+    }else{
+        fromLink.transferEnergy(toLink2);
+    }
+
 
     //CREEPS
     var tempCpuUsed = Game.cpu.getUsed();
