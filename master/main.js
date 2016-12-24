@@ -60,12 +60,20 @@ module.exports.loop = function () {
     }
 
     //ROOMS
-    //for each room, activate safe mode if someone comes in
-    var hostilesInFarNorth = util().findHostiles(util().farNorthRoom);
-    if(hostilesInFarNorth.length){
-        var controller = Game.structures['5836b91a8b8b9619519f3341'];
-        controller.activateSafeMode();
-    }
+    //for each room, activate safe mode if someone comes in, except Invaders
+    util().getAllRooms().forEach(room => {
+        var hostiles = util().findHostiles(room, {
+            usersToIgnore: [
+                util().milesUsername,
+                'Invader'
+            ]
+        });
+
+        if(hostiles.length){
+            Game.notify('ACTIVATING SAFE MODE');
+            room.controller.activateSafeMode();
+        }
+    });
 
     //TOWERS
     for(var structureKey in Game.structures) {
