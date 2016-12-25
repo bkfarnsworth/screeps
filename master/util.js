@@ -130,7 +130,7 @@ module.exports = function (creep) {
         needsEnergy: function(creep, code){
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);
         },
-        getClosestStructure: function(creep, filter=this.returnAllFilter){
+        getClosestEnergyStructure: function(creep, filter=this.returnAllFilter){
             return creep.pos.findClosestByPathUsingCache(FIND_STRUCTURES, {
                 filter: function(structure){
 
@@ -138,8 +138,7 @@ module.exports = function (creep) {
                     var isExtension = structure.structureType === STRUCTURE_EXTENSION;
                     var isStorage = structure.structureType === STRUCTURE_STORAGE;
                     var isContainer = structure.structureType === STRUCTURE_CONTAINER;
-                    var isLink = structure.structureType === STRUCTURE_LINK;
-                    var isStructure = isSpawn || isExtension || isStorage || isContainer || isLink;
+                    var isStructure = isSpawn || isExtension || isStorage || isContainer;
                     return isStructure && filter(structure);
                 }
             });
@@ -175,13 +174,21 @@ module.exports = function (creep) {
                 }
             });
         },
+        getClosestLink: function(creep, filter=this.returnAllFilter){
+            return creep.pos.findClosestByPathUsingCache(FIND_MY_STRUCTURES, {
+                filter: (s) => {
+                    return s.structureType === STRUCTURE_LINK && filter(s);
+                }
+            });
+        },
         getBestEnergyRecipient: function(creep, opts = {}){
 
             _.defaults(opts, {
                 maxEnergyRatio: 0.7,
                 creepTypes: [],
                 allowStructures: true,
-                allowStorage: true
+                allowStorage: true,
+                allowLink: true
             });
 
             var closestCreep;
@@ -215,11 +222,12 @@ module.exports = function (creep) {
                 return !opts.allowStorage ? !(s instanceof StructureStorage || s instanceof StructureContainer) && generalRequirements(s) : generalRequirements(s);
             }
 
-            closestStructure = opts.allowStructures ? this.getClosestStructure(creep, structureFilter) : null;
+            closestStructure = opts.allowStructures ? this.getClosestEnergyStructure(creep, structureFilter) : null;
             closestCreep = this.getClosestCreep(creep, generalRequirements, opts);
             closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestTower(creep, generalRequirements) : null;
+            closestLink = opts.allowLink ? this.getClosestLink(creep, generalRequirements) : null;
 
-            var possibilities = _.compact([closestStructure, closestCreep, closestTower]);
+            var possibilities = _.compact([closestStructure, closestCreep, closestTower, closestLink]);
             var best = creep.pos.findClosestByPathUsingCache(possibilities);
 
 
@@ -273,7 +281,7 @@ module.exports = function (creep) {
                 return  isCorrectRoom(possibility) && hasEnoughEnergyForGathering;
             }
 
-            closestStructure = opts.allowStructures ? this.getClosestStructure(creep, generalRequirements) : null;
+            closestStructure = opts.allowStructures ? this.getClosestEnergyStructure(creep, generalRequirements) : null;
             closestDroppedResource = this.getClosestDroppedEnergy(creep, generalRequirements);
             closestCreep = this.getClosestCreep(creep, generalRequirements, opts.creepTypes);
             closestSource = opts.allowHarvesting ? this.getClosestSource(creep, generalRequirements): null;
@@ -393,6 +401,7 @@ module.exports = function (creep) {
                 giveToTowers: false,
                 giveToStructures: true,
                 giveToStorage: true,
+                giveToLink: creep.room.status === 'complete'
             });
 
             var storageWithEnergy = this.getClosestStorageWithEnergy(creep);
@@ -404,6 +413,7 @@ module.exports = function (creep) {
                 allowStructures: opts.giveToStructures,
                 allowTowers: opts.giveToTowers,
                 allowStorage:   opts.giveToStorage,
+                allowLink: opts.giveToLink,
                 maxEnergyRatio: 0.9 
             });
             var source = creep.room.find(FIND_SOURCES)[opts.sourceIndex];

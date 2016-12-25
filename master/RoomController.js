@@ -244,20 +244,26 @@ class RoomController {
 	} 
 
 	printEnergy(){
-		//get total energy capacity as well
-		var totalEnergyCapacity = 0;
-		var totalEnergyAvailable = 0;
-		this.room.find(FIND_MY_STRUCTURES).forEach(function(structure){
-				if(structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN){
-						totalEnergyCapacity += structure.energyCapacity;
-						totalEnergyAvailable += structure.energy;
-				}
-		});
-		
-		//extraEnergy is energy that is dropped or in a creep, 
-		var extraEnergy = this.getExtraEnergy();
-		
+		var totalEnergyAvailable = this.getEnergyAvailableForSpawning();
+		var totalEnergyCapacity = this.getEnergyCapacityForSpawning();
+		var extraEnergy = this.getExtraEnergy();//extraEnergy is energy that is dropped or in a creep, 
 		console.log("TOTAL ENERGY ("+this.room.name+"): " + totalEnergyAvailable + " (+" + extraEnergy + ") / " + totalEnergyCapacity);
+	}
+
+	getEnergyAvailableForSpawning(){
+		return _.sum(this.getAllSpawningStructures(), 'energy');
+	}
+
+	getEnergyCapacityForSpawning(){
+		return _.sum(this.getAllSpawningStructures(), 'energyCapacity');
+	}
+
+	getAllSpawningStructures(){
+		return this.room.find(FIND_MY_STRUCTURES, {
+			filter: s => {
+				return s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_SPAWN;
+			}
+		});
 	}
 
 	getExtraEnergy(){
