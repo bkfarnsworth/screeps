@@ -1,16 +1,24 @@
 var util = require('util')
 
-module.exports = function (creep, opts={}) {
+class Harvester {
 
-    _.defaults(opts, {
-        sourceIndex: 0,
-        takeFromStorage: false,
-        giveToTowers: false
-    });
+	constructor(creep, creepOpts={}){
 
-    var inAssignedRoom = util().goToAssignedRoom(creep);
-    if(!inAssignedRoom){ return; }
+		this.creep = creep;
+		this.creepOpts = creepOpts;
 
-    util().depositEnergyOrHarvest(creep, opts);
+		_.defaults(this.creepOpts, {
+			sourceIndex: 0,
+			takeFromStorage: this.status === 'incomplete',
+			giveToStorage: this.status === 'complete',
+		});
+	}
+
+	doWork(){
+		var inAssignedRoom = util().goToAssignedRoom(this.creep);
+		if(!inAssignedRoom){ return; }
+		util().depositEnergyOrHarvest(this.creep, this.creepOpts);
+	}
 }
 
+module.exports = Harvester;  

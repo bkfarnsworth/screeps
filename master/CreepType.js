@@ -1,18 +1,13 @@
 var util = require('util')
 
-function CreepType(opts){
+function CreepType(opts={}){
 
     _.defaults(opts, {
         condition: true,
         stopOperation: false,
     });
     
-    this.role = opts.role;
-    this.bodyParts = opts.bodyParts;
-    this.assignedRoom = opts.assignedRoom;
-    this.condition = opts.condition;
-    this.stopOperation = opts.stopOperation;
-    this.name = opts.name;
+    Object.assign(this, opts);
 
     return this;
 }
