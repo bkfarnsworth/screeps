@@ -28,9 +28,9 @@ class RoomController {
 	get bodyParts(){
 		return {
 			//farNorthRoom
-			farNorthUpgraderBodyParts     : [WORK,CARRY,MOVE],
-			farNorthBuilderBodyParts      : [WORK,CARRY,MOVE],
-			farNorthHarvesterBodyParts    : [WORK,CARRY,MOVE],
+			farNorthUpgraderBodyParts     : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
+			farNorthBuilderBodyParts      : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
+			farNorthHarvesterBodyParts    : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
 
 			//north and south rooms
 			backUpHarvesterBodyParts      : [WORK,CARRY,MOVE],

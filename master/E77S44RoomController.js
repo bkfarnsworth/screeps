@@ -30,9 +30,24 @@ class E77S44RoomController extends RoomController {
 				role: 'harvester',           
 				stopOperation: true,
 				bodyParts: this.bodyParts.farNorthHarvesterBodyParts,
+				giveToTowers: this.status === 'complete'
 			},
 			{ 
 				name: 'harvester2',
+				role: 'harvester',           
+				stopOperation: true,
+				bodyParts: this.bodyParts.farNorthHarvesterBodyParts,
+				sourceIndex: 1
+			},
+			{ 
+				name: 'harvester3',
+				role: 'harvester',           
+				stopOperation: true,
+				bodyParts: this.bodyParts.farNorthHarvesterBodyParts,
+				giveToTowers: this.status === 'complete'
+			},
+			{ 
+				name: 'harvester4',
 				role: 'harvester',           
 				stopOperation: true,
 				bodyParts: this.bodyParts.farNorthHarvesterBodyParts,
@@ -46,6 +61,11 @@ class E77S44RoomController extends RoomController {
 			},
 			{ 
 				name: 'upgrader2',
+				role: 'upgrader',           
+				bodyParts: this.bodyParts.farNorthUpgraderBodyParts
+			},
+			{ 
+				name: 'upgrader3',
 				role: 'upgrader',           
 				bodyParts: this.bodyParts.farNorthUpgraderBodyParts
 			},
