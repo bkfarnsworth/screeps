@@ -1,16 +1,15 @@
 var Guard = require('Guard');
 var MeleeAttacker = require('MeleeAttacker');
 var Demoman = require('Demoman');
-var Claimer = require('Claimer');
 var util = require('util');
 var Harvester = require('Harvester')
-var upgrader = require('Upgrader')
-var guard = require('Guard')
+var Upgrader = require('Upgrader')
 var healer = require('Healer')
-var builder = require('Builder')
-var repairer = require('Repairer')
-var carrier = require('Carrier')
+var Builder = require('Builder')
+var Repairer = require('Repairer')
+var Carrier = require('Carrier')
 var CreepType = require('CreepType');
+var Worker = require('Worker');
 
 var printQueue = true;
 
@@ -132,44 +131,47 @@ class RoomController {
 		// 	return;
 		// }
 
+		var worker = new Worker(creep); 
+
 		if(creep.memory.role == 'carrier') {
-			carrier(creep, creepType);
+			worker = new Carrier(creep, creepType);
 		}
 
 		if(creep.memory.role == 'harvester') {
-			var harvester = new Harvester(creep, creepType);
-			harvester.doWork();
+			worker = new Harvester(creep, creepType);
 		}
 
 		if(creep.memory.role == 'upgrader') {
-			upgrader(creep, creepType);
-		}
-
-		if(creep.memory.role == 'claimer') {
-			Claimer(creep, creepType);
+			worker = new Upgrader(creep, creepType);
 		}
 
 		if(creep.memory.role == 'repairer') {
-			repairer(creep, creepType);
+			worker = new Repairer(creep, creepType);
 		}
 
 		if(creep.memory.role == 'guard') {
-			var guard = new Guard(creep, creepType);
-			guard.doWork();
+			worker = new Guard(creep, creepType);
 		}
 
 		if(creep.memory.role == 'meleeAttacker') {
-			var meleeAttacker = new MeleeAttacker(creep, creepType);
-			meleeAttacker.doWork();
+			worker = new MeleeAttacker(creep, creepType);
 		}
 
 		if(creep.memory.role == 'demoman') {
-			var demoman = new Demoman(creep, creepType);
-			demoman.doWork();
+			worker = new Demoman(creep, creepType);
 		}
 
 		if(creep.memory.role == 'builder') {
-			builder(creep, creepType);
+			worker = new Builder(creep, creepType);
+		}
+
+
+		if(this.status === 'complete'){
+			worker.doWork();
+		}else if(this.status === 'incomplete'){
+			worker.doIncompleteStatusWork();
+		}else if(this.status === 'underAttack'){
+			worker.doAttackStatusWork();
 		}
 	}
 

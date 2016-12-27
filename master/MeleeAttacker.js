@@ -1,9 +1,10 @@
 var util = require('util');
+var Worker = require('Worker');
 
-class MeleeAttacker {
+class MeleeAttacker extends Worker{
 
 	constructor(creep, roomToAttack){
-		this.creep = creep;
+		super(creep)
 		this.roomToAttack = roomToAttack;
 	}
 

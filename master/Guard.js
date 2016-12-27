@@ -1,9 +1,10 @@
 var util = require('util');
+var Worker = require('Worker');
 
-class Guard {
+class Guard extends Worker{
 
-	constructor(creep){
-		this.creep = creep;
+	constructor(creep, creepOpts){
+		super(creep, creepOpts);
 	}
 
 	doWork(){
@@ -19,9 +20,9 @@ class Guard {
 		}else {
 
 			if(creep.getAssignedRoom() === util().northRoom){
-		  	creep.moveToUsingCache(new RoomPosition(2, 10, creep.getAssignedRoom().name));
+		  		creep.moveToUsingCache(new RoomPosition(2, 10, creep.getAssignedRoom().name));
 			}else{
-		  	creep.moveToUsingCache(new RoomPosition(13, 11, creep.getAssignedRoom().name));
+		  		creep.moveToUsingCache(new RoomPosition(13, 11, creep.getAssignedRoom().name));
 			}
 		}
 	}

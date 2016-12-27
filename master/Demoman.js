@@ -1,9 +1,10 @@
 var util = require('util');
+var Worker = require('Worker');
 
-var Demoman = class {
+class Demoman extends Worker{
 
-	constructor(creep){
-		this.creep = creep;
+	constructor(creep, creepOpts){
+		super(creep, creepOpts);
 		this.targetRoomName = util().milesRoomName;
 
 		//list of targets

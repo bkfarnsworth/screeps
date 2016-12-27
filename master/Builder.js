@@ -1,64 +1,71 @@
 var util = require('util')
+var Worker = require('Worker');
 
-module.exports = function (creep) {
+class Builder extends Worker {
 
-	var findStrategy = 'closest';
-	// var findStrategy = 'FIFO';
+	constructor(creep){
+		super(creep);
+	}
 
-	var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
-	assignedRoom = Game.rooms[assignedRoom];
+	doWork(){
+		var creep = this.creep;
+		var findStrategy = 'closest';
+		// var findStrategy = 'FIFO';
 
-	var inAssignedRoom = util().goToAssignedRoom(creep);
-	if(!inAssignedRoom){ return; }
+		var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
+		assignedRoom = Game.rooms[assignedRoom];
 
-	if(creep.carry.energy !== 0) {
-		//manually set sites to be done first
-		var manualTargetIds = [
-			'585d90a3badd41083416b98c',
-			'584da2b4cf925b7f32ada75b',
-			'584da2b4cf925b7f32ada75c',
-			'5843b042b14a695e0d8b3194',
-			'',
-			'',
-			'',
-		]
+		if(creep.carry.energy !== 0) {
+			//manually set sites to be done first
+			var manualTargetIds = [
+				'585d90a3badd41083416b98c',
+				'584da2b4cf925b7f32ada75b',
+				'584da2b4cf925b7f32ada75c',
+				'5843b042b14a695e0d8b3194',
+				'',
+				'',
+				'',
+			]
 
-		var closestTarget = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+			var closestTarget = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
 
-		if(closestTarget) {
-			var target = closestTarget;
-			var allTargets;
+			if(closestTarget) {
+				var target = closestTarget;
+				var allTargets;
 
-			if(manualTargetIds.length){
-				allTargets = assignedRoom.find(FIND_CONSTRUCTION_SITES);
-				if(findStrategy === 'FIFO'){
-					closestTarget = allTargets[0];//if we are overriding the closest stuff, just get the first one
+				if(manualTargetIds.length){
+					allTargets = assignedRoom.find(FIND_CONSTRUCTION_SITES);
+					if(findStrategy === 'FIFO'){
+						closestTarget = allTargets[0];//if we are overriding the closest stuff, just get the first one
+					}
 				}
+
+				for (var i = 0; i < manualTargetIds.length; i++) {
+					target = _.find(allTargets, {id: manualTargetIds[i]});
+					if(target){ 
+						break;
+					}else{
+						target = closestTarget;
+					}
+				};
+
+				if(creep.build(target) == ERR_NOT_IN_RANGE) {
+					creep.moveToUsingCache(target);					
+				}	
+			}else{
+				//we need to go into the next room
+				// if(creep.room.name === util().southRoomName){
+				//     var exit = FIND_EXIT_TOP;
+				//     creep.moveToUsingCache(creep.pos.findClosestByRange(exit));    
+				// }
 			}
-
-			for (var i = 0; i < manualTargetIds.length; i++) {
-				target = _.find(allTargets, {id: manualTargetIds[i]});
-				if(target){ 
-					break;
-				}else{
-					target = closestTarget;
-				}
-			};
-
-			if(creep.build(target) == ERR_NOT_IN_RANGE) {
-				creep.moveToUsingCache(target);					
-			}	
 		}else{
-			//we need to go into the next room
-			// if(creep.room.name === util().southRoomName){
-			//     var exit = FIND_EXIT_TOP;
-			//     creep.moveToUsingCache(creep.pos.findClosestByRange(exit));    
-			// }
+			util().getEnergyFromBestSource(creep, {
+				minEnergyRatio: 0.2,
+				allowCarrier: true
+			});
 		}
-	}else{
-		util().getEnergyFromBestSource(creep, {
-			minEnergyRatio: 0.2,
-			allowCarrier: true
-		});
 	}
 }
+
+module.exports = Builder;

@@ -1,11 +1,11 @@
 var util = require('util')
+var Worker = require('Worker');
 
-class Harvester {
+class Harvester extends Worker{
 
 	constructor(creep, creepOpts={}){
 
-		this.creep = creep;
-		this.creepOpts = creepOpts;
+		super(creep, creepOpts);
 
 		_.defaults(this.creepOpts, {
 			sourceIndex: 0,
@@ -15,8 +15,6 @@ class Harvester {
 	}
 
 	doWork(){
-		var inAssignedRoom = util().goToAssignedRoom(this.creep);
-		if(!inAssignedRoom){ return; }
 		util().depositEnergyOrHarvest(this.creep, this.creepOpts);
 	}
 }
