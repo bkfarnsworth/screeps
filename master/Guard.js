@@ -9,7 +9,7 @@ class Guard extends Worker{
 
 	doWork(){
 		var creep = this.creep;
-		var targets = util().findHostiles(creep);
+		var targets = util().findHostiles(creep.room);
 		var closestTarget = creep.pos.findClosestByPathUsingCache(targets);
 
 		if(closestTarget) {
