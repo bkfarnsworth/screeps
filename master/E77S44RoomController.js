@@ -74,7 +74,17 @@ class E77S44RoomController extends RoomController {
 				role: 'builder',            
 				condition: this.getMyConstructionSites().length > 0,
 				bodyParts: this.bodyParts.farNorthBuilderBodyParts
-			}
+			},
+			{ 
+				name: 'upgrader4',
+				role: 'upgrader',           
+				bodyParts: this.bodyParts.farNorthUpgraderBodyParts
+			},
+			{ 
+				name: 'upgrader5',
+				role: 'upgrader',           
+				bodyParts: this.bodyParts.farNorthUpgraderBodyParts
+			},
 		]
 
 		return opts.map(obj => super.createCreepType(obj));
