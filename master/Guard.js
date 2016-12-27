@@ -9,23 +9,31 @@ class Guard extends Worker{
 
 	doWork(){
 		var creep = this.creep;
-		var targets = creep.getAssignedRoom().find(FIND_HOSTILE_CREEPS);
+		var targets = util().findHostiles(creep);
+		var closestTarget = creep.pos.findClosestByPathUsingCache(targets);
 
-		if(targets.length) {
-		    if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
-		        creep.moveToUsingCache(targets[0])
-		    }
-		
+		if(closestTarget) {
+
+			if(this.attack(closestTarget) == ERR_NOT_IN_RANGE) {
+				creep.moveToUsingCache(closestTarget);
+			}
+
 		//move to a specific position
 		}else {
+			//have roomcontroller pass in a location
+		}
+	}
 
-			if(creep.getAssignedRoom() === util().northRoom){
-		  		creep.moveToUsingCache(new RoomPosition(2, 10, creep.getAssignedRoom().name));
-			}else{
-		  		creep.moveToUsingCache(new RoomPosition(13, 11, creep.getAssignedRoom().name));
-			}
+	attack(target){
+		var creep = this.creep;
+		var body = creep.body;
+		var canRangeAttack = _.any(body, part => part.type === RANGED_ATTACK && part.hits > 0);
+		if(canRangeAttack){
+			return creep.rangedAttack(target);
+		}else{
+			return creep.attack(target);
 		}
 	}
 }
 
-module.exports = Guard
+module.exports = Guard;

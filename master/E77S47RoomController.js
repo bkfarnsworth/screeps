@@ -17,97 +17,51 @@ class E77S47RoomController extends RoomController {
 	}
 
 	get creepTypes(){
+
+		let {
+			harvester,
+			backUpHarvester,
+			guard,
+			builder,
+			upgrader,
+			carrier,
+		} = this.standardCreepTypes;
+
 		var opts = [ 
-			{ 
-				name: 'backUpHarvester',
-				role: 'harvester',    
-				condition: this.getHarvesters().length === 0, 
-				stopOperation: true,
-				bodyParts: this.bodyParts.backUpHarvesterBodyParts,
-				harvestSource: ''
-			},
-			{ 
-				name: 'harvester1',
-				role: 'harvester',          
-				stopOperation: true,
-				bodyParts: this.bodyParts.harvesterBodyParts
-			},
-			{ 
-				name: 'harvester2',
-				role: 'harvester',          
-				stopOperation: true,
-				bodyParts: this.bodyParts.harvesterBodyParts
-			},
-			{ 
-				name: 'harvester3',
-				role: 'harvester',          
-				stopOperation: true,
-				bodyParts: this.bodyParts.harvesterBodyParts
-			},
-			{ 
+			_.extend(backUpHarvester, {name: 'backUpHarvester'}),
+			_.extend(guard,     {name: 'guard1'}),
+			_.extend(harvester, {name: 'harvester1'}),
+			_.extend(guard,     {name: 'guard2'}),
+			_.extend(harvester, {name: 'harvester2'}),
+			_.extend(guard,     {name: 'guard3'}),
+			_.extend(harvester, {name: 'harvester3'}),
+			_.extend(guard,     {name: 'guard4'}),
+			_.extend(harvester, {
 				name: 'superHarvester',
-				role: 'harvester',  
-				stopOperation: true,
-				bodyParts: this.bodyParts.superHarvesterTwoBodyParts,
+				bodyParts: [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],
 				sourceIndex: 1,
 				giveToTowers: this.status === 'complete'
-			},
-			{ 
-				name: 'upgrader1',
-				role: 'upgrader',
-				bodyParts: this.bodyParts.upgraderBodyParts
-			},
-			{ 
-				name: 'builder1',
-				role: 'builder',            
-				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: this.bodyParts.builderBodyParts
-			},
-			{ 
-				name: 'carrier1',
-				role: 'carrier',
-				bodyParts: this.bodyParts.carrierBodyParts
-			},    
-			{ 
-				name: 'upgrader2',
-				role: 'upgrader',
-				bodyParts: this.bodyParts.upgraderBodyParts
-			},
-			{ 
-				name: 'builder2',
-				role: 'builder',            
-				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: this.bodyParts.builderBodyParts
-			},
-			{ 
-				name: 'upgrader3',
-				role: 'upgrader',
-				bodyParts: this.bodyParts.upgraderBodyParts
-			},
-			{ 
-				name: 'builder3',
-				role: 'builder',            
-				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: this.bodyParts.builderBodyParts
-			},
-			{ 
+			}),
+			_.extend(guard,    {name: 'guard5'}),
+			_.extend(upgrader, {name: 'upgrader1'}),
+			_.extend(builder,  {name: 'builder1'}),
+			_.extend(carrier,  {name: 'carrier1'}),
+			_.extend(upgrader, {name: 'upgrader2'}),
+			_.extend(builder,  {name: 'builder2'}),
+			_.extend(upgrader, {name: 'upgrader3'}),
+			_.extend(builder,  {name: 'builder3'}),
+			_.extend(upgrader, {
 				name: 'upgrader4',
-				role: 'upgrader',           
-				condition: this.getMyConstructionSites().length === 0,
-				bodyParts: this.bodyParts.upgraderBodyParts
-			},
-			{ 
+				condition: this.getMyConstructionSites().length === 0
+			}),
+			_.extend(upgrader, {
 				name: 'upgrader5',
-				role: 'upgrader',           
-				condition: this.getMyConstructionSites().length === 0,
-				bodyParts: this.bodyParts.upgraderBodyParts
-			},
-			{ 
+				condition: this.getMyConstructionSites().length === 0
+			}),
+			_.extend(upgrader, {
 				name: 'upgrader6',
-				role: 'upgrader',           
-				condition: this.getMyConstructionSites().length === 0,
-				bodyParts: this.bodyParts.upgraderBodyParts
-			}
+				condition: this.getMyConstructionSites().length === 0
+			})
 		]
 
 		return opts.map(obj => super.createCreepType(obj));

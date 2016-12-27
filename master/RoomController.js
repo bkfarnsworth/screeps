@@ -1,5 +1,4 @@
 var Guard = require('Guard');
-var MeleeAttacker = require('MeleeAttacker');
 var Demoman = require('Demoman');
 var util = require('util');
 var Harvester = require('Harvester')
@@ -26,23 +25,47 @@ class RoomController {
 
 	get bodyParts(){
 		return {
-			//farNorthRoom
+			//farNorthRoom 
 			farNorthUpgraderBodyParts     : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
 			farNorthBuilderBodyParts      : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
 			farNorthHarvesterBodyParts    : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
-
-			//north and south rooms
-			backUpHarvesterBodyParts      : [WORK,CARRY,MOVE],
-			guardBodyParts                : [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH],
-			demomanBodyParts              : [TOUGH,TOUGH,MOVE,MOVE,WORK,WORK,WORK,WORK,WORK,WORK],
-			meleeAttackerBodyParts        : [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH],
-			claimerBodyParts              : [MOVE,MOVE,MOVE,MOVE,MOVE,WORK,WORK,WORK,CARRY,CARRY,HEAL],
-			harvesterBodyParts            : [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],
-			superHarvesterTwoBodyParts    : [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],
-			carrierBodyParts              : [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],
-			upgraderBodyParts             : [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],
-			builderBodyParts              : [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],
 		};
+	}
+
+	get standardCreepTypes(){
+		return {
+			backUpHarvester: {
+				name: 'backUpHarvester',
+				role: 'harvester',    
+				condition: this.getHarvesters().length === 0, 
+				stopOperation: true,
+				bodyParts: [WORK,CARRY,MOVE]
+			},
+			harvester: {
+				role: 'harvester',          
+				stopOperation: true,
+				bodyParts: [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+			},
+			guard: { 
+				role: 'guard',          
+				stopOperation: true,
+				condition: this.roomIsUnderAttack(),
+				bodyParts: [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH]
+			},
+			upgrader: {
+				role: 'upgrader',
+				bodyParts: [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+			},
+			builder: {
+				role: 'builder',            
+				condition: this.getMyConstructionSites().length > 0,
+				bodyParts: [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+			},
+			carrier: {
+				role: 'carrier',
+				bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]
+			}
+		}
 	}
 
 	get room(){
@@ -101,13 +124,21 @@ class RoomController {
 		});
 	}
 
+	roomIsUnderAttack(){
+		var hostiles = util().findHostiles(this.room);
+		return hostiles.length > 0;
+	}
+
 	getMyConstructionSites(){
 		return this.room.find(FIND_MY_CONSTRUCTION_SITES);
 	}
 
 	createCreepType(opts={}){
 		opts.assignedRoom = this.room.name;
-		opts.name = opts.name + '(' + this.room.name + ')';
+
+		if(!opts.name.includes(this.room.name)){
+			opts.name = opts.name + '(' + this.room.name + ')';
+		}
 		return new CreepType(opts);
 	}
 
@@ -151,10 +182,6 @@ class RoomController {
 
 		if(creep.memory.role == 'guard') {
 			worker = new Guard(creep, creepType);
-		}
-
-		if(creep.memory.role == 'meleeAttacker') {
-			worker = new MeleeAttacker(creep, creepType);
 		}
 
 		if(creep.memory.role == 'demoman') {

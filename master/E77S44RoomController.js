@@ -18,13 +18,7 @@ class E77S44RoomController extends RoomController {
 
 	get creepTypes(){
 		var opts = [ 
-			{ 
-				name: 'backUpHarvester',
-				role: 'harvester',    
-				condition: this.getHarvesters().length === 0, 
-				stopOperation: true,
-				bodyParts: this.bodyParts.backUpHarvesterBodyParts,
-			},
+			this.standardCreepTypes.backUpHarvester,
 			{ 
 				name: 'harvester1',
 				role: 'harvester',           
