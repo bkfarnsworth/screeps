@@ -69,11 +69,11 @@ class E77S47RoomController extends RoomController {
 		var westLink = Game.structures['585b6ab33962b71d57030d66'];
 		var eastLink = Game.structures['585b75504b207b74496d64b5'];
 		var southLink = Game.structures['585cc390713f5c3c7a62662b'];
-		if(_.random(0, 1) === 1){
+		// if(_.random(0, 1) === 1){
 		    westLink.transferEnergy(eastLink);
-		}else{
-		    westLink.transferEnergy(southLink);
-		}
+		// }else{
+		    // westLink.transferEnergy(southLink);
+		// }
 	}
 }
 

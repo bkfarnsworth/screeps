@@ -70,11 +70,11 @@ class E77S46RoomController extends RoomController {
 		var fromLink = Game.structures['585dc5f78d7270785de7f890'];
 		var toLink1 = Game.structures['585dcc14d79a7fc4614ee0c0'];
 		var toLink2 = Game.structures['585dd6639d25db137ae10956'];
-		if(_.random(0, 1) === 1){
+		// if(_.random(0, 1) === 1){
 				fromLink.transferEnergy(toLink1);
-		}else{
-				fromLink.transferEnergy(toLink2);
-		}
+		// }else{
+				// fromLink.transferEnergy(toLink2);
+		// }
 	}
 }
 
