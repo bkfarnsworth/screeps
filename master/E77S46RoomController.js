@@ -32,14 +32,16 @@ class E77S46RoomController extends RoomController {
             // _.extend(guard(),     {name: 'guard2'}),
             _.extend(harvester(), {
                 name: 'harvester2',
-                sourceIndex: 1
+                sourceIndex: 1,
+                giveToTowers: this.status === 'complete'
             }),
             // _.extend(guard(),     {name: 'guard3'}),
             _.extend(harvester(), {name: 'harvester3'}),
             // _.extend(guard(),     {name: 'guard4'}),
             _.extend(harvester(), {
                 name: 'harvester4',
-                sourceIndex: 1
+                sourceIndex: 1,
+                giveToTowers: this.status === 'complete'
             }),
             // _.extend(guard(),    {name: 'guard5'}),
             _.extend(upgrader(), {name: 'upgrader1'}),
