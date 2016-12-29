@@ -24,9 +24,9 @@ module.exports.loop = function () {
     PathFinder.use(false);
 
     var roomControllers = [
-        // new E77S44RoomController(),
+        new E77S44RoomController(),
         new E77S46RoomController(),
-        // new E77S47RoomController()
+        new E77S47RoomController()
     ];
 
     roomControllers.forEach(rc => {
@@ -34,7 +34,7 @@ module.exports.loop = function () {
         if(_.random(1, 10) > throttleRatio*10 || rc.roomIsUnderAttack()){
             rc.runRoom({throttle: false});
         }else{
-            rc.runRoom({throttle: false});
+            rc.runRoom({throttle: true});
         }
     });
 
