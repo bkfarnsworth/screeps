@@ -112,7 +112,7 @@ class RoomController {
 	}
 
 	setRoomStatus(){
-		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn;
+		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
 		if(nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation){
 			this.status = 'incomplete';
 		}else{
