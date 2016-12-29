@@ -285,8 +285,9 @@ module.exports = function (creep) {
             closestDroppedResource = this.getClosestDroppedEnergy(creep, generalRequirements);
             closestCreep = this.getClosestCreep(creep, generalRequirements, opts.creepTypes);
             closestSource = opts.allowHarvesting ? this.getClosestSource(creep, generalRequirements): null;
+            closestLink = this.getClosestLink(creep, generalRequirements);
 
-            var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource]);
+            var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource, closestLink]);
             return creep.pos.findClosestByPathUsingCache(possibilities);
         },
 
