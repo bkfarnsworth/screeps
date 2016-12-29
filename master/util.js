@@ -636,29 +636,6 @@ module.exports = function (creep) {
 
             return hostiles.length && inRange;
         },
-        registerOtherRoomCreep: function(creep){
-            
-
-            
-            // console.log(creep)
-            if(!Memory.otherRoomCreeps){
-                Memory.otherRoomCreeps = [creep];
-            }else{
-                
-                if(creep.room === this.tamsonsRoom){
-                    if(!_.contains(Memory.otherRoomCreeps, creep)){
-                        Memory.otherRoomCreeps.push(creep)
-                    }   
-                }else{
-                    _.remove(Memory.otherRoomCreeps, function(c){
-                        return creep === c;
-                    });
-                }
-                
-                //clean up dead creeps
-                this.cleanDeadCreepsFromMemory(Memory.otherRoomCreeps);
-            }
-        },
         printObject(obj){
             _.forOwn(obj, function(value, key) {
               console.log(key + ': ' + value);
