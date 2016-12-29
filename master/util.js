@@ -663,6 +663,18 @@ module.exports = function (creep) {
             _.forOwn(obj, function(value, key) {
               console.log(key + ': ' + value);
             });
+        },
+        getDirections(){
+            return [
+                TOP,
+                TOP_RIGHT,
+                RIGHT,
+                BOTTOM_RIGHT,
+                BOTTOM,
+                BOTTOM_LEFT,
+                LEFT,
+                TOP_LEFT,
+            ];
         }
     }   
 }

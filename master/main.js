@@ -24,9 +24,9 @@ module.exports.loop = function () {
     PathFinder.use(false);
 
     var roomControllers = [
-        new E77S44RoomController(),
+        // new E77S44RoomController(),
         new E77S46RoomController(),
-        new E77S47RoomController()
+        // new E77S47RoomController()
     ];
 
     roomControllers.forEach(rc => {
@@ -34,7 +34,7 @@ module.exports.loop = function () {
         if(_.random(1, 10) > throttleRatio*10 || rc.roomIsUnderAttack()){
             rc.runRoom({throttle: false});
         }else{
-            rc.runRoom({throttle: true});
+            rc.runRoom({throttle: false});
         }
     });
 
@@ -135,7 +135,13 @@ Creep.prototype.moveToUsingCache = function(target){
     //if the path doesn't work for some reason, just calculate it without the cache
     if(_.contains(validErrCodes, errCode) || creepIsInTheWay){
         path = util().getPath(this, target, {useCache: false});
-        this.moveByPath(path);
+        var code = this.moveByPath(path);
+
+        //if we still can't find the path (like we are stuck or something between creeps)
+        //move in random direction until we get unstuck
+        if(code === ERR_NOT_FOUND){
+            this.moveInRandomDirection();
+        }
     }
 
     if(seeCPU){
@@ -145,6 +151,12 @@ Creep.prototype.moveToUsingCache = function(target){
     }
 
     return errCode;
+}
+
+Creep.prototype.moveInRandomDirection = function(){
+    var directions = util().getDirections();
+    var randomDirection = _.sample(directions)
+    return this.move(randomDirection);
 }
 
 RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts={}){
