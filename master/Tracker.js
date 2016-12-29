@@ -124,7 +124,7 @@ Tracker.prototype.trackCpu = function(opts){
     var averageCpu = trackWithDecay({
         key: 'averageCPUPerTick',
         value: Game.cpu.getUsed(),
-        decayFactor: 0.999
+        decayFactor: 0.95
     });
 
     if(opts.currentCpu){

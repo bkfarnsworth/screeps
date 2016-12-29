@@ -48,9 +48,9 @@ module.exports.loop = function () {
     }   
 
     //every n ticks, clear the paths hash
-    if(_.random(1, 500) === 1){
-        delete Memory.pathsHash;
-    }
+    // if(_.random(1, 500) === 1){
+        // delete Memory.pathsHash;
+    // }
 
     runTowers();
 
@@ -89,11 +89,48 @@ Creep.prototype.getName = function(){
 Creep.prototype.getAssignedRoom = function(){
     return Game.rooms[this.memory.assignedRoom] || util().southRoom;
 }
-
+    
+//REASONS FOR DOING ALL THIS CRAZY CACHING STUFF
+//I don't have to provide arbitrary times to clear the cache
+//I can compare paths more efficiently
 Creep.prototype.moveToUsingCache = function(target){
 
+    var seeCPU = false;
+    var tempCpuUsed = Game.cpu.getUsed();   
+    var start, end;
+
+    //have to convert to position
+    if(!(target instanceof RoomPosition)){
+        target = target.pos;
+    }
+
+    // delete this.memory._bfMove;
+
+    //get the cached end position if there is one
+    var cachedEndPosition, cachedStartPosition;
+    if(this.memory._bfMove){
+        cachedStartPosition = RoomPosition.create(this.memory._bfMove.start);
+        cachedEndPosition   = RoomPosition.create(this.memory._bfMove.end);
+    }
+
+    //if there is one, and the target equals that cached position, reuse the cached path
+    if(cachedEndPosition && target.isEqualTo(cachedEndPosition)){
+
+        //use the cached start pos to look up a path in the cache
+        start = cachedEndPosition;
+        end = cachedEndPosition;
+
+    //if the target doesn't match, it means the target has changed and we can no longer use the cached start and end to get a path.  Bust the cache on the creep and look up a new path from the path cache
+    }else{
+
+        //use the current position as the start, and the target as the end, and cache them
+        start = this.pos;
+        end = target;
+        this.memory._bfMove = {start, end};
+    }
+
+    var path = util().getPath(start, end);
     var validErrCodes = [ERR_NOT_FOUND, ERR_NO_PATH];
-    var path = util().getPath(this, target);
     var errCode = this.moveByPath(path);
     var obstacles = path[0] ? this.room.lookAt(path[0].x, path[0].y) : [];
     var creepIsInTheWay = Boolean(obstacles.find(o => o.type === 'creep'));
@@ -104,17 +141,11 @@ Creep.prototype.moveToUsingCache = function(target){
         this.moveByPath(path);
     }
 
-    // if(this.name === 'harvester3(E77S47)'){
-    //  console.log('this: ', this);
-    //  // console.log('path[0]: ', path[0]);
-    //  util().printObject(path[0]);   
-    //  // console.log('Room.deserializePath(path): ', Room.deserializePath(path).length);
-    //  console.log('target: ', target);
-    //  console.log('target.energy: ', target.energy);
-    //  console.log('target.pos: ', target.pos);
-    //  console.log('errCode: ', errCode);
-    //  console.log('target.id: ', target.id);
-    // }
+    if(seeCPU){
+        console.log('this.name: ', this.name);
+        console.log('CPU used: ' + _.round(Game.cpu.getUsed() - tempCpuUsed, 2));
+        tempCpuUsed = Game.cpu.getUsed();
+    }
 
     return errCode;
 }
@@ -166,6 +197,10 @@ RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts=
 
 RoomPosition.prototype.getRoom = function(){
     return Game.rooms[this.roomName];
+}
+
+RoomPosition.create = (opts) => {
+    return new RoomPosition(opts.x, opts.y, opts.roomName);
 }
 
 // Room.prototype.getSafeAreaFromInvaders = function(){

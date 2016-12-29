@@ -592,7 +592,7 @@ module.exports = function (creep) {
                 end = end.pos;
             }
 
-            var cachePropertyString = `pathsHash[${start.x}][${start.y}][${end.x}][${end.y}]`;
+            var cachePropertyString = `pathsHash[${start.roomName}][${start.x}][${start.y}][${end.roomName}][${end.x}][${end.y}]`;
 
             //CLEAR CACHE!!!!!!!!!!!!
             // delete Memory.pathsHash;
