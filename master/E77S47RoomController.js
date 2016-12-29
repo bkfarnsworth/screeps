@@ -3,8 +3,8 @@ var util = require('util');
 
 class E77S47RoomController extends RoomController {
 
-	runRoom(){
-		super.runRoom();
+	runRoom(opts){
+		super.runRoom(opts);
 		//custom
 	}
 

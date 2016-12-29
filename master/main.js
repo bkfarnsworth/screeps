@@ -14,7 +14,7 @@ var E77S44RoomController = require('E77S44RoomController')
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0.4;//0 - never throttle, 1 - throttle 100%
+var throttleRatio = 0.5;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
  
@@ -32,7 +32,9 @@ module.exports.loop = function () {
     roomControllers.forEach(rc => {
         //for now, throttle each room (unless it is under attack)
         if(_.random(1, 10) > throttleRatio*10 || rc.roomIsUnderAttack()){
-            rc.runRoom();
+            rc.runRoom({throttle: false});
+        }else{
+            rc.runRoom({throttle: true});
         }
     });
 
@@ -53,13 +55,13 @@ module.exports.loop = function () {
     tracker.track({
         currentCpu: true,
         averageCpu: true,
-        gclToNextLevel: true,
-        averageGcl: true,
-        upgradeToNextLevel: true,
-        averageUpgrade: true,
-        averageSourceDepletionRatio: true,
+        // gclToNextLevel: true,
+        // averageGcl: true,
+        // upgradeToNextLevel: true,
+        // averageUpgrade: true,
+        // averageSourceDepletionRatio: true,
         cachePercent: true,
-        averageSecondsPerTick: true
+        // averageSecondsPerTick: true
     });
 }
 

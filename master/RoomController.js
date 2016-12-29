@@ -14,13 +14,28 @@ var printQueue = true;
 
 class RoomController {
 
-	runRoom(){
-		this.spawnCreeps();
-		this.activateSafeModeIfNecessary();
-		this.printEnergy();
-		this.runLinks();
-		this.runCreeps();
+	runRoom(opts={}){
+
+		_.defaults(opts, {
+			throttle: false
+		});
+
+		console.log();
+		console.log('Room: ' + this.room.name);
+		
+		this.setRoomStatus();
+		this.printCreeps();
+
+		if(!opts.throttle){
+			this.spawnCreeps();
+			this.activateSafeModeIfNecessary();
+			this.printEnergy();
+			this.runLinks();
+			this.runCreeps();
+		}
+		
 		console.log('STATUS: ' + this.room.status);
+		console.log(opts.throttle ? 'throttled' : 'NOT throttled')
 	}
 
 	get bodyParts(){
@@ -94,6 +109,30 @@ class RoomController {
 
 	set status(val){
 		this.room.status = val;
+	}
+
+	setRoomStatus(){
+		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn;
+		if(nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation){
+			this.status = 'incomplete';
+		}else{
+			this.status = 'complete';
+		}
+	}
+
+	printCreeps(){
+		this.creepTypes.forEach(creepType => {
+			if(creepType.isSpawning()){
+				util().printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
+			}else if(creepType.needsSpawning() && creepType.condition){
+				util().printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
+			}else if(!creepType.condition){
+				util().printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
+			}else if(!creepType.needsSpawning()){
+				var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
+				util().printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
+			}
+		});
 	}
 
 	getCreeps(opts={}){
@@ -202,12 +241,8 @@ class RoomController {
 		}
 	}
 
-	spawnCreeps(){
-		console.log();
-		console.log('Room: ' + this.room.name);
-
+	getNextCreepTypeToSpawn(){
 		var creepsThatNeedSpawning = this.creepTypes.filter(creepType => creepType.needsSpawning());
-
 		//spawn the top priority one, else if spawning, do the next highest one
 		var creepToSpawn;
 		if(this.spawn.spawning){
@@ -215,30 +250,14 @@ class RoomController {
 		}else{
 				creepToSpawn = creepsThatNeedSpawning[0];
 		}
+		return creepToSpawn;
+	}
 
-		if(creepToSpawn && creepToSpawn.stopOperation){
-				this.status = 'incomplete';
-		}else{
-				this.status = 'complete';
-		}
 
-		if(creepToSpawn){
-				this.spawnCreep(creepToSpawn);
-		}
-
-		if(printQueue){
-			this.creepTypes.forEach(creepType => {
-				if(creepType.isSpawning()){
-					util().printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
-				}else if(creepType.needsSpawning() && creepType.condition){
-					util().printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
-				}else if(!creepType.condition){
-					util().printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
-				}else if(!creepType.needsSpawning()){
-					var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
-					util().printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
-				}
-			});
+	spawnCreeps(){
+		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
+		if(nextCreepTypeToSpawn){
+			this.spawnCreep(nextCreepTypeToSpawn);
 		}
 	}
 
