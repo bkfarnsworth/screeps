@@ -14,20 +14,12 @@ var E77S44RoomController = require('E77S44RoomController')
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0;//0 - never throttle, 1 - throttle 100%
+var throttleRatio = 0.4;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
  
-
-
     console.log();
     console.log("--------- Creep Report - new tick -------------");
-
-    if(_.random(1, 10) <= throttleRatio*10){
-        console.log('SAVING CPU');
-        return;
-    }
-
 
     PathFinder.use(false);
 
@@ -38,7 +30,10 @@ module.exports.loop = function () {
     ];
 
     roomControllers.forEach(rc => {
-        rc.runRoom();
+        //for now, throttle each room (unless it is under attack)
+        if(_.random(1, 10) > throttleRatio*10 || rc.roomIsUnderAttack()){
+            rc.runRoom();
+        }
     });
 
     //we could do this even less, but for now throttle it so it only happens on average every 100 ticks
