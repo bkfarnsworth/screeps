@@ -493,25 +493,9 @@ module.exports = function (creep) {
             TOUGH: 10,
             CLAIM: 600
         },
-        cleanDeadCreepsFromMemory: function(memoryVar){
-            if(typeof memoryVar !== 'object'){
-                _.remove(memoryVar, function(creep){
-                    return creep.ticksToLive < 3 || creep.ticksToLive === undefined;
-                })
-            }else{
-                var keys = _.keys(memoryVar);
-                
-                for(var i = 0; i < keys.length; i++){
-                    if(memoryVar[keys[i]].ticksToLive < 3 || memoryVar[keys[i]].ticksToLive === undefined){
-                        delete memoryVar[keys[i]];
-                    }
-                }
-            }
-        },
         returnAllFilter: function(){
             return true;
         },
-
         forEachCellInGrid: function(color, func, creep){
 
             var flags = this.findInAllRooms(FIND_FLAGS, {
