@@ -30,27 +30,13 @@ Tracker.prototype.track = function(opts={}) {
     this.trackSources(opts);
     this.trackSecondsPerTick(opts);
 
-    this.sendEmailReport();
-}
+    var trackingForEmail = `
+    Average CPU       : ${_.round(Memory.averageCPUPerTick, 2)}
+    GCL to Next Level : ${_.round(Game.gcl.progressTotal - Game.gcl.progress, 2)}
+    Average GCL       : ${_.round(Memory.averageGCLPerTick, 2)}
+    `;
 
-Tracker.prototype.sendEmailReport = function(){
-
-    if(_.isUndefined(Memory.emailReportTicks)){
-        Memory.emailReportTicks = 0;
-    }
-
-    if(Memory.emailReportTicks >= 1){
-    // if(Memory.emailReportTicks >= 600){
-        var msg = `
-            Average CPU       : ${_.round(Memory.averageCPUPerTick, 2)}
-            GCL to Next Level : ${_.round(Game.gcl.progressTotal - Game.gcl.progress, 2)}
-            Average GCL       : ${_.round(Memory.averageGCLPerTick, 2)}
-        `;
-        Game.notify(msg)
-        Memory.emailReportTicks = 0;
-    }else{
-        Memory.emailReportTicks++;
-    }
+    myGlobal.emailReport += trackingForEmail;
 }
 
 Tracker.prototype.trackSecondsPerTick = function(opts){

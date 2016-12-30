@@ -1,6 +1,7 @@
 myGlobal = {
     cacheHits: 0,
-    cacheMisses: 0
+    cacheMisses: 0,
+    emailReport: '',
 };
 
 var Tracker = require('Tracker');
@@ -58,14 +59,30 @@ module.exports.loop = function () {
         currentCpu: true,
         averageCpu: true,
         // gclToNextLevel: true,
-        // averageGcl: true,
+        averageGcl: true,
         // upgradeToNextLevel: true,
         // averageUpgrade: true,
-        // averageSourceDepletionRatio: true,
+        averageSourceDepletionRatio: true,
         cachePercent: true,
         // averageSecondsPerTick: true,
         throttleRatio: true
     });
+
+    sendEmailReport();
+}
+
+function sendEmailReport(){
+    if(_.isUndefined(Memory.emailReportTicks)){
+        Memory.emailReportTicks = 0;
+    }
+
+    if(Memory.emailReportTicks >= 600){
+        Game.notify(myGlobal.emailReport)
+        // console.log('myGlobal.emailReport: ', myGlobal.emailReport);
+        Memory.emailReportTicks = 0;
+    }else{
+        Memory.emailReportTicks++;
+    }
 }
 
 function runTowers(){
