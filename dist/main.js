@@ -63,6 +63,8 @@ module.exports.loop = function () {
         cachePercent: true,
         // averageSecondsPerTick: true
     });
+
+    console.log('AAAAAAAAAA');
 }
 
 function runTowers(){
