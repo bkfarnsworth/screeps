@@ -47,9 +47,9 @@ module.exports.loop = function () {
     }   
 
     //every n ticks, clear the paths hash
-    // if(_.random(1, 500) === 1){
-        // delete Memory.pathsHash;
-    // }
+    if(_.random(1, 500) === 1){
+        delete Memory.pathsHash;
+    }
 
     runTowers();
 
