@@ -1,6 +1,6 @@
 
 const INITIAL_THROTTLE_POINT = 0.4;
-const ADJUSTMENT_FREQUENCY = 50;//adjust every 10 ticks; this value is highly dependent on the decay rate for the averageCPUPerTick calculation
+const ADJUSTMENT_FREQUENCY = 15;//adjust every 10 ticks; this value is highly dependent on the decay rate for the averageCPUPerTick calculation
 const ADJUSTMENT_VALUE = 0.01;
 const MAX_THROTTLE = 1;
 const MIN_THROTTLE = 0;
@@ -15,6 +15,7 @@ class ThrottleService {
 
       if(_.isUndefined(Memory.throttleRatio)){
          Memory.throttleRatio = INITIAL_THROTTLE_POINT;
+         return
       }
 
       if(_.random(1, ADJUSTMENT_FREQUENCY) === 1){
