@@ -9,8 +9,8 @@ class Harvester extends Worker{
 
 		_.defaults(this.creepOpts, {
 			sourceIndex: 0,
-			takeFromStorage: this.status === 'incomplete',
-			giveToStorage: this.status === 'complete',
+			takeFromStorage: this.creep.room.status === 'incomplete',
+			giveToStorage: this.creep.room.status === 'complete',
 		});
 	}
 

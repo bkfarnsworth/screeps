@@ -14,7 +14,8 @@ class Carrier extends Worker {
                 maxEnergyRatio: 0.7,
                 allowTowers: false,
                 allowStorage: false,
-                allowStructures: false
+                allowExtensions: false,
+                allowSpawn: false,
             })
         });
     }

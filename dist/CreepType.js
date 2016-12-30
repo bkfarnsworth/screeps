@@ -25,12 +25,36 @@ CreepType.prototype.getMatchingCreeps = function(){
     return this._matchingCreeps;
 }
 
+// Spawn time = 3 ticks per each body part
+CreepType.prototype.ticksToSpawn = function(){
+    return this.bodyParts.length * 3;
+}
+
 CreepType.prototype.isSpawning = function() {
     return this.getMatchingCreeps().length && this.getMatchingCreeps()[0].spawning;
 };
 
 CreepType.prototype.needsSpawning = function() {
-    return !this.getMatchingCreeps().length && this.condition;
+    var needsSpawning;
+
+    if(!this.condition){
+        needsSpawning = false
+    }else{
+        var matchingCreeps = this.getMatchingCreeps();
+        if(matchingCreeps.length){
+            //see if one is about to die
+            var creepAboutToDie = matchingCreeps.find(creep => creep.ticksToLive <= this.ticksToSpawn());
+            if(creepAboutToDie){
+                needsSpawning = true;
+            }else{
+                needsSpawning = false;
+            }
+        }else{
+            needsSpawning = true;
+        }
+    }
+
+    return needsSpawning;
 };
 
 CreepType.prototype.getEnergyRequired = function() {

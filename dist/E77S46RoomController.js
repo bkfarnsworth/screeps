@@ -35,21 +35,8 @@ class E77S46RoomController extends RoomController {
                 sourceIndex: 1,
                 giveToTowers: this.status === 'complete'
             }),
-            // _.extend(guard(),     {name: 'guard3'}),
-            _.extend(harvester(), {name: 'harvester3'}),
-            // _.extend(guard(),     {name: 'guard4'}),
-            _.extend(harvester(), {
-                name: 'harvester4',
-                sourceIndex: 1,
-                giveToTowers: this.status === 'complete'
-            }),
-            // _.extend(guard(),    {name: 'guard5'}),
             _.extend(upgrader(), {name: 'upgrader1'}),
             _.extend(builder(),  {name: 'builder1'}),
-            _.extend(upgrader(), {name: 'upgrader2'}),
-            _.extend(builder(),  {name: 'builder2'}),
-            _.extend(upgrader(), {name: 'upgrader3'}),
-            _.extend(builder(),  {name: 'builder3'}),
         ]
 
         return opts.map(obj => super.createCreepType(obj));

@@ -130,16 +130,29 @@ module.exports = function (creep) {
         needsEnergy: function(creep, code){
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);
         },
-        getClosestEnergyStructure: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPathUsingCache(FIND_STRUCTURES, {
-                filter: function(structure){
+        getClosestStructure: function(creep, filter=this.returnAllFilter, opts={}){
 
-                    var isSpawn = structure.structureType === STRUCTURE_SPAWN;
-                    var isExtension = structure.structureType === STRUCTURE_EXTENSION;
-                    var isStorage = structure.structureType === STRUCTURE_STORAGE;
-                    var isContainer = structure.structureType === STRUCTURE_CONTAINER;
-                    var isStructure = isSpawn || isExtension || isStorage || isContainer;
-                    return isStructure && filter(structure);
+            _.defaults(opts, {
+                includeSpawns     : true,
+                includeExtensions : true,
+                includeStorage    : true,
+                includeContainers : true,
+                includeLinks      : true,
+                includeTowers     : true
+            });
+
+            var structuresToInclude = _.compact([
+                opts.includeSpawns     ? STRUCTURE_SPAWN     : undefined,
+                opts.includeExtensions ? STRUCTURE_EXTENSION : undefined,
+                opts.includeStorage    ? STRUCTURE_STORAGE   : undefined,
+                opts.includeContainers ? STRUCTURE_CONTAINER : undefined,
+                opts.includeLinks      ? STRUCTURE_LINK      : undefined,
+                opts.includeTowers     ? STRUCTURE_TOWER     : undefined
+            ]);
+
+            return creep.pos.findClosestByPathUsingCache(FIND_STRUCTURES, {
+                filter: function(s){
+                    return structuresToInclude.includes(s.structureType) && filter(s);
                 }
             });
         },
@@ -151,12 +164,12 @@ module.exports = function (creep) {
         getClosestCreep: function(creep, filter=this.returnAllFilter, opts={}){
 
             _.defaults(opts, {
-                creepTypes: []
+                takeFromCreeps: []
             });
 
             var closestCreep = creep.pos.findClosestByPathUsingCache(FIND_MY_CREEPS, {
                 filter: (c) => {
-                    return opts.creepTypes.includes(c.memory.role) && filter(c);    
+                    return opts.takeFromCreeps.includes(c.memory.role) && filter(c);    
                 }
             });
 
@@ -167,28 +180,15 @@ module.exports = function (creep) {
                 filter: filter
             });
         },
-        getClosestTower: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPathUsingCache(FIND_MY_STRUCTURES, {
-                filter: (s) => {
-                    return s.structureType === STRUCTURE_TOWER && filter(s);
-                }
-            });
-        },
-        getClosestLink: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByPathUsingCache(FIND_MY_STRUCTURES, {
-                filter: (s) => {
-                    return s.structureType === STRUCTURE_LINK && filter(s);
-                }
-            });
-        },
         getBestEnergyRecipient: function(creep, opts = {}){
 
             _.defaults(opts, {
                 maxEnergyRatio: 0.7,
-                creepTypes: [],
+                takeFromCreeps: [],
                 allowStructures: true,
                 allowStorage: true,
-                allowLink: true
+                allowLink: true,
+                allowTowers: true
             });
 
             var closestCreep;
@@ -218,21 +218,32 @@ module.exports = function (creep) {
                 return isCorrectRoom(possibility) && lacksEnoughEnergyForDepositing;
             }
 
-            var structureFilter = (s) => {
-                return !opts.allowStorage ? !(s instanceof StructureStorage || s instanceof StructureContainer) && generalRequirements(s) : generalRequirements(s);
-            }
+            //get closest structures
+            closestStructure = opts.allowStructures ? this.getClosestStructure(creep, generalRequirements, {
+                includeLinks: opts.allowLink,
+                includeStorage: opts.allowStorage,
+                includeContainers: opts.allowStorage,
+                includeTowers: opts.allowTowers
+            }) : null;
 
-            closestStructure = opts.allowStructures ? this.getClosestEnergyStructure(creep, structureFilter) : null;
+            //get closest creep
             closestCreep = this.getClosestCreep(creep, generalRequirements, opts);
-            closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestTower(creep, generalRequirements) : null;
-            closestLink = opts.allowLink ? this.getClosestLink(creep, generalRequirements) : null;
 
-            var possibilities = _.compact([closestStructure, closestCreep, closestTower, closestLink]);
+            //get the closest tower too, since we do some custom logic for towers
+            closestTower = opts.allowStructures && opts.allowTowers ? this.getClosestStructure(creep, generalRequirements, {
+                includeTowers: true,
+                includeExtensions: false,
+                includeContainers: false,
+                includeStorage: false,
+                includeSpawns: false,
+                includeLinks: false
+            }) : null;
+
+            var possibilities = _.compact([closestStructure, closestCreep, closestTower]);
             var best = creep.pos.findClosestByPathUsingCache(possibilities);
 
 
             //////// priority rules that override closest
-
             //make sure tower always stays at at least 700
             if(opts.allowTowers && closestTower && closestTower.energy < 700){
                 best = closestTower;
@@ -244,14 +255,17 @@ module.exports = function (creep) {
 
             _.defaults(opts, {
                 minEnergyRatio: 0,
-                allowHarvesting: false,
-                creepTypes: [],
-                allowStructures: true
+                takeFromSource: false,//allow them to go harvest on their own
+                takeFromStorage: true,
+                takeFromContainers: true,
+                takeFromExtensions: true,
+                takeFromSpawn: true,
+                takeFromCreeps: creep.room.status ? ['carrier', 'harvester'] : ['carrier']
             });
 
-            if(creep.room.status === 'incomplete'){
-                return this.getNoEnergySpot(creep);
-            }
+            // if(creep.room.status === 'incomplete'){
+            //     return this.getNoEnergySpot(creep);
+            // }
 
             var closestCreep;
             var closestSource;
@@ -281,55 +295,69 @@ module.exports = function (creep) {
                 return  isCorrectRoom(possibility) && hasEnoughEnergyForGathering;
             }
 
-            closestStructure = opts.allowStructures ? this.getClosestEnergyStructure(creep, generalRequirements) : null;
+            closestStructure = this.getClosestStructure(creep, generalRequirements, {
+                includeStorage: opts.takeFromStorage,
+                includeContainers: opts.takeFromContainers,
+                includeExtensions: opts.takeFromExtensions,
+                includeSpawns: opts.takeFromSpawn,
+                includeTowers: false
+            });
             closestDroppedResource = this.getClosestDroppedEnergy(creep, generalRequirements);
-            closestCreep = this.getClosestCreep(creep, generalRequirements, opts.creepTypes);
+            closestCreep = this.getClosestCreep(creep, generalRequirements, opts.takeFromCreeps);
             closestSource = opts.allowHarvesting ? this.getClosestSource(creep, generalRequirements): null;
-            closestLink = this.getClosestLink(creep, generalRequirements);
 
-            var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource, closestLink]);
+            var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource]);
             return creep.pos.findClosestByPathUsingCache(possibilities);
         },
-
-        getEnergyFromBestSource: function(creep, opts={}){
-
-            var creepTypes = creep.room.status ? ['carrier', 'harvester'] : ['carrier'];
-
+        getBestNonSpawningEnergySource(creep, opts={}){
             _.defaults(opts, {
-                minEnergyRatio: 0,
-                allowHarvesting: false,//allow them to go harvet on their own
-                allowCarrier: false,//allow them to get from a carrier
-                allowStructures: creep.room.status === 'complete',
-                creepTypes: creepTypes
+                takeFromStorage: true,
+                takeFromContainers: true,
+                takeFromSource: false,
+                takeFromExtensions: false,
+                takeFromSpawn: false,
+                takeFromCreeps: ['carrier']
             });
 
+            var bestNonSpawningEnergySource = this.getBestEnergySource(creep, opts);
+
+            //if we didn't get one (like if there are no storage units in the room), just get the best extension
+            var nextBest = this.getBestEnergySource(creep);
+            return bestNonSpawningEnergySource || nextBest;
+        },
+        getEnergyFromBestNonSpawningRoomObject(creep, opts={}){
+            var closestEnergySource = this.getBestNonSpawningEnergySource(creep, opts);
+            return this.getEnergyFromRoomObject(creep, closestEnergySource);
+        },
+        getEnergyFromRoomObject(creep, roomObject){
             var errCode;
-            var closestEnergySource = this.getBestEnergySource(creep, opts);
 
-            // console.log('closestEnergySource: ', closestEnergySource);
-
-            if(closestEnergySource instanceof StructureStorage || closestEnergySource instanceof StructureContainer){
-                errCode = creep.withdraw(closestEnergySource, RESOURCE_ENERGY);
-            }else if(closestEnergySource instanceof Structure){
-                errCode = closestEnergySource.transferEnergy(creep);
-            }else if(closestEnergySource instanceof Creep){
-                errCode = closestEnergySource.transfer(creep);
-            }else if(closestEnergySource instanceof Source){
-                errCode = creep.harvest(closestEnergySource);
-            }else if(closestEnergySource instanceof Resource){
-                errCode = creep.pickup(closestEnergySource);
+            if(roomObject instanceof StructureStorage || roomObject instanceof StructureContainer){
+                errCode = creep.withdraw(roomObject, RESOURCE_ENERGY);
+            }else if(roomObject instanceof Structure){
+                errCode = roomObject.transferEnergy(creep);
+            }else if(roomObject instanceof Creep){
+                errCode = roomObject.transfer(creep);
+            }else if(roomObject instanceof Source){
+                errCode = creep.harvest(roomObject);
+            }else if(roomObject instanceof Resource){
+                errCode = creep.pickup(roomObject);
             }
 
             if(errCode == ERR_NOT_IN_RANGE) {
-                creep.moveToUsingCache(closestEnergySource);              
+                creep.moveToUsingCache(roomObject);              
             }
 
-    		return errCode;
+            return errCode;
+        },
+        getEnergyFromBestSource: function(creep, opts={}){
+            var closestEnergySource = this.getBestEnergySource(creep, opts);
+    		return this.getEnergyFromRoomObject(closestEnergySource);
         },
         giveEnergyToBestRecipient: function(creep, opts={}){
 
             _.defaults(opts, {
-                creepTypes: ['builder', 'upgrader', 'repairer'],
+                takeFromCreeps: ['builder', 'upgrader', 'repairer'],
                 allowStructures: false,
                 allowStorage: true,
                 allowTowers: creep.room.status === 'complete',
@@ -364,11 +392,7 @@ module.exports = function (creep) {
 
             var debugMode = false;
 
-            _.defaults(opts, {
-                allowHarvesting: false
-            });
-
-            var closestEnergySource = this.getBestEnergySource(creep, opts);
+            var closestEnergySource = this.getBestNonSpawningEnergySource(creep, opts);
             var isCloseToEnergy = false;
             var range = 5;
 
@@ -379,7 +403,7 @@ module.exports = function (creep) {
             if(isCloseToEnergy){
                 if(creep.carry.energy < (creep.carryCapacity * 0.9)){
                     if(debugMode){console.log('gather 1');}
-                    this.getEnergyFromBestSource(creep, opts);
+                    this.getEnergyFromBestNonSpawningRoomObject(creep, opts);
                 }else{
                     if(debugMode){console.log('deposit 1');}
                     awayFromSourceWork(creep)
@@ -390,7 +414,7 @@ module.exports = function (creep) {
                     awayFromSourceWork(creep);
                 }else{
                     if(debugMode){console.log('gather 2');}
-                    this.getEnergyFromBestSource(creep, opts);
+                    this.getEnergyFromBestNonSpawningRoomObject(creep, opts);
                 }
             }
         },
@@ -415,7 +439,7 @@ module.exports = function (creep) {
                 allowTowers: opts.giveToTowers,
                 allowStorage:   opts.giveToStorage,
                 allowLink: opts.giveToLink,
-                maxEnergyRatio: 0.9 
+                maxEnergyRatio: 0.9
             });
             var source = creep.room.find(FIND_SOURCES)[opts.sourceIndex];
             var recipientIsCloserThanSource = false;
@@ -423,12 +447,6 @@ module.exports = function (creep) {
             if(closestEnergyRecipient && source){
                 recipientIsCloserThanSource = creep.pos.findClosestByPathUsingCache([closestEnergyRecipient, source]) === closestEnergyRecipient;
             }
-
-            // if(creep.name === 'harvester3(E77S47)'){
-            //     console.log('closestEnergyRecipient: ', closestEnergyRecipient);
-            //     console.log('source.pos: ', source.pos);
-            //     console.log('recipientIsCloserThanSource: ', recipientIsCloserThanSource);
-            // }
 
             if(recipientIsCloserThanSource){
                 if(creep.carry.energy > (creep.carryCapacity * 0.1)){
@@ -492,6 +510,26 @@ module.exports = function (creep) {
             HEAL: 250,
             TOUGH: 10,
             CLAIM: 600
+        },
+        bodyPartStringEnumMap: {
+            MOVE: MOVE,
+            WORK: WORK,
+            CARRY: CARRY,
+            ATTACK: ATTACK,
+            RANGED_ATTACK: RANGED_ATTACK,
+            HEAL: HEAL,
+            TOUGH: TOUGH,
+            CLAIM: CLAIM
+        },
+        getBodyPartsArray(bodyPartsHash){
+            var array = [];
+            _.forOwn(bodyPartsHash, (value, key) => {
+                for (var i = 0; i < value; i++) {
+                    array.push(this.bodyPartStringEnumMap[key]);
+                }
+            });
+
+            return array;
         },
         returnAllFilter: function(){
             return true;

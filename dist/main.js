@@ -4,6 +4,7 @@ myGlobal = {
 };
 
 var Tracker = require('Tracker');
+var ThrottleService = require('ThrottleService');
 var util = require('util');
 var tower = require('Tower');
 var ConstructionManager = require('ConstructionManager');
@@ -14,7 +15,6 @@ var E77S44RoomController = require('E77S44RoomController')
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
-var throttleRatio = 0.5;//0 - never throttle, 1 - throttle 100%
 
 module.exports.loop = function () {
  
@@ -22,6 +22,8 @@ module.exports.loop = function () {
     console.log("--------- Creep Report - new tick -------------");
 
     PathFinder.use(false);
+
+    ThrottleService.adjustThrottleRatio();
 
     var roomControllers = [
         new E77S44RoomController(),
@@ -31,7 +33,7 @@ module.exports.loop = function () {
 
     roomControllers.forEach(rc => {
         //for now, throttle each room (unless it is under attack)
-        if(_.random(1, 10) > throttleRatio*10 || rc.roomIsUnderAttack()){
+        if(ThrottleService.shouldThrottleRoom() || rc.roomIsUnderAttack()){
             rc.runRoom({throttle: false});
         }else{
             rc.runRoom({throttle: true});
@@ -61,7 +63,8 @@ module.exports.loop = function () {
         // averageUpgrade: true,
         // averageSourceDepletionRatio: true,
         cachePercent: true,
-        // averageSecondsPerTick: true
+        // averageSecondsPerTick: true,
+        throttleRatio: true
     });
 }
 

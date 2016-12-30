@@ -16,7 +16,8 @@ Tracker.prototype.track = function(opts={}) {
         averageGcl: false,
         averageSourceDepletionRatio: false,
         cachePercent: false,
-        averageSecondsPerTick: false
+        averageSecondsPerTick: false,
+        throttleRatio: false
     }); 
 
     console.log();
@@ -133,6 +134,10 @@ Tracker.prototype.trackCpu = function(opts){
 
     if(opts.averageCpu){
         console.log('Average CPU: ', _.round(averageCpu, 2));
+    }
+
+    if(opts.throttleRatio){
+        console.log('Throttle Ratio: ' + _.round(Memory.throttleRatio, 3));
     }
 }
 

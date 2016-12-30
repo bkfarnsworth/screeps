@@ -25,26 +25,17 @@ class RoomController {
 		
 		this.setRoomStatus();
 		this.printCreeps();
+		this.printEnergy();
 
 		if(!opts.throttle){
 			this.spawnCreeps();
 			this.activateSafeModeIfNecessary();
-			this.printEnergy();
 			this.runLinks();
 			this.runCreeps();
 		}
 		
 		console.log('STATUS: ' + this.room.status);
 		console.log(opts.throttle ? 'throttled' : 'NOT throttled')
-	}
-
-	get bodyParts(){
-		return {
-			//farNorthRoom 
-			farNorthUpgraderBodyParts     : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
-			farNorthBuilderBodyParts      : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
-			farNorthHarvesterBodyParts    : [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],
-		};
 	}
 
 	get standardCreepTypes(){
@@ -54,31 +45,54 @@ class RoomController {
 				role: 'harvester',    
 				condition: this.getHarvesters().length === 0, 
 				stopOperation: true,
-				bodyParts: [WORK,CARRY,MOVE]
+				bodyParts: util().getBodyPartsArray({
+					WORK: 1,
+					MOVE: 1,
+					CARRY: 1
+				})
 			},
 			harvester: {
 				role: 'harvester',          
 				stopOperation: true,
-				bodyParts: [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+				bodyParts: util().getBodyPartsArray({
+					WORK: 9,
+					MOVE: 8,
+					CARRY: 9
+				})
 			},
 			guard: { 
 				role: 'guard',          
 				stopOperation: true,
 				condition: this.roomIsUnderAttack(),
-				bodyParts: [MOVE,MOVE,MOVE,ATTACK,ATTACK,ATTACK,ATTACK,TOUGH,TOUGH,TOUGH]
+				bodyParts: util().getBodyPartsArray({
+					TOUGH: 3,
+					MOVE: 3,
+					ATTACK: 3
+				})
 			},
 			upgrader: {
 				role: 'upgrader',
-				bodyParts: [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+				bodyParts: util().getBodyPartsArray({
+					WORK: 9,
+					MOVE: 8,
+					CARRY: 9
+				})
 			},
 			builder: {
 				role: 'builder',            
 				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: [WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE]
+				bodyParts: util().getBodyPartsArray({
+					WORK: 9,
+					MOVE: 8,
+					CARRY: 9
+				})
 			},
 			carrier: {
 				role: 'carrier',
-				bodyParts: [CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE]
+				bodyParts: util().getBodyPartsArray({
+					MOVE: 7,
+					CARRY: 7
+				})
 			}
 		}
 	}
@@ -112,8 +126,12 @@ class RoomController {
 	}
 
 	setRoomStatus(){
+		var spawningEnergyRatio = 4/5;
 		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
-		if(nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation){
+		var isPriorityCreep = nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation;
+		var spawningEnergyNotFull = this.getEnergyAvailableForSpawning() < this.getEnergyCapacityForSpawning() * spawningEnergyRatio;
+
+		if(isPriorityCreep || spawningEnergyNotFull){
 			this.status = 'incomplete';
 		}else{
 			this.status = 'complete';
