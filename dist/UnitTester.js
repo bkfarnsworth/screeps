@@ -1,54 +1,20 @@
 var util = require('util');
-// var jasmine = require('jasmine')
+var chai = require('chai');
+var expect = chai.expect;
 
-
-// util().printObject(this)
-
+// http://chaijs.com/api/bdd/
 class UnitTester {
 
    runTests(){
-
-      // this.shouldConvertRatiosToBodyPartsArray():
       this.shouldPassSimpleTest();
-
-
    }
 
    shouldPassSimpleTest(){
-      this.expectArraysToBeEqual([1,2], [3,2,1]);
-   }
-
-
-   /////////TEST UTILITIES
-   expectToBeEqual(actual, expected){
-      if(Array.isArray(expected)){
-         return expectArraysToBeEqual(actual, expected);
-      }
-   }
-
-   expectArraysToBeEqual(actual, expected){
-
-      if(actual.length !== expected.length){
-         return console.log('FAIL') ;
-      }
-
-      //sort them
-      actual.sort();
-      expected.sort();
-
-      for (var i = 0; i < expected.length; i++) {
-         if(expected[i] !== actual[i]){
-            return console.log('FAIL')
-         }
-      }
-
-      return console.log('PASS');
+      expect([1,2,3]).to.deep.equal([1,2,3]);
    }
 }
 
-
 module.exports = UnitTester
-
 
 // shouldConvertRatiosToBodyPartsArray(){
 
@@ -65,6 +31,5 @@ module.exports = UnitTester
 //    var expectedArray = [WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
 
 //    this.assertEquals(bodyPartsArray, )
-
 
 // }
