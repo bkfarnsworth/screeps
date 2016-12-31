@@ -532,6 +532,35 @@ module.exports = function (creep) {
 
             return array;
         },
+        convertRatiosToBodyPartArray(opts={}){
+
+            _.defaults(opts, {
+                energyToUseForBodyParts    : 0,
+                attackPercent              : 0,
+                movePercent                : 0,
+                carryPercent               : 0,
+                rangedAttackPercent        : 0,
+                workPercent                : 0,
+                healPercent                : 0,
+                toughPercent               : 0,
+                claimPercent               : 0
+            });
+
+            //throw error if not enough energy or something
+
+            //calculate each percent
+            //if there is any left over, we are not going to try and do anything special with that energy
+            return this.getBodyPartsArray({
+                MOVE           : _.round((opts.movePercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
+                WORK           : _.round((opts.workPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
+                CARRY          : _.round((opts.carryPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
+                ATTACK         : _.round((opts.attackPercent       * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['ATTACK']),
+                RANGED_ATTACK  : _.round((opts.rangedAttackPercent * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['RANGED_ATTACK']),
+                HEAL           : _.round((opts.healPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
+                TOUGH          : _.round((opts.toughPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
+                CLAIM          : _.round((opts.claimPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
+            });
+        },
         returnAllFilter: function(){
             return true;
         },

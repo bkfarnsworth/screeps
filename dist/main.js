@@ -28,11 +28,6 @@ module.exports.loop = function () {
 
     ThrottleService.adjustThrottleRatio();
 
-    var unitTester = new UnitTester();
-    unitTester.runTests();
-
-
-
     var roomControllers = [
         new E77S44RoomController(),
         new E77S46RoomController(),
@@ -76,6 +71,10 @@ module.exports.loop = function () {
     });
 
     sendEmailReport();
+
+    console.log();
+    var unitTester = new UnitTester();
+    unitTester.runTests();
 }
 
 function sendEmailReport(){
