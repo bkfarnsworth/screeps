@@ -551,14 +551,14 @@ module.exports = function (creep) {
             //calculate each percent
             //if there is any left over, we are not going to try and do anything special with that energy
             return this.getBodyPartsArray({
-                MOVE           : _.round((opts.movePercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
-                WORK           : _.round((opts.workPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
-                CARRY          : _.round((opts.carryPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
-                ATTACK         : _.round((opts.attackPercent       * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['ATTACK']),
-                RANGED_ATTACK  : _.round((opts.rangedAttackPercent * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['RANGED_ATTACK']),
-                HEAL           : _.round((opts.healPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
-                TOUGH          : _.round((opts.toughPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
-                CLAIM          : _.round((opts.claimPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
+                MOVE           : Math.floor((opts.movePercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
+                WORK           : Math.floor((opts.workPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
+                CARRY          : Math.floor((opts.carryPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
+                ATTACK         : Math.floor((opts.attackPercent       * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['ATTACK']),
+                RANGED_ATTACK  : Math.floor((opts.rangedAttackPercent * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['RANGED_ATTACK']),
+                HEAL           : Math.floor((opts.healPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
+                TOUGH          : Math.floor((opts.toughPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
+                CLAIM          : Math.floor((opts.claimPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
             });
         },
         returnAllFilter: function(){
