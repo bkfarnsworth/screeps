@@ -13,6 +13,8 @@ var E77S47RoomController = require('E77S47RoomController')
 var E77S46RoomController = require('E77S46RoomController')
 var E77S44RoomController = require('E77S44RoomController')
 
+var UnitTester = require('UnitTester');
+
 var useTracker = false;
 var seeCPU = false;
 var debugMode = false;
@@ -25,6 +27,11 @@ module.exports.loop = function () {
     PathFinder.use(false);
 
     ThrottleService.adjustThrottleRatio();
+
+    var unitTester = new UnitTester();
+    unitTester.runTests();
+
+
 
     var roomControllers = [
         new E77S44RoomController(),
