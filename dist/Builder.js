@@ -22,7 +22,7 @@ class Builder extends Worker {
 
 		//manually set sites to be done first
 		var manualTargetIds = [
-			'585d90a3badd41083416b98c',
+			'586ab567c04c074e4f1feef8',
 			'584da2b4cf925b7f32ada75b',
 			'584da2b4cf925b7f32ada75c',
 			'5843b042b14a695e0d8b3194',
