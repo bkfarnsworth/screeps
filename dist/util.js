@@ -126,7 +126,7 @@ module.exports = function (creep) {
             }
 
             console.log(msg);
-            myGlobal.emailReport += (msg + '\n');
+            // myGlobal.emailReport += (msg + '\n');
         },
         needsEnergy: function(creep, code){
             return creep.carry.energy == 0 || (creep.carry.energy < creep.carryCapacity && code == ERR_NOT_IN_RANGE);

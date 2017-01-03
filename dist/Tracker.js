@@ -30,13 +30,9 @@ Tracker.prototype.track = function(opts={}) {
     this.trackSources(opts);
     this.trackSecondsPerTick(opts);
 
-    var trackingForEmail = `
-    Average CPU       : ${_.round(Memory.averageCPUPerTick, 2)}
-    GCL to Next Level : ${_.round(Game.gcl.progressTotal - Game.gcl.progress, 2)}
-    Average GCL       : ${_.round(Memory.averageGCLPerTick, 2)}
-    `;
-
-    myGlobal.emailReport += trackingForEmail;
+    myGlobal.emailReport += `Average CPU       : ${_.round(Memory.averageCPUPerTick, 2)}\n`
+    myGlobal.emailReport += `GCL to Next Level : ${_.round(Game.gcl.progressTotal - Game.gcl.progress, 2)}\n`
+    myGlobal.emailReport += `Average GCL       : ${_.round(Memory.averageGCLPerTick, 2)}\n`
 }
 
 Tracker.prototype.trackSecondsPerTick = function(opts){

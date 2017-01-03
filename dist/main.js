@@ -69,9 +69,9 @@ module.exports.loop = function () {
 
     sendEmailReport();
 
-    console.log();
-    var unitTester = new UnitTester();
-    unitTester.runTests();
+    // console.log();
+    // var unitTester = new UnitTester();
+    // unitTester.runTests();
 }
 
 function sendEmailReport(){
@@ -87,6 +87,16 @@ function sendEmailReport(){
         Memory.emailReportTicks++;
     }
 }
+
+
+
+
+
+
+//
+//  PROTOTYPE FUNCTIONS
+//
+//
 
 Creep.prototype.getName = function(){
     return this.name;

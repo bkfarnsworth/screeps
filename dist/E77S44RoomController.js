@@ -17,50 +17,26 @@ class E77S44RoomController extends RoomController {
 	}
 
 	get creepTypes(){
+
+		let backUpHarvester = () => _.clone(this.standardCreepTypes.backUpHarvester);
+		let harvester = () => _.clone(this.standardCreepTypes.harvester);
+		let guard = () => _.clone(this.standardCreepTypes.guard);
+		let builder = () => _.clone(this.standardCreepTypes.builder);
+		let upgrader = () => _.clone(this.standardCreepTypes.upgrader);
+		let carrier = () => _.clone(this.standardCreepTypes.carrier);
+
 		var opts = [ 
-			this.standardCreepTypes.backUpHarvester,
-			{ 
+			_.extend(backUpHarvester(), {name: 'backUpHarvester'}),
+			_.extend(harvester(), {
 				name: 'harvester1',
-				role: 'harvester',           
-				stopOperation: true,
-				bodyParts: util().getBodyPartsArray({
-					WORK: 4,
-					MOVE: 4,
-					CARRY: 4
-				}),
 				giveToTowers: this.status === 'complete'
-			},
-			{ 
+			}),
+			_.extend(harvester(), {
 				name: 'harvester2',
-				role: 'harvester',           
-				stopOperation: true,
-				bodyParts: util().getBodyPartsArray({
-					WORK: 4,
-					MOVE: 4,
-					CARRY: 4
-				}),
 				sourceIndex: 1
-			},
-			{ 
-				name: 'upgrader1',
-				role: 'upgrader',           
-				stopOperation: true,
-				bodyParts: util().getBodyPartsArray({
-					WORK: 4,
-					MOVE: 4,
-					CARRY: 4
-				})
-			},
-			{ 
-				name: 'builder1',
-				role: 'builder',            
-				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: util().getBodyPartsArray({
-					WORK: 4,
-					MOVE: 4,
-					CARRY: 4
-				})
-			}
+			}),
+			_.extend(upgrader(), {name: 'upgrader1'}),
+			_.extend(builder(),  {name: 'builder1'})
 		]
 
 		return opts.map(obj => super.createCreepType(obj));
