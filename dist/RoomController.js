@@ -144,7 +144,7 @@ class RoomController {
 	}
 
 	setRoomStatus(){
-		var spawningEnergyRatio = 4/5;
+		var spawningEnergyRatio = 1;
 		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
 		var isPriorityCreep = nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation;
 		var spawningEnergyNotFull = this.getEnergyAvailableForSpawning() < this.getEnergyCapacityForSpawning() * spawningEnergyRatio;
