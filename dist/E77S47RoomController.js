@@ -74,7 +74,9 @@ class E77S47RoomController extends RoomController {
 			Tower(this.westTower);
 		}
 
-		Tower(this.eastTower);
+		if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
+			Tower(this.eastTower);
+		}
 	}
 
 	useUpgraderToFillTower(creep){

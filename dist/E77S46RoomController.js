@@ -73,7 +73,9 @@ class E77S46RoomController extends RoomController {
             Tower(this.southTower);
         }
 
-        Tower(this.northTower);
+        if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
+            Tower(this.northTower);
+        }
     }
 
     useHarvesterToFillTower(creep){
