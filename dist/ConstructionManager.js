@@ -23,9 +23,9 @@ module.exports = function(){
 		];
 
 		var constructionPaths = [
-		    COLOR_CYAN,
-		    COLOR_GREEN,
-				COLOR_ORANGE,
+			COLOR_CYAN,
+			// COLOR_GREEN,
+			COLOR_ORANGE,
 		];
 
 		constuctionGrids.forEach(grid => {
