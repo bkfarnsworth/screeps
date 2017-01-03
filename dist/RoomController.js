@@ -32,7 +32,7 @@ class RoomController {
 			this.spawnCreeps();
 			this.activateSafeModeIfNecessary();
 			this.runLinks();
-			//eventually fix this so that if we are under attack, we never throttle towers
+			//remember that this isn't getting the 1/3 throttle anymore is the subclass implements it
 			this.runTowers();
 			this.runCreeps();
 		}
