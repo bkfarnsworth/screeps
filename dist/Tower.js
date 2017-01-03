@@ -19,15 +19,12 @@ module.exports = function (tower) {
     };
 
 
-    //if one invader, the tower can handle that
-    if(hostileCreeps.length === 1){
-        tower.attack(hostileCreeps[0]);
-
-    }else if(creepsToHeal.length){
+    if(creepsToHeal.length){
         tower.heal(creepsToHeal[0])
-
-    //if more than 1 invader, just set the tower healing the walls, becasue you might not be able to kill them
-    }else if(hostileCreeps.length === 0 || hostileCreeps.length > 1){
+    } else if(hostileCreeps.length){
+        //TODO: when we start getting many towers going at once, we will want this to be closest by range so that towers only attack creeps near the gate they are guarding
+        tower.attack(hostileCreeps[0]);
+    }else{
         var structures = tower.room.find(FIND_STRUCTURES, {
             filter: bestTowerTarget
         });

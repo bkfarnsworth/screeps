@@ -9,6 +9,7 @@ var Repairer = require('Repairer')
 var Carrier = require('Carrier')
 var CreepType = require('CreepType');
 var Worker = require('Worker');
+var Tower = require('Tower');
 
 var printQueue = true;
 
@@ -31,6 +32,8 @@ class RoomController {
 			this.spawnCreeps();
 			this.activateSafeModeIfNecessary();
 			this.runLinks();
+			//eventually fix this so that if we are under attack, we never throttle towers
+			this.runTowers();
 			this.runCreeps();
 		}
 		
@@ -89,9 +92,10 @@ class RoomController {
 			},
 			carrier: {
 				role: 'carrier',
-				bodyParts: util().getBodyPartsArray({
-					MOVE: 7,
-					CARRY: 7
+				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+					percentOfSpawningPotential: 0.8,
+					movePercent  : 0.5,
+					carryPercent : 0.5
 				})
 			}
 		}
@@ -119,6 +123,17 @@ class RoomController {
 
 	runLinks(){
 		throw new Error('Must be overwritten')
+	}
+
+	runTowers(){
+		this.room.find(FIND_MY_STRUCTURES).forEach(structure => {
+			if(structure instanceof StructureTower){
+				//towers go fast, so if there are no hostiles let's throttle them for now
+				if(this.roomIsUnderAttack() || _.random(1, 3) === 1){
+				    Tower(structure);
+				}
+			}
+		});
 	}
 
 	set status(val){
@@ -330,6 +345,23 @@ class RoomController {
 				return s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_SPAWN;
 			}
 		});
+	}
+
+	//opts - see opts for convertRatiosToBodyPartArray
+	convertRatiosToBodyPartArrayWithRoomCapactiy(opts={}){
+
+		_.defaults(opts, {
+			percentOfSpawningPotential: 0.7
+		});
+
+		//I noticed in the docs that there is actually a property to get this; I don't have to calculate it myself
+		var spawningPotential = this.getEnergyCapacityForSpawning();
+
+		_.extend(opts, {
+			energyToUseForBodyParts: spawningPotential * opts.percentOfSpawningPotential
+		});
+
+		return util().convertRatiosToBodyPartArray(opts);
 	}
 
 	getExtraEnergy(){

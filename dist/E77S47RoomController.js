@@ -1,5 +1,6 @@
 var RoomController = require('RoomController');
 var util = require('util');
+var Tower = require('Tower');
 
 class E77S47RoomController extends RoomController {
 
@@ -34,7 +35,13 @@ class E77S47RoomController extends RoomController {
 				sourceIndex: 1,
 				giveToTowers: this.status === 'complete'
 			}),
-			_.extend(upgrader(), {name: 'upgrader1'}),
+			_.extend(upgrader(), {
+				name: 'upgrader1',
+				extraTask: {
+					condition: this.westTower.energy < this.westTower.energyCapacity,
+					work: this.useUpgraderToFillTower.bind(this)
+				}
+			}),
 			_.extend(builder(),  {name: 'builder1'}),
 		]
 
@@ -50,6 +57,30 @@ class E77S47RoomController extends RoomController {
 		// }else{
 		    // westLink.transferEnergy(southLink);
 		// }
+	}
+
+	get eastTower(){
+		return Game.structures['584b91f093c23ff764e1db3c'];
+	}
+
+	get westTower(){
+		return Game.structures['586ac10a8eb8754a62fc8d2f'];
+	}
+
+	runTowers(){
+
+		//use the eastTower only for attacking
+		if(this.roomIsUnderAttack()){
+			Tower(this.westTower);
+		}
+
+		Tower(this.eastTower);
+	}
+
+	useUpgraderToFillTower(creep){
+		util().gatherEnergyOr(creep, () => {
+			util().giveEnergyToRecipient(creep, this.westTower);
+		});
 	}
 }
 

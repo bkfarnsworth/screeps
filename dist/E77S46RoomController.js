@@ -1,5 +1,6 @@
 var RoomController = require('RoomController');
 var util = require('util');
+var Tower = require('Tower');
 
 class E77S46RoomController extends RoomController {
 
@@ -27,13 +28,17 @@ class E77S46RoomController extends RoomController {
 
         var opts = [
             _.extend(backUpHarvester(), {name: 'backUpHarvester'}),
-            // _.extend(guard(),     {name: 'guard1'}),
-            _.extend(harvester(), {name: 'harvester1'}),
-            // _.extend(guard(),     {name: 'guard2'}),
+            _.extend(harvester(), {
+                name: 'harvester1',
+                giveToTowers: this.status === 'complete',
+                extraTask: {
+                    condition: this.southTower.energy < this.southTower.energyCapacity,
+                    work: this.useHarvesterToFillTower.bind(this)
+                }
+            }),
             _.extend(harvester(), {
                 name: 'harvester2',
-                sourceIndex: 1,
-                giveToTowers: this.status === 'complete'
+                sourceIndex: 1
             }),
             _.extend(upgrader(), {name: 'upgrader1'}),
             _.extend(builder(),  {name: 'builder1'}),
@@ -52,6 +57,30 @@ class E77S46RoomController extends RoomController {
 				// fromLink.transferEnergy(toLink2);
 		// }
 	}
+
+    get northTower(){
+        return Game.structures['586adf917e4601912c3c0388'];
+    }
+
+    get southTower(){
+        return Game.structures['586ab52db1940ad704a5fbc2'];
+    }
+
+    runTowers(){
+
+        //use one of the towers only for attacking
+        if(this.roomIsUnderAttack()){
+            Tower(this.southTower);
+        }
+
+        Tower(this.northTower);
+    }
+
+    useHarvesterToFillTower(creep){
+        util().gatherEnergyOr(creep, () => {
+            util().giveEnergyToRecipient(creep, this.southTower);
+        });
+    }
 }
 
 module.exports = E77S46RoomController;

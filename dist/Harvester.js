@@ -15,7 +15,9 @@ class Harvester extends Worker{
 	}
 
 	doWork(){
-		util().depositEnergyOrHarvest(this.creep, this.creepOpts);
+		if(!super.doWork()){
+			util().depositEnergyOrHarvest(this.creep, this.creepOpts);
+		}
 	}
 }
 

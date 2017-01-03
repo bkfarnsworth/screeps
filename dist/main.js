@@ -7,7 +7,6 @@ myGlobal = {
 var Tracker = require('Tracker');
 var ThrottleService = require('ThrottleService');
 var util = require('util');
-var tower = require('Tower');
 var ConstructionManager = require('ConstructionManager');
 var E77S47RoomController = require('E77S47RoomController')
 var E77S46RoomController = require('E77S46RoomController')
@@ -54,8 +53,6 @@ module.exports.loop = function () {
         delete Memory.pathsHash;
     }
 
-    runTowers();
-
     var tracker = new Tracker();
     tracker.track({
         currentCpu: true,
@@ -88,20 +85,6 @@ function sendEmailReport(){
         Memory.emailReportTicks = 0;
     }else{
         Memory.emailReportTicks++;
-    }
-}
-
-function runTowers(){
-    for(var structureKey in Game.structures) {
-        var structure = Game.structures[structureKey];
-        if(structure instanceof StructureTower){
-            var hostiles = structure.room.find(FIND_HOSTILE_CREEPS);
-
-            //towers go fast, so if there are no hostiles let's throttle them for now
-            if(hostiles.length || _.random(1, 3) === 1){
-                tower(structure);
-            }
-        }
     }
 }
 
