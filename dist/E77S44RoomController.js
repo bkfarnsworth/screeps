@@ -36,7 +36,13 @@ class E77S44RoomController extends RoomController {
 				sourceIndex: 1
 			}),
 			_.extend(upgrader(), {name: 'upgrader1'}),
-			_.extend(builder(),  {name: 'builder1'})
+			//TODO: make the builder strong in coordination with how much construction there is to do...or I just manually do it...
+			// _.extend(builder(),  {name: 'builder1'})
+			//for now I am making a cheap builder because I just want to build a single wall
+			_.extend(builder(),  {
+				name: 'builder1',
+				bodyParts: [WORK, MOVE, CARRY]
+			})
 		]
 
 		return opts.map(obj => super.createCreepType(obj));
