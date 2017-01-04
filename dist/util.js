@@ -323,8 +323,11 @@ module.exports = function (creep) {
             var bestNonSpawningEnergySource = this.getBestEnergySource(creep, opts);
 
             //if we didn't get one (like if there are no storage units in the room), just get the best extension
-            var nextBest = this.getBestEnergySource(creep);
-            return bestNonSpawningEnergySource || nextBest;
+
+            //TODO: for now I am commenting this out, which won't work if there is no storage
+            // var nextBest = this.getBestEnergySource(creep);
+            // return bestNonSpawningEnergySource || nextBest;
+            return bestNonSpawningEnergySource;
         },
         getEnergyFromBestNonSpawningRoomObject(creep, opts={}){
             var closestEnergySource = this.getBestNonSpawningEnergySource(creep, opts);
