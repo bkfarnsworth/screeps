@@ -10,6 +10,12 @@ class Worker {
    doWork(){
       var completedWork = false;//a way to know if the creep already did work through this super
 
+      if(!this.creepOpts.condition){
+         this.recycle();
+         completedWork = true;
+         return completedWork;
+      }
+
       var inAssignedRoom = util().goToAssignedRoom(this.creep);
       if(!inAssignedRoom){ 
          completedWork = true;
@@ -31,6 +37,13 @@ class Worker {
 
    doAttackStatusWork(){
       return this.doWork();
+   }
+
+   recycle(){
+      var spawn = util().getSpawnForRoom(this.creep.room.name);
+      if(spawn.recycleCreep(this.creep) == ERR_NOT_IN_RANGE) {
+         this.creep.moveToUsingCache(spawn);
+      }
    }
 }
 
