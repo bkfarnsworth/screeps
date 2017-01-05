@@ -356,7 +356,7 @@ module.exports = function (creep) {
         },
         getEnergyFromBestSource: function(creep, opts={}){
             var closestEnergySource = this.getBestEnergySource(creep, opts);
-    		return this.getEnergyFromRoomObject(closestEnergySource);
+    		return this.getEnergyFromRoomObject(creep, closestEnergySource);
         },
         giveEnergyToBestRecipient: function(creep, opts={}){
 
