@@ -11,6 +11,7 @@ class UnitTester {
       describeConvertRatiosToBodyPartsArray();
       describeUpgrader();
       describeHarvester();
+      describeRoomController();
    }
 
    describeConvertRatiosToBodyPartsArray(){
@@ -176,6 +177,12 @@ class UnitTester {
       it('should fill storage after extensions are full', () => {
 
       });      
+   }
+
+   describeRoomController(){
+      it('should spawn a builder if there is a construction site', () => {
+
+      });
    }
 }
 
