@@ -6,9 +6,15 @@ var expect = chai.expect;
 class UnitTester {
 
    runTests(){
-
       console.log('---- TESTS ----');
-      
+
+      describeConvertRatiosToBodyPartsArray();
+      describeUpgrader();
+      describeHarvester();
+   }
+
+   describeConvertRatiosToBodyPartsArray(){
+
       it('should say that true is true', () => {
          expect(true).to.deep.equal(true);
       });
@@ -143,6 +149,33 @@ class UnitTester {
          bodyPartsArray.sort();
          expect(bodyPartsArray).to.deep.equal(expectedArray);
       });
+
+   }
+
+   describeUpgrader(){
+      it('should get energy from storage if there is energy', () => {
+         //if there is an upgrader, start keeping track of it
+         //if it doesn't upgrade in 1500 ticks, fail the test.
+         //could do less ticks too.  
+      });
+
+      it('should upgrade the controller if it has enough energy', () => {
+
+      });
+   }
+
+   describeHarvester(){
+      it('should harvest energy if it needs energy', () => {
+
+      });
+
+      it('should fill the extensions first', () => {
+
+      });
+
+      it('should fill storage after extensions are full', () => {
+
+      });      
    }
 }
 
