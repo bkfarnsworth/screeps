@@ -18,12 +18,22 @@ class UnitTester {
       this.describeDoWorkBasedOnPositionOtherwise();
    }
 
+   /*
+      harvester - work if close and !full
+      harvester - work if far and 0
+      harvester - not work if far and !0
+      harvester - not work if close and full
+      upgrader  - work if close and !0 
+      upgrader  - work if far and full
+      upgrader  - not work if far and !full
+      upgrader  - not work if close and 0
+   */
    describeDoWorkBasedOnPositionOtherwise(){
-      it('should make a creep with positive polarity (like a harvester) work if it\'s close to it\'s work target and it\'s energy is less than it\'s capacity', () => {
+      it('should make harvester work (if close to work target, energy < capacity)', () => {
 
          var mockCreep = {
             carry: {
-               energy: 80
+               energy: 99
             },
             carryCapacity: 100
          };
@@ -42,20 +52,182 @@ class UnitTester {
          });
 
          expect(workSpy).to.have.been.called();
-         expect(otherwiseSpy).to.not.have.been.called();
       });
 
-      // it('should make a creep with positive polarity (like a harvester) work if it\'s close to it\'s work target and it\'s energy is less than it\'s capacity', () => {
+      it('should make harvester work (if far from work target, energy === 0)', () => {
 
-      // });
+         var mockCreep = {
+            carry: {
+               energy: 0
+            },
+            carryCapacity: 100
+         };
 
-      // it('should make a creep with positive polarity (like a harvester) work if it\'s close to it\'s work target and it\'s energy is less than it\'s capacity', () => {
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
 
-      // });
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
 
-      // it('should make a creep with positive polarity (like a harvester) work if it\'s close to it\'s work target and it\'s energy is less than it\'s capacity', () => {
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'positive',
+            isNearWorkTarget: false
+         });
 
-      // });
+         expect(workSpy).to.have.been.called();
+      });
+
+      it('should make harvester deposit (if close to work target, energy === capacity)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 100
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'positive',
+            isNearWorkTarget: true
+         });
+
+         expect(otherwiseSpy).to.have.been.called();
+      });
+
+      it('should make harvester deposit (if far from work target, energy > 0)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 1
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'positive',
+            isNearWorkTarget: false
+         });
+
+         expect(otherwiseSpy).to.have.been.called();
+      });
+
+      it('should make upgrader work (if close to work target, energy > 0)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 1
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'negative',
+            isNearWorkTarget: true
+         });
+
+         expect(workSpy).to.have.been.called();
+      });
+
+      it('should make upgrader work (if far from work target, energy === capacity)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 100
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'negative',
+            isNearWorkTarget: false
+         });
+
+         expect(workSpy).to.have.been.called();
+      });
+
+      it('should make upgrader gather energy (if close to work target, energy === 0)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 0
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'negative',
+            isNearWorkTarget: true
+         });
+
+         expect(otherwiseSpy).to.have.been.called();
+      });
+
+      it('should make upgrader gather energy (if far from work target, energy !== capacity)', () => {
+
+         var mockCreep = {
+            carry: {
+               energy: 99
+            },
+            carryCapacity: 100
+         };
+
+         var workFunc      = () => {};
+         var otherwiseFunc = () => {};
+
+         var workSpy       = chai.spy(workFunc);
+         var otherwiseSpy  = chai.spy(otherwiseFunc); 
+
+         util.doWorkBasedOnPositionOtherwise(mockCreep, {
+            workFunc: workSpy,
+            otherwiseFunc: otherwiseSpy,
+            polarity: 'negative',
+            isNearWorkTarget: false
+         });
+
+         expect(otherwiseSpy).to.have.been.called();
+      });
    }
 
    describeConvertRatiosToBodyPartsArray(){
