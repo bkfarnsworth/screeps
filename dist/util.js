@@ -347,7 +347,7 @@ module.exports = {
             }else if(roomObject instanceof Structure){
                 errCode = roomObject.transferEnergy(creep);
             }else if(roomObject instanceof Creep){
-                errCode = roomObject.transfer(creep);
+                errCode = roomObject.transfer(creep, RESOURCE_ENERGY);
             }else if(roomObject instanceof Source){
                 errCode = creep.harvest(roomObject);
             }else if(roomObject instanceof Resource){
