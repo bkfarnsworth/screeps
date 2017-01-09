@@ -426,8 +426,9 @@ module.exports = {
             });
 
             var energyIsBelowCapacity = creep.carry.energy < creep.carryCapacity;
-            var energyIsZero          = creep.carry.energy > 0;
+            var energyIsAboveZero     = creep.carry.energy > 0;
             var energyIsFull          = creep.carry.energy === creep.carryCapacity;
+            var energyIsZero          = creep.carry.energy === 0;
 
             //the range that if you are close to work, stay and work, but if you are far from work, keep doing your otherwise
             //eg a harvester should stay at source until full
