@@ -9,7 +9,7 @@ class Builder extends Worker {
 
 	doWork(){
 		if(!super.doWork()){
-			util().gatherEnergyOr(this.creep, this.build.bind(this));
+			util().doWorkOrGatherEnergy(this.creep, this.build.bind(this));
 		}
 	}
 

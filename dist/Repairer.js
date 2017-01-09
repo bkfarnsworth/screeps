@@ -9,7 +9,7 @@ class Repairer extends Worker {
 
     doWork(){
         var creep = this.creep;
-        util().gatherEnergyOr(creep, ()=>{
+        util().doWorkOrGatherEnergy(creep, ()=>{
             var target;
             var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
             var assignedRoomRoom = Game.rooms[assignedRoom];
