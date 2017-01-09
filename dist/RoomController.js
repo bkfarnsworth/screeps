@@ -48,7 +48,7 @@ class RoomController {
 				role: 'harvester',    
 				condition: this.getHarvesters().length === 0, 
 				stopOperation: true,
-				bodyParts: util().getBodyPartsArray({
+				bodyParts: util.getBodyPartsArray({
 					WORK: 1,
 					MOVE: 1,
 					CARRY: 1
@@ -68,7 +68,7 @@ class RoomController {
 				role: 'guard',          
 				stopOperation: true,
 				condition: this.roomIsUnderAttack(),
-				// bodyParts: util().getBodyPartsArray({
+				// bodyParts: util.getBodyPartsArray({
 				// 	TOUGH: 3,
 				// 	MOVE: 3,
 				// 	ATTACK: 3
@@ -159,14 +159,14 @@ class RoomController {
 	printCreeps(){
 		this.creepTypes.forEach(creepType => {
 			if(creepType.isSpawning()){
-				util().printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
+				util.printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
 			}else if(creepType.needsSpawning() && creepType.condition){
-				util().printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
+				util.printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
 			}else if(!creepType.condition){
-				util().printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
+				util.printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
 			}else if(!creepType.needsSpawning()){
 				var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
-				util().printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
+				util.printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
 			}
 		});
 	}
@@ -200,7 +200,7 @@ class RoomController {
 	}
 
 	roomIsUnderAttack(){
-		var hostiles = util().findHostiles(this.room);
+		var hostiles = util.findHostiles(this.room);
 		return hostiles.length > 0;
 	}
 
@@ -233,7 +233,7 @@ class RoomController {
 
 	runCreep(creep, creepType){
 
-		// if(util().runFromInvader(creep)){
+		// if(util.runFromInvader(creep)){
 		// 	return;
 		// }
 
@@ -312,11 +312,11 @@ class RoomController {
 			assignedRoom: creepTypeToSpawn.assignedRoom
 		}
 
-		var assignedSpawn = util().getSpawnForRoom(creepTypeToSpawn.assignedRoom);
+		var assignedSpawn = util.getSpawnForRoom(creepTypeToSpawn.assignedRoom);
 
 		//we already put a default else where
 		if(!assignedSpawn){
-			assignedSpawn = util().getSpawnForRoom(util().northRoomName);
+			assignedSpawn = util.getSpawnForRoom(util.northRoomName);
 		}
 
 		var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
@@ -364,7 +364,7 @@ class RoomController {
 			energyToUseForBodyParts: spawningPotential * opts.percentOfSpawningPotential
 		});
 
-		return util().convertRatiosToBodyPartArray(opts);
+		return util.convertRatiosToBodyPartArray(opts);
 	}
 
 	getExtraEnergy(){
@@ -390,9 +390,9 @@ class RoomController {
 	}
 
 	activateSafeModeIfNecessary(){
-		var hostiles = util().findHostiles(this.room, {
+		var hostiles = util.findHostiles(this.room, {
 				usersToIgnore: [
-						util().milesUsername,
+						util.milesUsername,
 						'Invader'
 				]
 		});

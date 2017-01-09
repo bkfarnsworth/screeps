@@ -9,7 +9,7 @@ class Builder extends Worker {
 
 	doWork(){
 		if(!super.doWork()){
-			util().doWorkOrGatherEnergy(this.creep, this.build.bind(this));
+			util.doWorkOrGatherEnergy(this.creep, this.build.bind(this));
 		}
 	}
 
@@ -19,7 +19,7 @@ class Builder extends Worker {
 		var findStrategy = 'closest';
 		// var findStrategy = 'FIFO';
 
-		var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
+		var assignedRoom = creep.memory.assignedRoom || util.northRoomName;
 		assignedRoom = Game.rooms[assignedRoom];
 
 		//manually set sites to be done first

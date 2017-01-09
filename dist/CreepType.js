@@ -21,7 +21,7 @@ CreepType.prototype.getMatchingCreeps = function(){
     }
 
     //cache result
-    this._matchingCreeps = this._matchingCreeps || util().findMyCreeps({filter: roleFilter.bind(this)});
+    this._matchingCreeps = this._matchingCreeps || util.findMyCreeps({filter: roleFilter.bind(this)});
     return this._matchingCreeps;
 }
 
@@ -58,7 +58,7 @@ CreepType.prototype.needsSpawning = function() {
 };
 
 CreepType.prototype.getEnergyRequired = function() {
-    var bodyPartEnergyMap = util().bodyPartEnergyMap;
+    var bodyPartEnergyMap = util.bodyPartEnergyMap;
     return _.sum(this.bodyParts.map(bp => bodyPartEnergyMap[bp.toString().toUpperCase()]));
 };
 

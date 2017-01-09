@@ -5,7 +5,7 @@ class Demoman extends Worker{
 
 	constructor(creep, creepOpts){
 		super(creep, creepOpts);
-		this.targetRoomName = util().milesRoomName;
+		this.targetRoomName = util.milesRoomName;
 
 		//list of targets
 		var wallPoint = new RoomPosition(7, 5, this.targetRoomName);
@@ -21,7 +21,7 @@ class Demoman extends Worker{
 	doWork(){ 
 		var creep = this.creep;
 		if(creep.room.name !== this.targetRoomName){
-			util().goToRoom(this.targetRoomName, creep);
+			util.goToRoom(this.targetRoomName, creep);
 		}else{
 			this.goToAndDismantleTarget();
 		}

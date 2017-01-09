@@ -29,11 +29,11 @@ module.exports = function(){
 		];
 
 		constuctionGrids.forEach(grid => {
-			util().forEachCellInGrid(grid, this.createConstructionSite);
+			util.forEachCellInGrid(grid, this.createConstructionSite);
 		});
 
 		constructionPaths.forEach(path => {
-			util().forEachCellInPath(path, this.createConstructionSite);
+			util.forEachCellInPath(path, this.createConstructionSite);
 		});
 	}
 

@@ -10,7 +10,7 @@ class E77S47RoomController extends RoomController {
 	}
 
 	get room(){
-		return util().southRoom;
+		return util.southRoom;
 	}
 
 	get spawn(){
@@ -80,8 +80,8 @@ class E77S47RoomController extends RoomController {
 	}
 
 	useUpgraderToFillTower(creep){
-		util().doWorkOrGatherEnergy(creep, () => {
-			util().giveEnergyToRecipient(creep, this.westTower);
+		util.doWorkOrGatherEnergy(creep, () => {
+			util.giveEnergyToRecipient(creep, this.westTower);
 		});
 	}
 }

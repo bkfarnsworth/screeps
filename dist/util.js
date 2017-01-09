@@ -1,5 +1,4 @@
-module.exports = function (creep) {
-    return {
+module.exports = {
         milesRoomName: 'E78S47',
         teaSkittlesRoomName: 'E78S46',
         farNorthRoomName: 'E77S44',
@@ -740,5 +739,4 @@ module.exports = function (creep) {
                 TOP_LEFT,
             ];
         }
-    }   
 }

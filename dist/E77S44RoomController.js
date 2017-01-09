@@ -9,7 +9,7 @@ class E77S44RoomController extends RoomController {
 	}
 
 	get room(){
-		return util().farNorthRoom;
+		return util.farNorthRoom;
 	}
 
 	get spawn(){

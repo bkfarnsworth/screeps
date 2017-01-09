@@ -9,9 +9,9 @@ class Repairer extends Worker {
 
     doWork(){
         var creep = this.creep;
-        util().doWorkOrGatherEnergy(creep, ()=>{
+        util.doWorkOrGatherEnergy(creep, ()=>{
             var target;
-            var assignedRoom = creep.memory.assignedRoom || util().northRoomName;
+            var assignedRoom = creep.memory.assignedRoom || util.northRoomName;
             var assignedRoomRoom = Game.rooms[assignedRoom];
             
             //find the structure with the least hit points, as long as that structure is not at its max

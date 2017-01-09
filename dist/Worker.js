@@ -17,7 +17,7 @@ class Worker {
       //    return completedWork;
       // }
 
-      var inAssignedRoom = util().goToAssignedRoom(this.creep);
+      var inAssignedRoom = util.goToAssignedRoom(this.creep);
       if(!inAssignedRoom){ 
          completedWork = true;
          return completedWork; 
@@ -41,7 +41,7 @@ class Worker {
    }
 
    recycle(){
-      var spawn = util().getSpawnForRoom(this.creep.room.name);
+      var spawn = util.getSpawnForRoom(this.creep.room.name);
       if(spawn.recycleCreep(this.creep) == ERR_NOT_IN_RANGE) {
          this.creep.moveToUsingCache(spawn);
       }

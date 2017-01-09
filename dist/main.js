@@ -103,7 +103,7 @@ Creep.prototype.getName = function(){
 }
 
 Creep.prototype.getAssignedRoom = function(){
-    return Game.rooms[this.memory.assignedRoom] || util().southRoom;
+    return Game.rooms[this.memory.assignedRoom] || util.southRoom;
 }
     
 //REASONS FOR DOING ALL THIS CRAZY CACHING STUFF
@@ -145,7 +145,7 @@ Creep.prototype.moveToUsingCache = function(target){
         this.memory._bfMove = {start, end};
     }
 
-    var path = util().getPath(start, end);
+    var path = util.getPath(start, end);
     var validErrCodes = [ERR_NOT_FOUND, ERR_NO_PATH];
     var errCode = this.moveByPath(path);
     var obstacles = path[0] ? this.room.lookAt(path[0].x, path[0].y) : [];
@@ -153,7 +153,7 @@ Creep.prototype.moveToUsingCache = function(target){
 
     //if the path doesn't work for some reason, just calculate it without the cache
     if(_.contains(validErrCodes, errCode) || creepIsInTheWay){
-        path = util().getPath(this, target, {useCache: false});
+        path = util.getPath(this, target, {useCache: false});
         var code = this.moveByPath(path);
 
         //if we still can't find the path (like we are stuck or something between creeps)
@@ -173,7 +173,7 @@ Creep.prototype.moveToUsingCache = function(target){
 }
 
 Creep.prototype.moveInRandomDirection = function(){
-    var directions = util().getDirections();
+    var directions = util.getDirections();
     var randomDirection = _.sample(directions)
     return this.move(randomDirection);
 }
@@ -194,7 +194,7 @@ RoomPosition.prototype.findClosestByPathUsingCache = function(typeOrArray, opts=
 
     var objectPathPairs = [];
     objects.forEach(object => {
-        var path = util().getPath(this, object);
+        var path = util.getPath(this, object);
         objectPathPairs.push({
             object: object,
             path: path
@@ -232,9 +232,9 @@ RoomPosition.create = (opts) => {
 }
 
 // Room.prototype.getSafeAreaFromInvaders = function(){
-//     if(this === util().northRoom){
+//     if(this === util.northRoom){
 //         return new RoomPosition(6, 24, this.name);
-//     }else if(this === util().southRoom){
+//     }else if(this === util.southRoom){
 //         return new RoomPosition(21, 19, this.name);
 //     }else{
 //         console.log('main.js::172 :: ');

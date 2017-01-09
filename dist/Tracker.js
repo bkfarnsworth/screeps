@@ -50,7 +50,7 @@ Tracker.prototype.trackSecondsPerTick = function(opts){
 
 Tracker.prototype.trackControllers = function(opts){
 
-    util().getAllRooms().forEach(room => {
+    util.getAllRooms().forEach(room => {
 
         var averageUpgrade = trackWithDecayUsingPrevious({
             key: 'averageUpgradePerTick' + room.name,
@@ -87,7 +87,7 @@ Tracker.prototype.trackSources = function(opts){
         console.log('> 0.1 = harvesting too fast');
         console.log('Try to get each above 0.1');
 
-        var sources = util().findInAllRooms(FIND_SOURCES);
+        var sources = util.findInAllRooms(FIND_SOURCES);
         sources.forEach(s => {
 
             var key = 'averageDepletionRatioForSource' + s.id;
@@ -216,7 +216,7 @@ Tracker.prototype.otherTracking = function(opts){
     //was getting 19 at noon...so....so
     //22 for 3
     var util = require('util');
-    var controller = util().southRoom.controller;
+    var controller = util.southRoom.controller;
     var serverHour = new Date().getHours();
     var hour = serverHour < 7 ? serverHour + 24 - 7 : serverHour - 7;
     var minutes = new Date().getMinutes();

@@ -25,7 +25,7 @@ class UnitTester {
       });
 
       it('should convert move, carry, and work to the right bodyPartsArray', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts    : 600,
             movePercent                : 1/3, 
             carryPercent               : 1/3,
@@ -39,7 +39,7 @@ class UnitTester {
       });
 
       it('should convert attack, ranged_attack, heal, and tough to bodyPartsArray', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts    : 800,
             attackPercent              : 1/4, 
             rangedAttackPercent        : 1/4,
@@ -60,7 +60,7 @@ class UnitTester {
       });
 
       it('should create an array with one claim part', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts     : 1000,
             claimPercent                : 6/10, 
             movePercent                 : 2/10,
@@ -74,7 +74,7 @@ class UnitTester {
       });
 
       it('should create an array with 5 claim parts', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts     : 6000,
             claimPercent                : 1/2,
             movePercent                 : 1/4,
@@ -92,7 +92,7 @@ class UnitTester {
       });
 
       it('should create body parts array with small amount of energy', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts     : 75,
             workPercent                 : 1/3,
             movePercent                 : 1/3,
@@ -106,7 +106,7 @@ class UnitTester {
       });
 
       it('should create body parts array with large amount of energy', () => {
-         var bodyPartsArray = util().convertRatiosToBodyPartArray({
+         var bodyPartsArray = util.convertRatiosToBodyPartArray({
             energyToUseForBodyParts     : 10000,//1250 each
             attackPercent               : 1/8,//15 parts
             movePercent                 : 1/8,//25

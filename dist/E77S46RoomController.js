@@ -10,7 +10,7 @@ class E77S46RoomController extends RoomController {
 	}
 
 	get room(){
-		return util().northRoom;
+		return util.northRoom;
 	}
 
 	get spawn(){
@@ -87,8 +87,8 @@ class E77S46RoomController extends RoomController {
     }
 
     useHarvesterToFillTower(creep){
-        util().doWorkOrGatherEnergy(creep, () => {
-            util().giveEnergyToRecipient(creep, this.southTower);
+        util.doWorkOrGatherEnergy(creep, () => {
+            util.giveEnergyToRecipient(creep, this.southTower);
         });
     }
 }
