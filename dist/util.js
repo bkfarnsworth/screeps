@@ -760,5 +760,8 @@ module.exports = {
                 LEFT,
                 TOP_LEFT,
             ];
+        },
+        creepIsAboutToDie(creep, creepType){
+            return creep.ticksToLive <= creepType.ticksToSpawn();
         }
 }

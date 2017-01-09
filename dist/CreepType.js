@@ -43,7 +43,7 @@ CreepType.prototype.needsSpawning = function() {
         var matchingCreeps = this.getMatchingCreeps();
         if(matchingCreeps.length){
             //see if one is about to die
-            var creepAboutToDie = matchingCreeps.find(creep => creep.ticksToLive <= this.ticksToSpawn());
+            var creepAboutToDie = matchingCreeps.find(creep => util.creepIsAboutToDie(creep, this));
             if(creepAboutToDie){
                 needsSpawning = true;
             }else{

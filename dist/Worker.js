@@ -11,11 +11,11 @@ class Worker {
       var completedWork = false;//a way to know if the creep already did work through this super
 
       //commenting out the recycle stuff for now, because I'm not sure if it is working right 
-      // if(!this.creepOpts.condition){
-      //    this.recycle();
-      //    completedWork = true;
-      //    return completedWork;
-      // }
+      if(!this.creepOpts.condition || util.creepIsAboutToDie(this.creep, this.creepOpts)){
+         this.recycle();
+         completedWork = true;
+         return completedWork;
+      }
 
       var inAssignedRoom = util.goToAssignedRoom(this.creep);
       if(!inAssignedRoom){ 
