@@ -87,8 +87,9 @@ class E77S46RoomController extends RoomController {
     }
 
     useHarvesterToFillTower(creep){
-        util.doWorkOrGatherEnergy(creep, () => {
-            util.giveEnergyToRecipient(creep, this.southTower);
+        util.doWorkOrGatherEnergy(creep, {
+            workTarget: this.southTower,
+            workFunc: util.giveEnergyToRecipient.bind(util, creep, this.southTower)
         });
     }
 }

@@ -8,12 +8,24 @@ class Builder extends Worker {
 	}
 
 	doWork(){
+
+		var target = this.getTarget();
+
 		if(!super.doWork()){
-			util.doWorkOrGatherEnergy(this.creep, this.build.bind(this));
+			util.doWorkOrGatherEnergy(this.creep, {
+				workTarget: target,
+				workFunc: this.build.bind(this, target)
+			})
 		}
 	}
 
-	build(){
+	build(target){
+		if(this.creep.build(target) == ERR_NOT_IN_RANGE) {
+			this.creep.moveToUsingCache(target);					
+		}	
+	}
+
+	getTarget(){
 
 		var creep = this.creep;
 		var findStrategy = 'closest';
@@ -52,9 +64,7 @@ class Builder extends Worker {
 				}
 			};
 
-			if(creep.build(target) == ERR_NOT_IN_RANGE) {
-				creep.moveToUsingCache(target);					
-			}	
+			return target;
 		}
 	}
 }

@@ -170,7 +170,7 @@ module.exports = {
 
             var closestCreep = creep.pos.findClosestByPathUsingCache(FIND_MY_CREEPS, {
                 filter: (c) => {
-                    return opts.creepTypes.includes(c.memory.role) && filter(c);    
+                    return opts.creepTypes.includes(c.memory.role) && opts.filter(c);    
                 }
             });
 
@@ -409,26 +409,47 @@ module.exports = {
                 polarity      : 'positive' 
             });
 
-            var pathToWorkTarget = this.getPath(creep, workTarget);
-            var isNearWorkTarget = pathToWorkTarget.length <= 3;
+            var pathToWorkTarget = this.getPath(creep, opts.workTarget);
+            opts.isNearWorkTarget = pathToWorkTarget.length <= 3;
+
+            return this.doWorkBasedOnPositionOtherwise(creep, opts);
+        },
+        doWorkBasedOnPositionOtherwise(creep, opts){
+
+            _.defaults(opts, {
+                workFunc         : undefined,
+                otherwiseFunc    : undefined,
+                //positive means doing work gains energy, eg harvesters
+                //negative means doing work loses energy, eg upgraders
+                polarity         : 'positive',
+                isNearWorkTarget : undefined
+            });
 
             var energyIsBelowCapacity = creep.carry.energy < creep.carryCapacity;
             var energyIsZero          = creep.carry.energy > 0;
+            var energyIsFull          = creep.carry.energy === creep.carryCapacity;
 
-            var energyIsAtNearWorkLevel     = polarity === 'positive' ? energyIsBelowCapacity : energyIsAboveZero;
-            var energyIsAtAwayFromWorkLevel = polarity === 'positive' ? energyIsZero          : energyIsBelowCapacity;
+            //the range that if you are close to work, stay and work, but if you are far from work, keep doing your otherwise
+            //eg a harvester should stay at source until full
+            //eg an upgrader shold stay at controller until empty
+            var energyIsAtInRangeToWorkLevel  = opts.polarity === 'positive' ? energyIsBelowCapacity : energyIsAboveZero;
 
-            if(isNearWorkTarget){
-                if(energyIsAtNearWorkLevel){  
-                    workFunc();
+            //the range that if you are far away come back and do more work, otherwise stay out and keep doing otherwise
+            //eg a harvester should come back and harvest when empty
+            //eg an upgrader should come back and do work when full of energy
+            var energyIsAtAwayFromWorkLevel   = opts.polarity === 'positive' ? energyIsZero          : energyIsFull;
+
+            if(opts.isNearWorkTarget){
+                if(energyIsAtInRangeToWorkLevel){  
+                    opts.workFunc();
                 }else{
-                    otherwiseFunc();
+                    opts.otherwiseFunc();
                 }
             }else{
                 if(energyIsAtAwayFromWorkLevel){
-                    workFunc();
+                    opts.workFunc();
                 }else{
-                    otherwiseFunc();
+                    opts.otherwiseFunc();
                 }
             }
         },
@@ -485,7 +506,7 @@ module.exports = {
         //         //get from harvesters
         //     }
         // },
-        depositEnergyForSpawning(){
+        depositEnergyForSpawning(creep){
             return this.giveEnergyToBestRecipient(creep, {
                 allowStructures  : true,
                 allowTowers      : false,
@@ -494,7 +515,7 @@ module.exports = {
                 creepTypes       : [] 
             });
         },
-        depositEnergyForWork(){
+        depositEnergyForWork(creep){
             return this.giveEnergyToBestRecipient(creep, {
                 allowStructures  : true,
                 allowTowers      : true,

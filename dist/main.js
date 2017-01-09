@@ -27,6 +27,20 @@ module.exports.loop = function () {
 
     ThrottleService.adjustThrottleRatio();
 
+    runRooms();
+
+    runConstructionManager();
+
+    clearPathsHash();
+
+    doTracking();
+
+    sendEmailReport();
+
+    runTests();
+}
+
+function runRooms(){
     var roomControllers = [
         new E77S44RoomController(),
         new E77S46RoomController(),
@@ -41,18 +55,24 @@ module.exports.loop = function () {
             rc.runRoom({throttle: true});
         }
     });
+}
 
+function runConstructionManager(){
     //we could do this even less, but for now throttle it so it only happens on average every 100 ticks
     if(_.random(1, 100) === 1){
         var constructionManager = new ConstructionManager();
         constructionManager.doWork();    
     }   
+}
 
+function clearPathsHash(){
     //every n ticks, clear the paths hash
     if(_.random(1, 500) === 1){
         delete Memory.pathsHash;
     }
+}
 
+function doTracking(){
     var tracker = new Tracker();
     tracker.track({
         currentCpu: true,
@@ -66,12 +86,6 @@ module.exports.loop = function () {
         // averageSecondsPerTick: true,
         throttleRatio: true
     });
-
-    sendEmailReport();
-
-    // console.log();
-    // var unitTester = new UnitTester();
-    // unitTester.runTests();
 }
 
 function sendEmailReport(){
@@ -88,6 +102,11 @@ function sendEmailReport(){
     }
 }
 
+function runTests(){
+    console.log();
+    var unitTester = new UnitTester();
+    unitTester.runTests();
+}
 
 
 

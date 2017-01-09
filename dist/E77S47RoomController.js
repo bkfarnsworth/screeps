@@ -80,8 +80,9 @@ class E77S47RoomController extends RoomController {
 	}
 
 	useUpgraderToFillTower(creep){
-		util.doWorkOrGatherEnergy(creep, () => {
-			util.giveEnergyToRecipient(creep, this.westTower);
+		util.doWorkOrGatherEnergy(creep, {
+			workTarget: this.westTower,
+			workFunc: util.giveEnergyToRecipient.bind(util, creep, this.westTower)
 		});
 	}
 }
