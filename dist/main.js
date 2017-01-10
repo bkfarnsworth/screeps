@@ -37,7 +37,7 @@ module.exports.loop = function () {
 
     sendEmailReport();
 
-    runTests();
+    // runTests();
 }
 
 function runRooms(){
@@ -49,10 +49,10 @@ function runRooms(){
 
     roomControllers.forEach(rc => {
         //for now, throttle each room (unless it is under attack)
-        if(ThrottleService.shouldThrottleRoom() || rc.roomIsUnderAttack()){
-            rc.runRoom({throttle: false});
-        }else{
+        if(ThrottleService.shouldThrottleRoom() && !rc.roomIsUnderAttack()){
             rc.runRoom({throttle: true});
+        }else{
+            rc.runRoom({throttle: false});
         }
     });
 }
@@ -78,11 +78,11 @@ function doTracking(){
         currentCpu: true,
         averageCpu: true,
         // gclToNextLevel: true,
-        averageGcl: true,
+        // averageGcl: true,
         upgradeToNextLevel: true,
         averageUpgrade: true,
-        averageSourceDepletionRatio: true,
-        cachePercent: true,
+        // averageSourceDepletionRatio: true,
+        // cachePercent: true,
         // averageSecondsPerTick: true,
         throttleRatio: true
     });

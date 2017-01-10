@@ -3,8 +3,8 @@ var Worker = require('Worker');
 
 class Builder extends Worker {
 
-	constructor(creep){
-		super(creep);
+	constructor(creep, creepOpts){
+		super(creep, creepOpts);
 	}
 
 	doWork(){
@@ -36,7 +36,7 @@ class Builder extends Worker {
 
 		//manually set sites to be done first
 		var manualTargetIds = [
-			'586ab567c04c074e4f1feef8',
+			'587467f325890532550d332c',
 			'584da2b4cf925b7f32ada75b',
 			'584da2b4cf925b7f32ada75c',
 			'5843b042b14a695e0d8b3194',

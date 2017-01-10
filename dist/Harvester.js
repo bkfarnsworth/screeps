@@ -39,7 +39,7 @@ class Harvester extends Worker{
 	doIncompleteStatusWork(){
 		var creep = this.creep;
 		var creepOpts = this.creepOpts;
-		if(!super.doIncompleteStatusWork()){
+		// if(!super.doIncompleteStatusWork()){
 			//get energy from storage if there IS energy in storage.  other wise we just need to harvest
 			var storage = util.getClosestStorageWithEnergy(this.creep);
 
@@ -58,7 +58,7 @@ class Harvester extends Worker{
 					polarity      : 'positive'
 				});
 			}
-		}
+		// }
 	}
 }
 

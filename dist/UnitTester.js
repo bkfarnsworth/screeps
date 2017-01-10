@@ -12,10 +12,17 @@ class UnitTester {
       chai.use(spies);
 
       this.describeConvertRatiosToBodyPartsArray();
-      this.describeUpgrader();
-      this.describeHarvester();
+
       this.describeRoomController();
       this.describeDoWorkBasedOnPositionOtherwise();
+
+      var ptr = false;
+      if(ptr){
+         //set up infrastructure
+
+         this.describeUpgrader();
+         this.describeHarvester();
+      }
    }
 
    /*
@@ -371,9 +378,13 @@ class UnitTester {
 
    describeUpgrader(){
       it('should get energy from storage if there is energy', () => {
-         //if there is an upgrader, start keeping track of it
-         //if it doesn't upgrade in 1500 ticks, fail the test.
-         //could do less ticks too.  
+
+         //spawn harvesters
+         //spawn builders
+         //create a storage
+         //put energy in it
+
+
       });
 
       it('should upgrade the controller if it has enough energy', () => {

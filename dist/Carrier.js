@@ -3,7 +3,12 @@ var Worker = require('Worker');
 
 class Carrier extends Worker {
 
-    constructor(creep, creepOpts){
+    constructor(creep, creepOpts={}){
+
+        _.defaults(creepOpts, {
+
+        });
+
         super(creep, creepOpts);
     }
 
@@ -12,17 +17,41 @@ class Carrier extends Worker {
         var creepOpts = this.creepOpts;
         var harvesterWithEnergy = this.getClosestHarvesterWithEnergy();
 
+        var recipient = util.getBestEnergyRecipient(creep, {
+            allowStructures  : false,
+            allowTowers      : false,
+            allowStorage     : false,
+            allowLink        : false,
+            creepTypes       : ['upgrader', 'builder'] 
+        }) || util.getBestEnergyRecipient(creep, {
+            allowStructures  : true,
+            allowTowers      : false,
+            allowStorage     : true,
+            allowLink        : false,
+            creepTypes       : ['upgrader', 'builder'] 
+        });
+
+
+
         if(!super.doWork()){
 
             if(harvesterWithEnergy){
                 util.doWorkOtherwise(creep, {
                     workTarget    : harvesterWithEnergy,
                     workFunc      : util.getEnergyFromRoomObject.bind(util, creep, harvesterWithEnergy),
-                    otherwiseFunc : util.depositEnergyForWork.bind(util, creep),
+                    otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, recipient),
                     polarity      : 'positive'
                 });
             }else{
-                //harvest?                
+                var storage = util.getClosestStorageWithEnergy(this.creep);
+                if(storage){
+                    util.doWorkOtherwise(this.creep, {
+                        workTarget    : storage,
+                        workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
+                        otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, recipient),
+                        polarity      : 'positive'
+                    }); 
+                }
             }
         }
     }
@@ -58,7 +87,7 @@ class Carrier extends Worker {
             //has very little energy
             //but I get the reverse problem which is skipping a very close creep that has a little bit of energy
             //I feel like eventually I will want a function that takes into account distance and the amount of energy the creep has or something
-            return h.carry.energy > 0;
+            return h.carry.energy > h.carryCapacity * 0.7;
         });
 
         return this.creep.pos.findClosestByPathUsingCache(harvestersWithEnergy);

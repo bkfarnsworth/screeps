@@ -43,14 +43,14 @@ class E77S47RoomController extends RoomController {
 				}
 			}),
 			_.extend(builder(),  {name: 'builder1'}),
-			_.extend(carrier(), {
-			    name: 'carrier1',
-			    bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-			        percentOfSpawningPotential: 1/5,
-			        movePercent  : 0.5,
-			        carryPercent : 0.5
-			    })
-			})
+			// _.extend(carrier(), {
+			//     name: 'carrier1',
+			//     bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+			//         percentOfSpawningPotential: 1/5,
+			//         movePercent  : 0.5,
+			//         carryPercent : 0.5
+			//     })
+			// })
 		]
 
 		return opts.map(obj => super.createCreepType(obj));
@@ -82,9 +82,9 @@ class E77S47RoomController extends RoomController {
 			Tower(this.westTower);
 		}
 
-		if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
-			Tower(this.eastTower);
-		}
+		// if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
+		// 	Tower(this.eastTower);
+		// }
 	}
 
 	useUpgraderToFillTower(creep){

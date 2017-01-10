@@ -22,6 +22,10 @@ class Upgrader extends Worker {
 			});
 		}
 	}
+
+	doIncompleteStatusWork(){
+		this.doWork();
+	}
 }
 
 module.exports = Upgrader;
