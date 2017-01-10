@@ -42,7 +42,13 @@ class E77S47RoomController extends RoomController {
 					work: this.useUpgraderToFillTower.bind(this)
 				}
 			}),
-			_.extend(builder(),  {name: 'builder1'}),
+			_.extend(builder(),  {
+				name: 'builder1',
+				// extraTask: {
+				// 	condition: this.eastTower.energy < 700,
+				// 	work: this.useBuilderToFillTower.bind(this)
+				// }
+			}),
 			// _.extend(carrier(), {
 			//     name: 'carrier1',
 			//     bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
@@ -68,7 +74,7 @@ class E77S47RoomController extends RoomController {
 	}
 
 	get eastTower(){
-		return Game.structures['584b91f093c23ff764e1db3c'];
+		return Game.structures['5874798a95b1c94623b2aa90'];
 	}
 
 	get westTower(){
@@ -82,9 +88,9 @@ class E77S47RoomController extends RoomController {
 			Tower(this.westTower);
 		}
 
-		// if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
-		// 	Tower(this.eastTower);
-		// }
+		if(_.random(1, 3) === 1 || this.roomIsUnderAttack()){
+			Tower(this.eastTower);
+		}
 	}
 
 	useUpgraderToFillTower(creep){
@@ -93,6 +99,13 @@ class E77S47RoomController extends RoomController {
 			workFunc: util.giveEnergyToRecipient.bind(util, creep, this.westTower)
 		});
 	}
+
+	// useBuilderToFillTower(creep){
+	// 	util.doWorkOrGatherEnergy(creep, {
+	// 		workTarget: this.eastTower,
+	// 		workFunc: util.giveEnergyToRecipient.bind(util, creep, this.eastTower)
+	// 	});
+	// }
 }
 
 module.exports = E77S47RoomController;

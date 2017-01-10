@@ -57,12 +57,12 @@ class E77S44RoomController extends RoomController {
 				})
 			}),
 			//TODO: make the builder strong in coordination with how much construction there is to do...or I just manually do it...
-			// _.extend(builder(),  {name: 'builder1'})
+			_.extend(builder(),  {name: 'builder1'}),
 			//for now I am making a cheap builder because I just want to build a single wall
-			_.extend(builder(),  {
-				name: 'builder1',
-				bodyParts: [WORK, MOVE, CARRY]
-			}),
+			// _.extend(builder(),  {
+			// 	name: 'builder1',
+			// 	bodyParts: [WORK, MOVE, CARRY]
+			// }),
 			_.extend(carrier(), {
 			    name: 'carrier1',
 			    bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
