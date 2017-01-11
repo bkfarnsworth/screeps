@@ -62,15 +62,21 @@ class E77S47RoomController extends RoomController {
 		return opts.map(obj => super.createCreepType(obj));
 	}
 
+	get eastLink(){
+		return Game.structures['585b6ab33962b71d57030d66'];
+	}
+
+	get centerLink(){
+		return Game.structures['5874aaf932070d0273cd8c0e'];
+	}
+
+	get westLink(){
+		return Game.structures['585b75504b207b74496d64b5'];
+	}
+
 	runLinks(){
-		var westLink = Game.structures['585b6ab33962b71d57030d66'];
-		var eastLink = Game.structures['585b75504b207b74496d64b5'];
-		var southLink = Game.structures['585cc390713f5c3c7a62662b'];
-		// if(_.random(0, 1) === 1){
-		    westLink.transferEnergy(eastLink);
-		// }else{
-		    // westLink.transferEnergy(southLink);
-		// }
+		this.centerLink.transferEnergy(this.westLink);
+		this.eastLink.transferEnergy(this.westLink);
 	}
 
 	get eastTower(){

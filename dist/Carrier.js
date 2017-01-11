@@ -17,21 +17,50 @@ class Carrier extends Worker {
         var creepOpts = this.creepOpts;
         var harvesterWithEnergy = this.getClosestHarvesterWithEnergy();
 
-        var recipient = util.getBestEnergyRecipient(creep, {
-            allowStructures  : false,
-            allowTowers      : false,
-            allowStorage     : false,
-            allowLink        : false,
-            creepTypes       : ['upgrader', 'builder'] 
-        }) || util.getBestEnergyRecipient(creep, {
-            allowStructures  : true,
-            allowTowers      : false,
-            allowStorage     : true,
-            allowLink        : false,
-            creepTypes       : ['upgrader', 'builder'] 
-        });
+        //in priority order
+        var targets = [
+            'creep',
+            'tower',
+            'storage',
+        ];
 
+        var lockedTarget;
+        for (var i = 0; i < targets.length; i++) {
+            var target = targets[i];
+            switch (target) {
+                case 'creep':
+                    lockedTarget = util.getBestEnergyRecipient(creep, {
+                        allowStructures  : false,
+                        allowTowers      : false,
+                        allowStorage     : false,
+                        allowLink        : false,
+                        creepTypes       : ['upgrader', 'builder'] 
+                    });
+                    break;
+                case 'tower':
+                    lockedTarget = util.getBestEnergyRecipient(creep, {
+                        allowStructures  : true,
+                        allowTowers      : true,
+                        allowStorage     : false,
+                        allowLink        : false,
+                        creepTypes       : [] 
+                    });
+                    break;
+                case 'storage':
+                    util.getBestEnergyRecipient(creep, {
+                        allowStructures  : true,
+                        allowTowers      : false,
+                        allowStorage     : true,
+                        allowLink        : false,
+                        creepTypes       : [] 
+                    });
+                    break;
+            }
 
+            if(lockedTarget){
+                break;
+            }
+        }
 
         if(!super.doWork()){
 
@@ -39,7 +68,7 @@ class Carrier extends Worker {
                 util.doWorkOtherwise(creep, {
                     workTarget    : harvesterWithEnergy,
                     workFunc      : util.getEnergyFromRoomObject.bind(util, creep, harvesterWithEnergy),
-                    otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, recipient),
+                    otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, lockedTarget),
                     polarity      : 'positive'
                 });
             }else{
@@ -48,7 +77,7 @@ class Carrier extends Worker {
                     util.doWorkOtherwise(this.creep, {
                         workTarget    : storage,
                         workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
-                        otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, recipient),
+                        otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, lockedTarget),
                         polarity      : 'positive'
                     }); 
                 }
