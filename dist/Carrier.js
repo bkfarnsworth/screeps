@@ -86,6 +86,7 @@ class Carrier extends Worker {
     }
 
     doIncompleteStatusWork(){
+        var harvesterToCollectFrom = this.getClosestHarvesterWithEnergy() || this.getClosestHarvester();
         // if(!super.doIncompleteStatusWork()){
             var storage = util.getClosestStorageWithEnergy(this.creep);
 
@@ -98,15 +99,18 @@ class Carrier extends Worker {
                     polarity      : 'positive'
                 });
             }else{
-                var harvesterWithEnergy = this.getClosestHarvesterWithEnergy();
                 util.doWorkOtherwise(this.creep, {
-                    workTarget    : harvesterWithEnergy,
-                    workFunc      : util.getEnergyFromRoomObject.bind(util, this.creep, harvesterWithEnergy),
+                    workTarget    : harvesterToCollectFrom,
+                    workFunc      : util.getEnergyFromRoomObject.bind(util, this.creep, harvesterToCollectFrom),
                     otherwiseFunc : util.depositEnergyForSpawning.bind(util, this.creep),
                     polarity      : 'positive'
                 });
             }
         // }    
+    }
+
+    getClosestHarvester(){
+        return this.creep.pos.findClosestByPathUsingCache(util.getCreepsOfType(['harvester'], this.creep.room));
     }
 
     getClosestHarvesterWithEnergy(){

@@ -78,7 +78,7 @@ function doTracking(){
         currentCpu: true,
         averageCpu: true,
         // gclToNextLevel: true,
-        // averageGcl: true,
+        averageGcl: true,
         upgradeToNextLevel: true,
         averageUpgrade: true,
         averageSourceDepletionRatio: true,
