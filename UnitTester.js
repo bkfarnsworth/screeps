@@ -2,6 +2,7 @@ var util = require('util');
 var chai = require('chai');
 var spies = require('chai-spies');
 var expect = chai.expect;
+var Upgrader = require('Upgrader');
 
 // http://chaijs.com/api/bdd/
 class UnitTester {
@@ -19,9 +20,9 @@ class UnitTester {
       var ptr = false;
       if(ptr){
          //set up infrastructure
-
+         //assume there is an upgrader for now
          this.describeUpgrader();
-         this.describeHarvester();
+         // this.describeHarvester();
       }
    }
 
@@ -377,20 +378,45 @@ class UnitTester {
    }
 
    describeUpgrader(){
-      it('should get energy from storage if there is energy', () => {
-
-         //spawn harvesters
-         //spawn builders
-         //create a storage
-         //put energy in it
-
-
-      });
-
       it('should upgrade the controller if it has enough energy', () => {
+         var room = Game.rooms.sim;
+         var upgrader = room.find(FIND_MY_CREEPS)[0];
+         var storage = room.storage;
+         var controller = room.controller;
 
-      });
+        //  var pathToStorage = room.findPath(upgrader, storage);
+        //  var pathFromStorageToController = room.findPath(storage, controller);
+
+         //2 to transfer energy and * 2 for fatigue
+         // Game.memory.tickLimit = (pathToStorage.length + pathFromStorageToController.length) * 2 + 2;
+         //hard coding for now
+         var tickLimit = 30;
+
+         if(_.isUndefined(_.get(Game.memory, 'testTimer.upgraderTest'))){
+            _.set(Game.memory, 'testTimer.upgraderTest', 0)
+         }else{
+            Game.memory.testTimer.upgraderTest++;
+         }
+
+         var worker = new Upgrader(upgrader, {
+            role: 'upgrader',
+            assignedRoom: 'sim',
+            bodyParts: [WORK, CARRY, MOVE, WORK, CARRY, MOVE],
+            name: upgrader.name
+         });
+
+         worker.doWork();
+
+         if(Game.memory.testTimer.upgraderTest > tickLimit || controller.progress >= 1){
+            delete Game.memory.testTimer.upgraderTest;
+            expect(controller.progress).to.be.at.least(1);
+         }
+      })
    }
+
+   // getTicksToCompletePaths(paths, creep){
+   //    return _.sum(paths, 'length') + ;
+   // }
 
    describeHarvester(){
       it('should harvest energy if it needs energy', () => {

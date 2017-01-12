@@ -1,3 +1,52 @@
+
+module.exports = function(config) {
+
+   if(config.cli) {
+       config.cli.on('cliSandbox', function(sandbox) {
+           sandbox.test = function() {
+
+            //to see everything
+            // sandbox.print(config) 
+
+            // sandbox.print(config.common.storage)
+
+               var creep = {
+                   name: 'test',
+                   x: 23,
+                   y: 23,
+                   body: [
+                     { type: 'carry', hits: 100},
+                     { type: 'work', hits: 100},
+                     { type: 'move', hits: 100}
+                   ],
+                   energy: 100,
+                   energyCapacity: 100,
+                   type: 'creep',
+                   room: 'W8N3',
+                   user: 'd9a70d66d19daa5',
+                   hits: 500,
+                   hitsMax: 500,
+                   spawning: false,
+                   fatigue: 0,
+                   notifyWhenAttacked: true
+               };
+
+               config.common.storage.db['rooms.objects'].insert(creep);
+
+               sandbox.print('This is the test!');
+               return 'Test result';
+           };
+       });
+   }
+
+
+};
+
+
+
+
+
+
 var RoomController = require('RoomController');
 var util = require('util');
 var Tower = require('Tower');

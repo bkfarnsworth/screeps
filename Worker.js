@@ -1,8 +1,9 @@
 var util = require('util')
+var CreepType = require('CreepType');
 
 class Worker {
 
-   constructor(creep, creepOpts={}){
+   constructor(creep, creepOpts={}) {
       this.creep = creep;
       this.creepOpts = creepOpts;
    }
