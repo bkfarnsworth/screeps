@@ -17,7 +17,7 @@ class UnitTester {
       this.describeRoomController();
       this.describeDoWorkBasedOnPositionOtherwise();
 
-      var ptr = false;
+      var ptr = true;
       if(ptr){
          //set up infrastructure
          //assume there is an upgrader for now
@@ -379,7 +379,7 @@ class UnitTester {
 
    describeUpgrader(){
       it('should upgrade the controller if it has enough energy', () => {
-         var room = Game.rooms.sim;
+         var room = Game.rooms.W8N3
          var upgrader = room.find(FIND_MY_CREEPS)[0];
          var storage = room.storage;
          var controller = room.controller;
@@ -388,29 +388,32 @@ class UnitTester {
         //  var pathFromStorageToController = room.findPath(storage, controller);
 
          //2 to transfer energy and * 2 for fatigue
-         // Game.memory.tickLimit = (pathToStorage.length + pathFromStorageToController.length) * 2 + 2;
+         // Memory.tickLimit = (pathToStorage.length + pathFromStorageToController.length) * 2 + 2;
          //hard coding for now
-         var tickLimit = 30;
+         var tickLimit = 120;
 
-         if(_.isUndefined(_.get(Game.memory, 'testTimer.upgraderTest'))){
-            _.set(Game.memory, 'testTimer.upgraderTest', 0)
+         if(_.isUndefined(_.get(Memory, 'testTimer.upgraderTest'))){
+            _.set(Memory, 'testTimer.upgraderTest', 0)
          }else{
-            Game.memory.testTimer.upgraderTest++;
+            Memory.testTimer.upgraderTest++;
          }
 
          var worker = new Upgrader(upgrader, {
             role: 'upgrader',
-            assignedRoom: 'sim',
+            assignedRoom: 'W8N3',
             bodyParts: [WORK, CARRY, MOVE, WORK, CARRY, MOVE],
             name: upgrader.name
          });
 
          worker.doWork();
 
-         if(Game.memory.testTimer.upgraderTest > tickLimit || controller.progress >= 1){
-            delete Game.memory.testTimer.upgraderTest;
+         if(Memory.testTimer.upgraderTest > tickLimit || controller.progress >= 1){
+            delete Memory.testTimer.upgraderTest;
             expect(controller.progress).to.be.at.least(1);
+            return 'DONE';
          }
+
+         return 'WAITING';
       })
    }
 
@@ -440,15 +443,20 @@ class UnitTester {
 }
 
 function it(testMsg, test){
+   var status
    try {
-      test();
+      status = test();
    } catch (e) {
       console.log('FAILED - ' + testMsg);
       console.log('e: ', e);
       return;
    }
 
-   console.log('Passed - ' + testMsg);
+   if(status === 'WAITING'){
+      console.log('WAITING - ' + testMsg);
+   }else{
+      console.log('Passed - ' + testMsg);
+   }
 }
 
 module.exports = UnitTester
