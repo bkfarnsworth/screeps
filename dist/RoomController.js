@@ -58,10 +58,10 @@ class RoomController {
 				role: 'harvester',          
 				stopOperation: true,
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.7,
-					movePercent  : 0.25,
-					carryPercent : 0.25,
-					workPercent  : 0.5
+					percentOfSpawningPotential: 0.9,
+					movePercent  : 0.1,
+					carryPercent : 0.3,
+					workPercent  : 0.6
 				})
 			},
 			guard: { 
@@ -78,9 +78,9 @@ class RoomController {
 				role: 'upgrader',
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
 					percentOfSpawningPotential: 0.9,
-					movePercent  : 0.25,
-					carryPercent : 0.25,
-					workPercent  : 0.5
+					movePercent  : 0.2,
+					carryPercent : 0.2,
+					workPercent  : 0.6
 				})
 			},
 			builder: {
@@ -96,7 +96,7 @@ class RoomController {
 			carrier: {
 				role: 'carrier',
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.9,
+					percentOfSpawningPotential: 2/5,
 					movePercent  : 0.5,
 					carryPercent : 0.5
 				})

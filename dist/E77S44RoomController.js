@@ -30,51 +30,28 @@ class E77S44RoomController extends RoomController {
 			_.extend(backUpHarvester(), {name: 'backUpHarvester'}),
 			_.extend(harvester(), {
 				name: 'harvester1',
-				giveToTowers: this.status === 'complete',
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.7,
-					movePercent  : 0.1,
-					carryPercent : 0.3,
-					workPercent  : 0.6
-				})
+				giveToTowers: this.status === 'complete'
 			}),
 			_.extend(harvester(), {
 				name: 'harvester2',
-				sourceIndex: 1,
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.7,
-					movePercent  : 0.1,
-					carryPercent : 0.3,
-					workPercent  : 0.6
-				})
+				sourceIndex: 1
 			}),
 			_.extend(upgrader(), {
 				name: 'upgrader1',
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.9,
-					movePercent  : 0.2,
-					carryPercent : 0.2,
-					workPercent  : 0.6
-				}),
 				extraTask: {
 					condition: this.southTower.energy < this.southTower.energyCapacity,
 					work: this.useUpgraderToFillTower.bind(this)
 				}
 			}),
-			//TODO: make the builder strong in coordination with how much construction there is to do...or I just manually do it...
 			_.extend(builder(),  {name: 'builder1'}),
+			//TODO: make the builder strong in coordination with how much construction there is to do...or I just manually do it...
 			//for now I am making a cheap builder because I just want to build a single wall
 			// _.extend(builder(),  {
 			// 	name: 'builder1',
 			// 	bodyParts: [WORK, MOVE, CARRY]
 			// }),
 			_.extend(carrier(), {
-			    name: 'carrier1',
-			    bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-			        percentOfSpawningPotential: 2/5,
-			        movePercent  : 0.5,
-			        carryPercent : 0.5
-			    })
+			   name: 'carrier1'
 			})
 		]
 

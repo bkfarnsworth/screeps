@@ -81,7 +81,7 @@ function doTracking(){
         // averageGcl: true,
         upgradeToNextLevel: true,
         averageUpgrade: true,
-        // averageSourceDepletionRatio: true,
+        averageSourceDepletionRatio: true,
         // cachePercent: true,
         // averageSecondsPerTick: true,
         throttleRatio: true

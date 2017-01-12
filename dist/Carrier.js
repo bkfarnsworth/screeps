@@ -86,7 +86,7 @@ class Carrier extends Worker {
     }
 
     doIncompleteStatusWork(){
-        if(!super.doIncompleteStatusWork()){
+        // if(!super.doIncompleteStatusWork()){
             var storage = util.getClosestStorageWithEnergy(this.creep);
 
             //get energy from storage if there IS energy in storage.  other wise we just need to get energy from harvesters
@@ -106,7 +106,7 @@ class Carrier extends Worker {
                     polarity      : 'positive'
                 });
             }
-        }
+        // }    
     }
 
     getClosestHarvesterWithEnergy(){

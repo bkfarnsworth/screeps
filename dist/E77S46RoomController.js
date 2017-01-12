@@ -42,14 +42,9 @@ class E77S46RoomController extends RoomController {
             }),
             _.extend(upgrader(), {name: 'upgrader1'}),
             _.extend(builder(),  {name: 'builder1'}),
-            // _.extend(carrier(), {
-            //     name: 'carrier1',
-            //     bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-            //         percentOfSpawningPotential: 1/5,
-            //         movePercent  : 0.5,
-            //         carryPercent : 0.5
-            //     })
-            // })
+            _.extend(carrier(), {
+               name: 'carrier1'
+            })
         ]
 
         return opts.map(obj => super.createCreepType(obj));
