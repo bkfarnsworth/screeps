@@ -407,11 +407,19 @@ module.exports = {
                 otherwiseFunc : undefined,
                 //positive means doing work gains energy, eg harvesters
                 //negative means doing work loses energy, eg upgraders
-                polarity      : 'positive' 
+                polarity      : 'positive',
+                nearAlgorithm : 'range' //or range
             });
 
-            var pathToWorkTarget = this.getPath(creep, opts.workTarget);
-            opts.isNearWorkTarget = pathToWorkTarget.length <= 3;
+            var distanceFromTarget;
+            if(opts.nearAlgorithm === 'path'){
+                var pathToWorkTarget = this.getPath(creep, opts.workTarget);
+                distanceFromTarget = pathToWorkTarget.length;
+            }else if(opts.nearAlgorithm === 'range'){
+                distanceFromTarget = creep.pos.getRangeTo(opts.workTarget);
+            }
+
+            opts.isNearWorkTarget = distanceFromTarget <= 3;
 
             return this.doWorkBasedOnPositionOtherwise(creep, opts);
         },

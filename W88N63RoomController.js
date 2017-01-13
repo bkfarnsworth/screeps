@@ -34,7 +34,6 @@ class W88N63RoomController extends RoomController {
          }),
          _.extend(harvester(), {
             name: 'harvester2',
-            sourceIndex: 1
          }),
          _.extend(upgrader(), {
             name: 'upgrader1'
@@ -44,9 +43,9 @@ class W88N63RoomController extends RoomController {
          //    name: 'builder1',
          //    bodyParts: [WORK, MOVE, CARRY]
          // }),
-         _.extend(carrier(), {
-            name: 'carrier1'
-         })
+         // _.extend(carrier(), {
+         //    name: 'carrier1'
+         // })
       ]
 
       return opts.map(obj => super.createCreepType(obj));
