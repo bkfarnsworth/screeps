@@ -1,5 +1,5 @@
 
-const INITIAL_THROTTLE_POINT = 0.4;// 4/10 times it should throttle
+const INITIAL_THROTTLE_POINT = 0;// 4/10 times it should throttle
 const ADJUSTMENT_FREQUENCY = 15;//adjust every n ticks; this value is highly dependent on the decay rate for the averageCPUPerTick calculation
 const ADJUSTMENT_VALUE = 0.01;
 const MAX_THROTTLE = 1;

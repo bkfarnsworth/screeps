@@ -8,13 +8,14 @@ module.exports = {
         southRoom: Game.rooms['E77S47'],
         northRoom: Game.rooms['E77S46'],
         farNorthRoom: Game.rooms['E77S44'],
+        room1: Game.rooms['W88N63'],
         milesUsername: 'Nephite135',
         dcn: 'superHarvester(E77S47)',//debugCreepName
         findMyCreeps: function(filterObj){
             return _.values(Game.creeps).filter(filterObj.filter);
         },
         getAllRooms: function(){
-            return [this.farNorthRoom, this.northRoom, this.southRoom];
+            return [this.room1];
         },
         //like the room.find method but will look in all my rooms
         findInAllRooms: function(constant, opts){
@@ -35,7 +36,7 @@ module.exports = {
             }
         },
         getSpawnForRoom: function(roomName){
-            if(roomName === this.southRoomName){
+            if(roomName === this.room1.name){
                 return Game.spawns.Spawn1;
             }else if(roomName === this.northRoomName){
                 return Game.spawns.Spawn2;

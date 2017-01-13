@@ -58,10 +58,10 @@ class RoomController {
 				role: 'harvester',          
 				stopOperation: true,
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.9,
-					movePercent  : 0.1,
-					carryPercent : 0.3,
-					workPercent  : 0.6
+					percentOfSpawningPotential: 1,
+					movePercent  : 1/3,
+					carryPercent : 1/3,
+					workPercent  : 1/3
 				})
 			},
 			guard: { 
@@ -77,26 +77,26 @@ class RoomController {
 			upgrader: {
 				role: 'upgrader',
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.9,
-					movePercent  : 0.2,
-					carryPercent : 0.2,
-					workPercent  : 0.6
+					percentOfSpawningPotential: 1,
+					movePercent  : 1/3,
+					carryPercent : 1/3,
+					workPercent  : 1/3
 				})
 			},
 			builder: {
 				role: 'builder',            
 				condition: this.getMyConstructionSites().length > 0,
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 0.9,
-					movePercent  : 0.25,
-					carryPercent : 0.25,
-					workPercent  : 0.5
+					percentOfSpawningPotential: 1,
+					movePercent  : 1/3,
+					carryPercent : 1/3,
+					workPercent  : 1/3
 				})
 			},
 			carrier: {
 				role: 'carrier',
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 2/5,
+					percentOfSpawningPotential: 1,
 					movePercent  : 0.5,
 					carryPercent : 0.5
 				})

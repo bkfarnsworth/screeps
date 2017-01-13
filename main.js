@@ -8,9 +8,7 @@ var Tracker = require('Tracker');
 var ThrottleService = require('ThrottleService');
 var util = require('util');
 var ConstructionManager = require('ConstructionManager');
-var E77S47RoomController = require('E77S47RoomController')
-var E77S46RoomController = require('E77S46RoomController')
-var E77S44RoomController = require('E77S44RoomController')
+var W88N63RoomController = require('W88N63RoomController');
 
 var UnitTester = require('UnitTester');
 
@@ -29,7 +27,7 @@ module.exports.loop = function () {
 
     runRooms();
 
-    runConstructionManager();
+    // runConstructionManager();
 
     clearPathsHash();
 
@@ -42,9 +40,7 @@ module.exports.loop = function () {
 
 function runRooms(){
     var roomControllers = [
-        new E77S44RoomController(),
-        new E77S46RoomController(),
-        new E77S47RoomController()
+        new W88N63RoomController()
     ];
 
     roomControllers.forEach(rc => {
