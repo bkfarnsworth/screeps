@@ -39,6 +39,20 @@ class W88N63RoomController extends RoomController {
             name: 'upgrader1'
          }),
          _.extend(builder(),  {name: 'builder1'}),
+         _.extend(harvester(), {
+            name: 'harvester3',
+         }),
+         _.extend(upgrader(), {
+            name: 'upgrader2'
+         }),
+         _.extend(builder(),  {name: 'builder2'}),
+         _.extend(harvester(), {
+            name: 'harvester4',
+         }),
+         _.extend(upgrader(), {
+            name: 'upgrader3'
+         }),
+         _.extend(builder(),  {name: 'builder3'}),
          // _.extend(builder(),  {
          //    name: 'builder1',
          //    bodyParts: [WORK, MOVE, CARRY]
