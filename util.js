@@ -470,10 +470,17 @@ module.exports = {
                 workTarget : undefined
             });
 
+            var otherwiseFunc;
+            if(creep.room.storage){
+                otherwiseFunc = this.getEnergyFromBestNonSpawningRoomObject.bind(this, creep)
+            }else{
+                otherwiseFunc = this.getEnergyFromBestSource.bind(this, creep)
+            }
+
             this.doWorkOtherwise(creep, {
                 workTarget    : opts.workTarget,
                 workFunc      : opts.workFunc,
-                otherwiseFunc : this.getEnergyFromBestNonSpawningRoomObject.bind(this, creep),
+                otherwiseFunc,
                 polarity      : 'negative'
             });
         },
