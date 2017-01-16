@@ -8,7 +8,7 @@ module.exports = {
         southRoom: Game.rooms['E77S47'],
         northRoom: Game.rooms['E77S46'],
         farNorthRoom: Game.rooms['E77S44'],
-        room1: Game.rooms['W88N63'],
+        room1: Game.rooms['E57N86'],
         milesUsername: 'Nephite135',
         dcn: 'superHarvester(E77S47)',//debugCreepName
         findMyCreeps: function(filterObj){
@@ -419,7 +419,7 @@ module.exports = {
                 distanceFromTarget = creep.pos.getRangeTo(opts.workTarget);
             }
 
-            opts.isNearWorkTarget = distanceFromTarget <= 3;
+            opts.isNearWorkTarget = distanceFromTarget <= 10;
 
             return this.doWorkBasedOnPositionOtherwise(creep, opts);
         },

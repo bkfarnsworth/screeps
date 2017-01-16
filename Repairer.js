@@ -7,28 +7,53 @@ class Repairer extends Worker {
         super(creep, creepOpts);
     }
 
+
     doWork(){
-        var creep = this.creep;
-        util.doWorkOrGatherEnergy(creep, ()=>{
-            var target;
-            var assignedRoom = creep.memory.assignedRoom || util.northRoomName;
-            var assignedRoomRoom = Game.rooms[assignedRoom];
-            
-            //find the structure with the least hit points, as long as that structure is not at its max
-            assignedRoomRoom.find(FIND_STRUCTURES).forEach(function(structure){
-                if(!target){
-                    target = structure;
-                }else{
-                    target = getBetterTarget(target, structure, creep);
+        if(!super.doWork()){
+            var creep = this.creep;
+            util.doWorkOrGatherEnergy(creep, { 
+                workTarget: creep.room.controller,
+                workFunc: () => {
+                    var errCode = creep.upgradeController(creep.room.controller)
+                    if(errCode == ERR_NOT_IN_RANGE) {
+                        // change to claimController if I want to claim a new one - make sure you have the claim body part
+                        creep.moveToUsingCache(creep.room.controller);    
+                    }
                 }
             });
+        }
+    }
 
-            if(target) {
-                if(creep.repair(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveToUsingCache(target);    
-                }
+    doWork(status){
+        var creep = this.creep;
+
+        var target;
+        var assignedRoom = creep.memory.assignedRoom || util.northRoomName;
+        var assignedRoomRoom = Game.rooms[assignedRoom];
+        
+        //find the structure with the least hit points, as long as that structure is not at its max
+        assignedRoomRoom.find(FIND_STRUCTURES).forEach(function(structure){
+            if(!target){
+                target = structure;
+            }else{
+                target = getBetterTarget(target, structure, creep);
             }
         });
+
+        if(target) {
+
+            util.doWorkOrGatherEnergy(creep, {
+                workTarget: target,
+                workFunc: () => {
+                    if(creep.repair(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveToUsingCache(target);    
+                    }
+                }     
+            });
+
+        }
+
+
     }
 }
 

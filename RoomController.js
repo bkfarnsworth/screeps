@@ -59,9 +59,9 @@ class RoomController {
 				stopOperation: true,
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
 					percentOfSpawningPotential: 1,
-					movePercent  : 1/3,
-					carryPercent : 1/3,
-					workPercent  : 1/3
+					movePercent  : 1/6,
+					carryPercent : 1/6,
+					workPercent  : 2/3
 				})
 			},
 			guard: { 
@@ -76,6 +76,15 @@ class RoomController {
 			},
 			upgrader: {
 				role: 'upgrader',
+				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+					percentOfSpawningPotential: 1,
+					movePercent  : 1/3,
+					carryPercent : 1/3,
+					workPercent  : 1/3
+				})
+			},
+			repairer: {
+				role: 'repairer',
 				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
 					percentOfSpawningPotential: 1,
 					movePercent  : 1/3,
@@ -149,7 +158,8 @@ class RoomController {
 		var isPriorityCreep = nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation;
 		var spawningEnergyNotFull = this.getEnergyAvailableForSpawning() < this.getEnergyCapacityForSpawning() * spawningEnergyRatio;
 
-		if(isPriorityCreep || spawningEnergyNotFull){
+		// if(isPriorityCreep || spawningEnergyNotFull){
+		if(isPriorityCreep){
 			this.status = 'incomplete';
 		}else{
 			this.status = 'complete';
@@ -390,16 +400,9 @@ class RoomController {
 	}
 
 	activateSafeModeIfNecessary(){
-		var hostiles = util.findHostiles(this.room, {
-				usersToIgnore: [
-						util.milesUsername,
-						'Invader'
-				]
-		});
-
-		if(hostiles.length){
-			Game.notify('WOULD ACTIVATE SAFE MODE, BUT I COMMENTED IT OUT');
-			// this.room.controller.activateSafeMode();
+		if(this.spawn.hits < this.spawn.hitsMax){
+			Game.notify('ACTIVATING SAFE MODE, SPAWN IS UNDER ATTACK');
+			this.room.controller.activateSafeMode();
 		}
 	}
 }

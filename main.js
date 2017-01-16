@@ -8,7 +8,7 @@ var Tracker = require('Tracker');
 var ThrottleService = require('ThrottleService');
 var util = require('util');
 var ConstructionManager = require('ConstructionManager');
-var W88N63RoomController = require('W88N63RoomController');
+var E57N86RoomController = require('E57N86RoomController');
 
 var UnitTester = require('UnitTester');
 
@@ -40,7 +40,7 @@ module.exports.loop = function () {
 
 function runRooms(){
     var roomControllers = [
-        new W88N63RoomController()
+        new E57N86RoomController()
     ];
 
     roomControllers.forEach(rc => {
