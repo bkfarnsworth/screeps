@@ -37,7 +37,7 @@ class RoomController {
 			this.runCreeps();
 		}
 		
-		console.log('STATUS: ' + this.room.status);
+		console.log('STATUS: ' + this.status);
 		console.log(opts.throttle ? 'throttled' : 'NOT throttled')
 	}
 
@@ -129,10 +129,6 @@ class RoomController {
 	   return _.indexBy(this.creepTypes, 'name');
 	}
 
-	get status(){
-		return this.room.status;
-	}
-
 	runLinks(){
 		throw new Error('Must be overwritten')
 	}
@@ -146,10 +142,6 @@ class RoomController {
 				}
 			}
 		});
-	}
-
-	set status(val){
-		this.room.status = val;
 	}
 
 	setRoomStatus(){
@@ -277,14 +269,7 @@ class RoomController {
 			worker = new Builder(creep, creepType);
 		}
 
-
-		if(this.status === 'complete'){
-			worker.doWork();
-		}else if(this.status === 'incomplete'){
-			worker.doIncompleteStatusWork();
-		}else if(this.status === 'underAttack'){
-			worker.doAttackStatusWork();
-		}
+		worker.doWork(this.status);
 	}
 
 	getNextCreepTypeToSpawn(){

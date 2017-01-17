@@ -22,18 +22,23 @@ class Harvester extends Worker{
 		}
 	}
 
-	doWork(){
+	doWork(status){
 		var creep = this.creep;
 		var creepOpts = this.creepOpts;
 
-		if(!super.doWork()){
-			util.doWorkOtherwise(creep, {
-				workTarget    : this.source,
-				workFunc      : util.harvest.bind(util, creep, creepOpts),
-				otherwiseFunc : util.depositEnergyForWork.bind(util, creep),
-				polarity      : 'positive'
-			});
+		if(status === 'complete'){
+			if(!super.doWork()){
+				util.doWorkOtherwise(creep, {
+					workTarget    : this.source,
+					workFunc      : util.harvest.bind(util, creep, creepOpts),
+					otherwiseFunc : util.depositEnergyForWork.bind(util, creep),
+					polarity      : 'positive'
+				});
+			}
+		}else{
+			this.doIncompleteStatusWork();
 		}
+
 	}
 
 	doIncompleteStatusWork(){

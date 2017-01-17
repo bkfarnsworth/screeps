@@ -4,15 +4,16 @@ var Worker = require('Worker');
 class Carrier extends Worker {
 
     constructor(creep, creepOpts={}){
-
-        _.defaults(creepOpts, {
-
-        });
-
         super(creep, creepOpts);
     }
 
-    doWork(){
+    doWork(status){
+
+        if(status === 'incomplete'){
+            this.doIncompleteStatusWork();
+            return;
+        }
+
         var creep = this.creep;
         var creepOpts = this.creepOpts;
         var harvesterWithEnergy = this.getClosestHarvesterWithEnergy();

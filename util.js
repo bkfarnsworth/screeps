@@ -265,7 +265,7 @@ module.exports = {
                 takeFromContainers: true,
                 takeFromExtensions: true,
                 takeFromSpawn: true,
-                takeFromCreeps: creep.room.status ? ['carrier', 'harvester'] : ['carrier']
+                takeFromCreeps: ['carrier']
             });
 
             // if(creep.room.status === 'incomplete'){
@@ -328,12 +328,6 @@ module.exports = {
             });
 
             var bestNonSpawningEnergySource = this.getBestEnergySource(creep, opts);
-
-            //if we didn't get one (like if there are no storage units in the room), just get the best extension
-
-            //TODO: for now I am commenting this out, which won't work if there is no storage
-            // var nextBest = this.getBestEnergySource(creep);
-            // return bestNonSpawningEnergySource || nextBest;
             return bestNonSpawningEnergySource;
         },
         getEnergyFromBestNonSpawningRoomObject(creep, opts={}){
@@ -371,8 +365,8 @@ module.exports = {
                 creepTypes: ['builder', 'upgrader', 'repairer'],
                 allowStructures: false,
                 allowStorage: true,
-                allowTowers: creep.room.status === 'complete',
-                allowLink: creep.room.status === 'complete'
+                allowTowers: true,
+                allowLink: true
             });
 
             var errCode;
@@ -473,7 +467,7 @@ module.exports = {
             var otherwiseFunc;
             if(creep.room.storage){
                 otherwiseFunc = this.getEnergyFromBestNonSpawningRoomObject.bind(this, creep)
-            }else if(creep.room.status === 'complete'){
+            }else if(opts.status === 'complete'){
                 otherwiseFunc = this.getEnergyFromBestSource.bind(this, creep)
             }else{
                 otherwiseFunc = () => {}

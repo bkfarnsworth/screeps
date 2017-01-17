@@ -8,7 +8,7 @@ class Worker {
       this.creepOpts = creepOpts;
    }
 
-   doWork(){
+   doWork(status){
       var completedWork = false;//a way to know if the creep already did work through this super
 
       //commenting out the recycle stuff for now, because I'm not sure if it is working right 
@@ -31,14 +31,6 @@ class Worker {
       }
 
       return completedWork;
-   }
-
-   doIncompleteStatusWork(){
-      return this.doWork();
-   }
-
-   doAttackStatusWork(){
-      return this.doWork();
    }
 
    recycle(){

@@ -7,14 +7,14 @@ class Builder extends Worker {
 		super(creep, creepOpts);
 	}
 
-	doWork(){
-
+	doWork(status){
 		var target = this.getTarget();
 
 		if(!super.doWork()){
 			util.doWorkOrGatherEnergy(this.creep, {
 				workTarget: target,
-				workFunc: this.build.bind(this, target)
+				workFunc: this.build.bind(this, target),
+				status: status
 			})
 		}
 	}

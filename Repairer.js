@@ -7,23 +7,6 @@ class Repairer extends Worker {
         super(creep, creepOpts);
     }
 
-
-    doWork(){
-        if(!super.doWork()){
-            var creep = this.creep;
-            util.doWorkOrGatherEnergy(creep, { 
-                workTarget: creep.room.controller,
-                workFunc: () => {
-                    var errCode = creep.upgradeController(creep.room.controller)
-                    if(errCode == ERR_NOT_IN_RANGE) {
-                        // change to claimController if I want to claim a new one - make sure you have the claim body part
-                        creep.moveToUsingCache(creep.room.controller);    
-                    }
-                }
-            });
-        }
-    }
-
     doWork(status){
         var creep = this.creep;
 
@@ -43,6 +26,7 @@ class Repairer extends Worker {
         if(target) {
 
             util.doWorkOrGatherEnergy(creep, {
+                status: status,
                 workTarget: target,
                 workFunc: () => {
                     if(creep.repair(target) == ERR_NOT_IN_RANGE) {
