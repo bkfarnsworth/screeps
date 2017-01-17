@@ -27,11 +27,17 @@ class E57N86RoomController extends RoomController {
       let carrier = () => _.clone(this.standardCreepTypes.carrier);
       let repairer = () => _.clone(this.standardCreepTypes.repairer);
 
+      upgrader = _.extend(upgrader, {
+         extraTask: {
+            condition: this.tower.energy < this.tower.energyCapacity * 0.7,
+            work: this.useUpgraderToFillTower.bind(this)
+         }
+      });
+
       var opts = [ 
          _.extend(backUpHarvester(), {name: 'backUpHarvester'}),
          _.extend(harvester(), {
-            name: 'harvester1',
-            giveToTowers: this.status === 'complete',
+            name: 'harvester1'
          }),
          _.extend(harvester(), {
             name: 'harvester2',
@@ -72,12 +78,25 @@ class E57N86RoomController extends RoomController {
       return opts.map(obj => super.createCreepType(obj));
    }
 
+   get tower(){
+      return Game.structures['587db205bc1d5f961f75421c'];
+   }
+
    runLinks(){
 
    }
 
    runTowers(){
-      
+      if(_.random(1, 3) === 3){
+         Tower(this.tower);
+      }
+   }
+
+   useUpgraderToFillTower(creep){
+      util.doWorkOrGatherEnergy(creep, {
+         workTarget: this.tower,
+         workFunc: util.giveEnergyToRecipient.bind(util, creep, this.tower)
+      });
    }
 }
 
