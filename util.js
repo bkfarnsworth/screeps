@@ -460,8 +460,9 @@ module.exports = {
         doWorkOrGatherEnergy(creep, opts={}){
 
             _.defaults(opts, {
-                workFunc   : undefined,
-                workTarget : undefined
+                workFunc   : this.throwIfMissing(opts.workFunc, 'workFunc'),
+                workTarget : this.throwIfMissing(opts.workTarget, 'workTarget'),
+                status     : this.throwIfMissing(opts.status, 'status'),
             });
 
             var otherwiseFunc;
@@ -506,6 +507,11 @@ module.exports = {
         //         //get from harveser, then storage if need be
         //     }
         // },
+
+        //the distance value stuff should: 
+        // [ ] I should generalize the distance formala futher, so that I can get the distanceValue of any item.  That is how it will find the ‘closest item’ too.  IT would be cool if it also took into account energy sources nearby
+
+
         // collectEnergyForSpawning(){
 
         //     _.defaults(opts, {
@@ -531,7 +537,7 @@ module.exports = {
         depositEnergyForWork(creep){
             return this.giveEnergyToBestRecipient(creep, {
                 allowStructures  : true,
-                allowTowers      : true,
+                allowTowers      : false,//setting to false so harvesters don't walk all the way to the towers for now
                 allowStorage     : true,
                 allowLink        : true,
                 creepTypes       : ['upgrader', 'builder'] 
@@ -775,5 +781,10 @@ module.exports = {
         },
         creepIsAboutToDie(creep, creepType){
             return creep.ticksToLive <= creepType.ticksToSpawn();
+        },
+        throwIfMissing(prop, propName) {
+            if(_.isUndefined(prop)){
+                throw new Error('Missing parameter: ' + (propName ? propName : 'No prop name provided'));
+            }
         }
 }

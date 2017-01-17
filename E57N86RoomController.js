@@ -19,20 +19,22 @@ class E57N86RoomController extends RoomController {
 
    get creepTypes(){
 
+      //I'm not sure why this are all anon functions, but I think I had to for some reason
       let backUpHarvester = () => _.clone(this.standardCreepTypes.backUpHarvester);
       let harvester = () => _.clone(this.standardCreepTypes.harvester);
       let guard = () => _.clone(this.standardCreepTypes.guard);
       let builder = () => _.clone(this.standardCreepTypes.builder);
-      let upgrader = () => _.clone(this.standardCreepTypes.upgrader);
       let carrier = () => _.clone(this.standardCreepTypes.carrier);
       let repairer = () => _.clone(this.standardCreepTypes.repairer);
-
-      upgrader = _.extend(upgrader, {
-         extraTask: {
-            condition: this.tower.energy < this.tower.energyCapacity * 0.7,
-            work: this.useUpgraderToFillTower.bind(this)
-         }
-      });
+      let upgrader = () => {
+         var clone = _.clone(this.standardCreepTypes.upgrader);
+         return _.extend(clone, {
+            extraTask: {
+               condition: this.tower.energy < this.tower.energyCapacity * 0.7,
+               work: this.useUpgraderToFillTower.bind(this)
+            }
+         });
+      }
 
       var opts = [ 
          _.extend(backUpHarvester(), {name: 'backUpHarvester'}),
@@ -87,13 +89,14 @@ class E57N86RoomController extends RoomController {
    }
 
    runTowers(){
-      if(_.random(1, 3) === 3){
+      if(_.random(1, 6) === 6 || this.roomIsUnderAttack()){
          Tower(this.tower);
       }
    }
 
    useUpgraderToFillTower(creep){
       util.doWorkOrGatherEnergy(creep, {
+         status: this.status,
          workTarget: this.tower,
          workFunc: util.giveEnergyToRecipient.bind(util, creep, this.tower)
       });
