@@ -62,10 +62,22 @@ class E57N86RoomController extends RoomController {
          _.extend(builder(),  {name: 'builder2'}),
          _.extend(upgrader(), {name: 'upgrader3' }),
          _.extend(upgrader(), {name: 'upgrader4' }),
-         // _.extend(upgrader(), {name: 'upgrader5' }),
-         // _.extend(upgrader(), {name: 'upgrader6' }),
-         // _.extend(upgrader(), {name: 'upgrader7' }),
-         // _.extend(repairer(), {name: 'repairer2'}),
+
+         //for now, instead of attackers, let's just strengthen the wall a ton if we are under attack
+         _.extend(repairer(), {
+            name: 'repairer2',
+            condition: this.roomIsUnderAttack()
+         }),
+         _.extend(repairer(), {
+            name: 'repairer3',
+            condition: this.roomIsUnderAttack()
+         }),
+         _.extend(repairer(), {
+            name: 'repairer4',
+            condition: this.roomIsUnderAttack()
+         }),
+
+
          // _.extend(carrier(), {
          //    name: 'carrier1'
          // })
@@ -89,7 +101,7 @@ class E57N86RoomController extends RoomController {
    }
 
    runTowers(){
-      if(_.random(1, 6) === 6 || this.roomIsUnderAttack()){
+      if(_.random(1, 3) === 3 || this.roomIsUnderAttack()){
          Tower(this.tower);
       }
    }
