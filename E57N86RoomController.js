@@ -45,9 +45,6 @@ class E57N86RoomController extends RoomController {
             name: 'harvester2',
          }),
          _.extend(harvester(), {
-            name: 'harvester3',
-         }),
-         _.extend(harvester(), {
             name: 'harvester4',
             sourceIndex: 1
          }),
