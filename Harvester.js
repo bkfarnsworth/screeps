@@ -28,10 +28,25 @@ class Harvester extends Worker{
 
 		if(status === 'complete'){
 			if(!super.doWork()){
+
+				var depositFunc;
+
+				if(creep.room.energyAvailable < creep.room.energyCapacityAvailable){
+					depositFunc = util.giveEnergyToBestRecipient.bind(util, creep, {
+						allowStructures  : true,
+						allowTowers      : false,
+						allowStorage     : false,
+						allowLink        : false,
+						creepTypes       : [] 
+					});
+				}else{
+					depositFunc = util.depositEnergyForWork.bind(util, creep)
+				}
+
 				util.doWorkOtherwise(creep, {
 					workTarget    : this.source,
 					workFunc      : util.harvest.bind(util, creep, creepOpts),
-					otherwiseFunc : util.depositEnergyForWork.bind(util, creep),
+					otherwiseFunc : depositFunc,
 					polarity      : 'positive'
 				});
 			}
