@@ -472,12 +472,12 @@ module.exports = {
             });
 
             var otherwiseFunc;
-            if(creep.room.storage){
+            if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 0){
                 otherwiseFunc = this.getEnergyFromBestNonSpawningRoomObject.bind(this, creep)
             }else if(opts.status === 'complete'){
                 otherwiseFunc = this.getEnergyFromBestSource.bind(this, creep)
             }else{
-                otherwiseFunc = () => {}
+                otherwiseFunc = this.harvest.bind(this, creep, {sourceIndex: 0});
             }
 
             this.doWorkOtherwise(creep, {
