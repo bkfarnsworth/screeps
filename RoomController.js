@@ -10,10 +10,16 @@ var Carrier = require('Carrier')
 var CreepType = require('CreepType');
 var Worker = require('Worker');
 var Tower = require('Tower');
+var BodyPartEffectCalculator = require('BodyPartEffectCalculator');
 
 var printQueue = true;
 
 class RoomController {
+
+	constructor(){
+		this.defenseManager = new DefenseManager();
+		this.bodyPartEffectCalculator = new BodyPartEffectCalculator();
+	}
 
 	runRoom(opts={}){
 
@@ -32,7 +38,6 @@ class RoomController {
 			this.spawnCreeps();
 			this.activateSafeModeIfNecessary();
 			this.runLinks();
-			//remember that this isn't getting the 1/3 throttle anymore is the subclass implements it
 			this.runTowers();
 			this.runCreeps();
 		}
@@ -250,11 +255,19 @@ class RoomController {
 		}
 
 		if(creep.memory.role == 'upgrader') {
-			worker = new Upgrader(creep, creepType);
+			if(this.roomIsUnderAttack()){
+				worker = new Repairer(creep, creepType);
+			}else{
+				worker = new Upgrader(creep, creepType);
+			}
 		}
 
 		if(creep.memory.role == 'repairer') {
-			worker = new Repairer(creep, creepType);
+			if(this.roomIsUnderAttack()){
+				worker = new Repairer(creep, creepType);
+			}else{
+				worker = new Upgrader(creep, creepType);
+			}
 		}
 
 		if(creep.memory.role == 'guard') {
@@ -362,6 +375,10 @@ class RoomController {
 		return util.convertRatiosToBodyPartArray(opts);
 	}
 
+	get towers(){
+		return [];
+	}
+
 	getExtraEnergy(){
 		var extraEnergy = 0;
 		
@@ -389,6 +406,78 @@ class RoomController {
 			Game.notify('ACTIVATING SAFE MODE, SPAWN IS UNDER ATTACK');
 			this.room.controller.activateSafeMode();
 		}
+	}
+
+	getHostiles(){
+		return util.findHostiles(this.room);
+	}
+}
+
+class DefenseManager{
+
+	getDefenseStrategy(roomController){
+
+		var debugMode = true;
+
+		var enemyHealRate = this.getEnemyHealRate(roomController);
+		var myAttackRate = this.getMyAttackRate(roomController);
+		var enemyToughBoost = this.getEnemyToughBoost(roomController);
+		var myAdjustedAttackRate = myAttackRate * enemyToughBoost;
+
+		if(debugMode){
+			console.log('enemyHealRate: ', enemyHealRate);
+			console.log('myAttackRate: ', myAttackRate);
+			console.log('enemyToughBoost: ', enemyToughBoost);
+			console.log('myAdjustedAttackRate: ', myAdjustedAttackRate);
+		}
+
+		if(myAdjustedAttackRate - enemyHealRate > 100){
+			if(debugMode){console.log('ATTACK');}
+			return 'attack';
+		}else{
+			if(debugMode){console.log('REPAIR');}
+			return 'repair';
+		}
+	}
+
+	getEnemyHealRate(roomController){
+
+		var enemeyHealPointsPerTick = 0;
+		roomController.getHostiles().forEach(h => {
+			h.body.filter(bp => bp.type === HEAL && bp.hits > 0).forEach(bp => {
+				enemeyHealPointsPerTick += roomController.bodyPartEffectCalculator.getEffect(bp, 'heal');
+			});
+		});
+
+		return enemeyHealPointsPerTick;
+	}
+
+	getMyAttackRate(roomController){
+		//for now just towers, but eventually all creeps
+		var myAttackPointsPerTick = 0;
+
+		roomController.towers.forEach(t => {
+			myAttackPointsPerTick += TOWER_POWER_ATTACK
+		});
+
+		return myAttackPointsPerTick;
+	}
+
+	getEnemyToughBoost(roomController){
+
+		const nonBoostedMultiplier = 1;		
+
+		//low means they take less damage
+		var lowestToughMultiplier = nonBoostedMultiplier;
+
+		_.forEach(roomController.getHostiles(), h => {
+			_.forEach(h.body, bp => {
+				var toughMultiplier = bp.type === TOUGH ? roomController.bodyPartEffectCalculator.getEffect(bp, 'damage') : nonBoostedMultiplier;
+				lowestToughMultiplier = _.min([toughMultiplier, lowestToughMultiplier]);
+			});
+		})
+
+		return lowestToughMultiplier;
 	}
 }
 

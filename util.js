@@ -95,7 +95,10 @@ module.exports = {
             return false;
         },
         goToAssignedRoom: function(creep){
-            return this.goToRoom(creep.getAssignedRoom().name, creep);
+            var room  = creep.getAssignedRoom()
+            if(room){
+                return this.goToRoom(room.name, creep);
+            }
         },
         printCPU(callback){
             if(callback){callback();}

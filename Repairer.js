@@ -51,8 +51,8 @@ function getBetterTarget(currentTarget, structure, creep){
     if(_.isUndefined(structure.hits) || _.isUndefined(structure.hitsMax)){ return currentTarget; }
 
     //if the one already is (basically) at it's max, do the other
-    if(currentTarget.hits > currentTarget.hitsMax * 0.95){ return structure; }
-    if(structure.hits > structure.hitsMax * 0.95){ return currentTarget; }
+    if(currentTarget.hits > currentTarget.hitsMax - 800){ return structure; }
+    if(structure.hits > structure.hitsMax - 800){ return currentTarget; }
 
     //if the structure has less hits than the currentTarget
     if(structure.hits < currentTarget.hits){ return structure; }

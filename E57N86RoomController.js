@@ -24,7 +24,6 @@ class E57N86RoomController extends RoomController {
       let guard = () => _.clone(this.standardCreepTypes.guard);
       let builder = () => _.clone(this.standardCreepTypes.builder);
       let carrier = () => _.clone(this.standardCreepTypes.carrier);
-      let repairer = () => _.clone(this.standardCreepTypes.repairer);
 
       let harvester = () => {
          var clone = _.clone(this.standardCreepTypes.harvester);
@@ -36,12 +35,23 @@ class E57N86RoomController extends RoomController {
          });
       }
 
+      //EVEN THOUGH THE CREEPS ARE MORE EFFECIENT AT REPAIRING, WE WANT TO REPAIR AS MANY POINTS AS WE CAN PER TICK
       let upgrader = () => {
          var clone = _.clone(this.standardCreepTypes.upgrader);
          return _.extend(clone, {
             extraTask: {
                condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
-               work: this.useUpgraderToFillTower.bind(this)
+               work: this.useCreepToFillTower.bind(this)
+            }
+         });
+      }
+
+      let repairer = () => {
+         var clone = _.clone(this.standardCreepTypes.repairer);
+         return _.extend(clone, {
+            extraTask: {
+               condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
+               work: this.useCreepToFillTower.bind(this)
             }
          });
       }
@@ -62,7 +72,7 @@ class E57N86RoomController extends RoomController {
          _.extend(upgrader(), {name: 'upgrader1'}),
          _.extend(builder(),  {name: 'builder1'}),
          _.extend(repairer(), {
-            name: 'repairer1  ',
+            name: 'repairer1',
             condition: this.roomIsUnderAttack()
          }),
          // _.extend(upgrader(), {name: 'upgrader2' }),
@@ -73,14 +83,6 @@ class E57N86RoomController extends RoomController {
          //for now, instead of attackers, let's just strengthen the wall a ton if we are under attack
          _.extend(repairer(), {
             name: 'repairer2',
-            condition: this.roomIsUnderAttack()
-         }),
-         _.extend(repairer(), {
-            name: 'repairer3',
-            condition: this.roomIsUnderAttack()
-         }),
-         _.extend(repairer(), {
-            name: 'repairer4',
             condition: this.roomIsUnderAttack()
          }),
 
@@ -116,16 +118,16 @@ class E57N86RoomController extends RoomController {
    }
 
    runTowers(){
-      if(_.random(1, 3) === 3 || this.roomIsUnderAttack()){
-         Tower(this.tower1);
+
+      var defenseStrategy = 'none';
+      if(this.roomIsUnderAttack()){
+         defenseStrategy = this.defenseManager.getDefenseStrategy(this);
       }
 
-      if(this.roomIsUnderAttack()){
-         Tower(this.tower2);
-      }
+      this.towers.forEach(tower => Tower(tower, defenseStrategy));
    }
 
-   useUpgraderToFillTower(creep){
+   useCreepToFillTower(creep){
       var towerWithLeast = _.min(this.towers, 'energy');
       util.doWorkOrGatherEnergy(creep, {
          status: this.status,
@@ -135,11 +137,11 @@ class E57N86RoomController extends RoomController {
    }
 
    thereIsDroppedEnergy(){
-      return Boolean(this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200).length);
+      return Boolean(this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200 && e.pos.x !== 1).length);
    }
 
    useHarvesterToGetDroppedEnergy(creep){
-      var energy = this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200)[0];
+      var energy = this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200 && e.pos.x !== 1)[0];
       var bestEnergyRecipient = util.getBestEnergyRecipient(creep);
 
       util.doWorkOtherwise(creep, {
