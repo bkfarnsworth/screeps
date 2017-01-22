@@ -2,6 +2,10 @@ var util = require('util');
 
 module.exports = function (tower) {
 
+
+    const maxHits = 3000000;
+
+
     var hostileCreeps = util.findHostiles(tower.room)
 
     var creepsToHeal = tower.room.find(FIND_MY_CREEPS, {
@@ -13,7 +17,7 @@ module.exports = function (tower) {
     var bestTowerTarget = (struct) => {
         //so we aren't wasting any of the tower's 800 repair
         var hitsBelowStructureMax = struct.hits < struct.hitsMax - 800;
-        var hitsBelowSpecifiedMax = struct.hits < Infinity;
+        var hitsBelowSpecifiedMax = struct.hits < maxHits;
 
         return hitsBelowStructureMax && hitsBelowSpecifiedMax;
     };
