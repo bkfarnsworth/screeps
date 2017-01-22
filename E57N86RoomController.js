@@ -21,11 +21,21 @@ class E57N86RoomController extends RoomController {
 
       //I'm not sure why this are all anon functions, but I think I had to for some reason
       let backUpHarvester = () => _.clone(this.standardCreepTypes.backUpHarvester);
-      let harvester = () => _.clone(this.standardCreepTypes.harvester);
       let guard = () => _.clone(this.standardCreepTypes.guard);
       let builder = () => _.clone(this.standardCreepTypes.builder);
       let carrier = () => _.clone(this.standardCreepTypes.carrier);
       let repairer = () => _.clone(this.standardCreepTypes.repairer);
+
+      let harvester = () => {
+         var clone = _.clone(this.standardCreepTypes.harvester);
+         return _.extend(clone, {
+            extraTask: {
+               condition: this.thereIsDroppedEnergy(),
+               work: this.useHarvesterToGetDroppedEnergy.bind(this)
+            }
+         });
+      }
+
       let upgrader = () => {
          var clone = _.clone(this.standardCreepTypes.upgrader);
          return _.extend(clone, {
@@ -122,6 +132,23 @@ class E57N86RoomController extends RoomController {
          workTarget: towerWithLeast,
          workFunc: util.giveEnergyToRecipient.bind(util, creep, towerWithLeast)
       });
+   }
+
+   thereIsDroppedEnergy(){
+      return Boolean(this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200).length);
+   }
+
+   useHarvesterToGetDroppedEnergy(creep){
+      var energy = this.room.find(FIND_DROPPED_ENERGY).filter(e => e.amount > 200)[0];
+      var bestEnergyRecipient = util.getBestEnergyRecipient(creep);
+
+      util.doWorkOtherwise(creep, {
+         workTarget: energy,
+         workFunc: util.getEnergyFromRoomObject.bind(util, creep, energy),
+         otherwiseTarget: bestEnergyRecipient,
+         otherwiseFunc: util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipient),
+         polarity: 'positive'
+      })
    }
 
    get westLink(){

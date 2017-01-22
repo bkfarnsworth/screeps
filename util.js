@@ -1,3 +1,6 @@
+var DistanceValueCalculator = require('DistanceValueCalculator');
+var GetEnergyUtil = require('GetEnergyUtil');
+
 module.exports = {
         milesRoomName: 'E78S47',
         teaSkittlesRoomName: 'E78S46',
@@ -206,23 +209,9 @@ module.exports = {
             var closestTower;
             var isCorrectRoom = (obj) => { return opts.room ? obj.room === opts.room : true }
             var generalRequirements = (possibility) => {
-
-                var currentEnergyKey;
-                var potentialEnergyKey;
-
-                if(possibility instanceof StructureStorage || possibility instanceof StructureContainer) {
-                    currentEnergyKey = 'store[' + RESOURCE_ENERGY + ']';
-                    potentialEnergyKey = 'storeCapacity';
-                }else if(possibility instanceof Creep){
-                    currentEnergyKey = 'carry[' + RESOURCE_ENERGY + ']';
-                    potentialEnergyKey = 'carryCapacity';
-                }else{
-                    currentEnergyKey = 'energy';
-                    potentialEnergyKey = 'energyCapacity';
-                }
-
-                var lacksEnoughEnergyForDepositing = _.get(possibility, currentEnergyKey) < _.get(possibility, potentialEnergyKey) * opts.maxEnergyRatio;
-
+                var energy = GetEnergyUtil.getCurrentEnergy(possibility);
+                var energyCapacity = GetEnergyUtil.getEnergyCapacity(possibility);
+                var lacksEnoughEnergyForDepositing = energy < energyCapacity * opts.maxEnergyRatio;
                 return isCorrectRoom(possibility) && lacksEnoughEnergyForDepositing;
             }
 
@@ -251,8 +240,16 @@ module.exports = {
             }) : null;
 
             var possibilities = _.compact([closestStructure, closestCreep, closestTower]);
-            var best = creep.pos.findClosestByPathUsingCache(possibilities);
 
+            var distanceValuePossibilities = possibilities.map(p => {
+                return {
+                    target: p,
+                    valueFunc: DistanceValueCalculator.giveEnergyValueFunc
+                };
+            });
+
+            var distanceValueCalculator = new DistanceValueCalculator(this.getPath.bind(this));
+            var best = distanceValueCalculator.getBestDistanceValue(creep, distanceValuePossibilities);
 
             //////// priority rules that override closest
             //make sure tower always stays at at least 700
@@ -284,26 +281,10 @@ module.exports = {
             var closestStructure;
             var isCorrectRoom = (obj) => { return opts.room ? obj.room === opts.room : true }
             var generalRequirements = (possibility) => {
-
-                var currentEnergyKey;
-                var potentialEnergyKey;
-
-                if(possibility instanceof StructureStorage || possibility instanceof StructureContainer){
-                    currentEnergyKey = 'store[' + RESOURCE_ENERGY + ']';
-                    potentialEnergyKey = 'storeCapacity';
-                }else if(possibility instanceof Creep){
-                    currentEnergyKey = 'carry[' + RESOURCE_ENERGY + ']';
-                    potentialEnergyKey = 'carryCapacity';
-                }else if(possibility instanceof Resource){
-                    //if it's a resource, don't do any calculations
-                    return true;
-                }else{
-                    currentEnergyKey = 'energy';
-                    potentialEnergyKey = 'energyCapacity';
-                }
-
-                var hasEnoughEnergyForGathering = _.get(possibility, currentEnergyKey) > (_.get(possibility, potentialEnergyKey) * opts.minEnergyRatio);
-                return  isCorrectRoom(possibility) && hasEnoughEnergyForGathering;
+                var energy = GetEnergyUtil.getCurrentEnergy(possibility);
+                var energyCapacity = GetEnergyUtil.getEnergyCapacity(possibility);
+                var hasEnoughEnergyForGathering = energy > energyCapacity * opts.minEnergyRatio;
+                return isCorrectRoom(possibility) && hasEnoughEnergyForGathering;
             }
 
             closestStructure = this.getClosestStructure(creep, generalRequirements, {
@@ -321,7 +302,18 @@ module.exports = {
             closestSource = opts.allowHarvesting ? this.getClosestSource(creep, generalRequirements): null;
 
             var possibilities = _.compact([closestStructure, closestCreep, closestSource, closestDroppedResource]);
-            return creep.pos.findClosestByPathUsingCache(possibilities);
+
+            var distanceValuePossibilities = possibilities.map(p => {
+                return {
+                    target: p,
+                    valueFunc: DistanceValueCalculator.fillUpOnEnergyValueFunc
+                };
+            });
+
+            var distanceValueCalculator = new DistanceValueCalculator(this.getPath.bind(this));
+            var best = distanceValueCalculator.getBestDistanceValue(creep, distanceValuePossibilities);
+
+            return best;
         },
         getBestNonSpawningEnergySource(creep, opts={}){
             _.defaults(opts, {
@@ -402,65 +394,45 @@ module.exports = {
         doWorkOtherwise(creep, opts={}){
 
             _.defaults(opts, {
-                workTarget    : undefined,
-                workFunc      : undefined,
-                otherwiseFunc : undefined,
+                workTarget      : this.throwIfMissing(opts.workTarget, 'workTarget'),
+                workFunc        : this.throwIfMissing(opts.workFunc, 'workFunc'),
+                otherwiseTarget : this.throwIfMissing(opts.otherwiseTarget, 'otherwiseTarget'),
+                otherwiseFunc   : this.throwIfMissing(opts.otherwiseFunc, 'otherwiseFunc'),
                 //positive means doing work gains energy, eg harvesters
                 //negative means doing work loses energy, eg upgraders
-                polarity      : 'positive',
-                nearAlgorithm : 'range' //or range
+                polarity        : 'positive',
             });
 
-            var distanceFromTarget;
-            if(opts.nearAlgorithm === 'path'){
-                var pathToWorkTarget = this.getPath(creep, opts.workTarget);
-                distanceFromTarget = pathToWorkTarget.length;
-            }else if(opts.nearAlgorithm === 'range'){
-                distanceFromTarget = creep.pos.getRangeTo(opts.workTarget);
-            }
-
-            opts.isNearWorkTarget = distanceFromTarget <= 10;
-
-            return this.doWorkBasedOnPositionOtherwise(creep, opts);
-        },
-        doWorkBasedOnPositionOtherwise(creep, opts){
-
-            _.defaults(opts, {
-                workFunc         : undefined,
-                otherwiseFunc    : undefined,
-                //positive means doing work gains energy, eg harvesters
-                //negative means doing work loses energy, eg upgraders
-                polarity         : 'positive',
-                isNearWorkTarget : undefined
-            });
-
-            var energyIsBelowCapacity = creep.carry.energy < creep.carryCapacity;
-            var energyIsAboveZero     = creep.carry.energy > 0;
-            var energyIsFull          = creep.carry.energy === creep.carryCapacity;
-            var energyIsZero          = creep.carry.energy === 0;
-
-            //the range that if you are close to work, stay and work, but if you are far from work, keep doing your otherwise
-            //eg a harvester should stay at source until full
-            //eg an upgrader shold stay at controller until empty
-            var energyIsAtInRangeToWorkLevel  = opts.polarity === 'positive' ? energyIsBelowCapacity : energyIsAboveZero;
-
-            //the range that if you are far away come back and do more work, otherwise stay out and keep doing otherwise
-            //eg a harvester should come back and harvest when empty
-            //eg an upgrader should come back and do work when full of energy
-            var energyIsAtAwayFromWorkLevel   = opts.polarity === 'positive' ? energyIsZero          : energyIsFull;
-
-            if(opts.isNearWorkTarget){
-                if(energyIsAtInRangeToWorkLevel){  
-                    opts.workFunc();
-                }else{
-                    opts.otherwiseFunc();
+            var distanceValuePossibilities = [
+                {
+                    target: opts.workTarget,
+                    valueFunc: (creep, target) => {
+                        if(opts.polarity === 'positive'){
+                            return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
+                        }else if(opts.polarity === 'negative'){
+                            return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
+                        }
+                    }
+                },
+                {
+                    target: opts.otherwiseTarget,
+                    valueFunc: (creep, target) => {
+                        if(opts.polarity === 'positive'){
+                            return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
+                        }else if(opts.polarity === 'negative'){
+                            return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
+                        }
+                    }
                 }
+            ];
+
+            var distanceValueCalculator = new DistanceValueCalculator(this.getPath.bind(this));
+            var bestDistanceValue = distanceValueCalculator.getBestDistanceValue(creep, distanceValuePossibilities);
+
+            if(bestDistanceValue === opts.workTarget){
+                opts.workFunc();
             }else{
-                if(energyIsAtAwayFromWorkLevel){
-                    opts.workFunc();
-                }else{
-                    opts.otherwiseFunc();
-                }
+                opts.otherwiseFunc();
             }
         },
         doWorkOrGatherEnergy(creep, opts={}){
@@ -472,11 +444,15 @@ module.exports = {
             });
 
             var otherwiseFunc;
+            var otherwiseTarget;
             if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 0){
-                otherwiseFunc = this.getEnergyFromBestNonSpawningRoomObject.bind(this, creep)
+                otherwiseTarget = this.getBestNonSpawningEnergySource(creep);
+                otherwiseFunc = this.getEnergyFromRoomObject.bind(this, creep, otherwiseTarget);
             }else if(opts.status === 'complete'){
-                otherwiseFunc = this.getEnergyFromBestSource.bind(this, creep)
+                otherwiseTarget = this.getBestEnergySource(creep);
+                otherwiseFunc = this.getEnergyFromRoomObject.bind(this, creep, otherwiseTarget);
             }else{
+                otherwiseTarget = creep.room.find(FIND_SOURCES)[0]
                 otherwiseFunc = this.harvest.bind(this, creep, {sourceIndex: 0});
             }
 
@@ -484,6 +460,7 @@ module.exports = {
                 workTarget    : opts.workTarget,
                 workFunc      : opts.workFunc,
                 otherwiseFunc,
+                otherwiseTarget: otherwiseTarget,
                 polarity      : 'negative'
             });
         },
@@ -531,14 +508,17 @@ module.exports = {
         //         //get from harvesters
         //     }
         // },
-        depositEnergyForSpawning(creep){
-            return this.giveEnergyToBestRecipient(creep, {
+        getBestRecipientForSpawning(creep){
+            return this.getBestEnergyRecipient(creep, {
                 allowStructures  : true,
                 allowTowers      : false,
                 allowStorage     : false,
                 allowLink        : false,
                 creepTypes       : [] 
             });
+        },
+        depositEnergyForSpawning(creep){
+            return this.giveEnergyToRecipient(creep, this.getBestRecipientForSpawning(creep));
         },
         depositEnergyForWork(creep){
             return this.giveEnergyToBestRecipient(creep, {

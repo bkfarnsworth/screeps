@@ -68,6 +68,7 @@ class Carrier extends Worker {
             if(harvesterWithEnergy){
                 util.doWorkOtherwise(creep, {
                     workTarget    : harvesterWithEnergy,
+                    otherwiseTarget : lockedTarget,
                     workFunc      : util.getEnergyFromRoomObject.bind(util, creep, harvesterWithEnergy),
                     otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, lockedTarget),
                     polarity      : 'positive'
@@ -77,6 +78,7 @@ class Carrier extends Worker {
                 if(storage){
                     util.doWorkOtherwise(this.creep, {
                         workTarget    : storage,
+                        otherwiseTarget : lockedTarget,
                         workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
                         otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, lockedTarget),
                         polarity      : 'positive'
@@ -91,19 +93,23 @@ class Carrier extends Worker {
         // if(!super.doIncompleteStatusWork()){
             var storage = util.getClosestStorageWithEnergy(this.creep);
 
+            var bestEnergyRecipientForSpawning = this.getBestRecipientForSpawning(this.creep);
+
             //get energy from storage if there IS energy in storage.  other wise we just need to get energy from harvesters
             if(storage){
                 util.doWorkOtherwise(this.creep, {
                     workTarget    : storage,
+                    otherwiseTarget : bestEnergyRecipientForSpawning,
                     workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
-                    otherwiseFunc : util.depositEnergyForSpawning.bind(util, this.creep),
+                    otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
                     polarity      : 'positive'
                 });
             }else{
                 util.doWorkOtherwise(this.creep, {
                     workTarget    : harvesterToCollectFrom,
+                    otherwiseTarget : bestEnergyRecipientForSpawning,
                     workFunc      : util.getEnergyFromRoomObject.bind(util, this.creep, harvesterToCollectFrom),
-                    otherwiseFunc : util.depositEnergyForSpawning.bind(util, this.creep),
+                    otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
                     polarity      : 'positive'
                 });
             }

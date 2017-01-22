@@ -1,190 +1,92 @@
+var GetEnergyUtil = require('GetEnergyUtil');
+
+var debugMode = false;
+
+/*
+   known limitations:
+      The static methods won't take into account neighbors
+         I could make this where instead of passing in the best target, we have helpers that just know to get energy, and they pass in all possiblitiies
+      It won't take into account if the energy will be done by the time the creep gets there
+*/
 class DistanceValueCalculator {
 
-
-
-
-   constructor(opts){
-      this.creep          = opts.creep;
-      this.workTarget     = opts.workTarget;
-      this.nonWorkTarget  = opts.nonWorkTarget;
-      this.polarity       = opts.polarity;
-      this.pathCalculator = opts.pathCalculator;
-
-
-
-
-
-
-
-
+   constructor(pathCalculator){
+      this.pathCalculator = pathCalculator;
    }
 
-   get polarityList(){
-      return [
-         {
-            type: StructureController,
-            polarity: 'negative'
-         },
-         {
-            type: Source
+   /*
+      pvo (posibilityValueObj) is like 
+      {
+         target
+         valueFunc
+      }
+   */
+   getBestDistanceValue(creep, possibilityValueObjs){
+
+      if(debugMode){
+         console.log();
+         console.log('Distance Value Report');
+         console.log('creep: ', creep);
+      }
+
+      var distanceValueObjs = possibilityValueObjs.map(pvo => {
+         var distanceValue = this.getDistanceValueForTarget(creep, pvo)
+         if(debugMode){
+            console.log('pvo.target: ', pvo.target);
+            console.log('distanceValue: ', distanceValue);
          }
-
-
-      ];
-   }
-
-
-
-
-
-   //possible targets = controller, energy sources, sources for harvesters.  you tell us what the possible is, and we will give you the distanceValue of each
-
-
-   // and make the distance value of each multipled by the distance value of nearby things.
-      //so two extensions near each other would be worth 50 * steps + 50 * incremental steps.  because it is not that much more.
-      //for now we aren't going to care about prediciting if it will be there when the creeps arrives etc.
-
-   possibilities will be an object like {
-      target: something,
-      valueFunc: () => {}
-   }
-
-
-   //valueFunc will be 
-
-   //THESE COULD ALSO BE STATIC METHODS ON THIS CLASS
-
-   //say it is a controller, you would provide a method like
-   (creep, target) => {
-      return creep.carryCapacity
-   }
-
-
-   //one problem with this algorithm is that it doesn't persist the energy needed as it looks at neighbors...known issue
-
-   //for an upgrader and a controller it would be something like
-   (creep, target) => {
-      var amountOfEnergyNeeded = creep.carryCapacity - creep.carry.energy;
-
-
-      //we want to return the amount of energy the target has, up to the amountOfEnergyNeeded
-      return amountOfEnergyNeeded < target.energy ? amountOfEnergyNeeded : target.energy;
-   }
-
-
-
-
-
-   getBestDisanceValue(creep, possibilities){
-
-
-      var bestDistanceValue = 0;
-      var bestPossibility = possibilities[0];
-
-      possibilities.forEach(p => {
-         var distanceValue = this.getDistanceValueForTarget(creep, p);
-         if(distanceValue > best){
-            bestDistanceValue = distanceValue;
-            bestPossibility = p;
+         return {
+            target: pvo.target,
+            distanceValue 
          }
       });
 
-      return bestPossibility;
+      var best = _.max(distanceValueObjs, 'distanceValue');
+      return _.get(best, 'target');
    }
 
+   getDistanceValueForTarget(creep, pvo, opts={}){
 
-   //so plaority is passed in 
+      _.defaults(opts, {
+         otherPossibilities: [],
+         alternateStartPvo: undefined,
+      });
 
-   //so if polarity is positive, it needs to treat source as positive and extensions as negative
-   //if pol is negative, it needs to treat extensions as positive and controller as negative
+      var start = opts.alternateStartPvo ? opts.alternateStartPvo.target : creep;
 
-   getDistanceValueForTarget(creep, target, otherPossibilities){
-      var distanceToTarget = this.pathCalculator(creep, target);
-      var valueOfTarget = this.getValueForTarget(creep, target);
+      var distanceToTarget = this.pathCalculator(start, pvo.target).length;
+      var valueOfTarget = pvo.valueFunc(creep, pvo.target);
 
-      var bastDistanceValue = valueOfTarget / distanceToTarget;
-
-
-      //for eacha other
-         //get the value of it
-         //get the distance from teh target to it
-         //get the distance value..if it's really far away then it will be very small, so there is no problem adding them all together
-
-         //so add that to the base, and loop again
-
-
-      return bastDistanceValue + all other relative distance values;
-   }
-
-
-
-
-
-   getValueForTarget(creep, target){
-
-      controller we need to know how much 
-
-      if(target === negative){
-         check creeps carry
+      if(debugMode){
+         console.log('distanceToTarget: ', distanceToTarget);
+         console.log('valueOfTarget: ', valueOfTarget);
       }
 
-      else
+      var baseDistanceValue = valueOfTarget / distanceToTarget;
+      var totalDistanceValue = baseDistanceValue;
 
-         check creeps carryCapacity
+      opts.otherPossibilities.forEach(op => {
+         totalDistanceValue += this.getDistanceValueForTarget(creep, op, {
+            alternateStartPos: pvo.target
+         });
+      });
 
-
-
-
-
-
+      return totalDistanceValue;
    }
 
-
-
-
-
-
-
-
-
-   creepShouldWork(){
-      return this.getDistanceValueOfWorking() > this.getDistanceValueOfNotWorking();
+   static fillUpOnEnergyValueFunc(creep, target){
+      //we want to return the amount of energy the target has, up to the amountOfEnergyNeeded
+      var targetEnergy = GetEnergyUtil.getCurrentEnergy(target);
+      var amountOfEnergyNeeded = creep.carryCapacity - creep.carry.energy;
+      return amountOfEnergyNeeded < targetEnergy ? amountOfEnergyNeeded : targetEnergy;
    }
 
-   getDistanceValueOfWorking(){
-      return this.getValueOfWorking() / this.getDistanceToWork();
-   }
-
-   getDistanceValueOfNotWorking(){
-      return this.getValueOfNotWorking() / this.getDistanceToNonWorkTarget();
-   }
-
-   getValueOfWorking(){
-      if(this.polarity === 'negative'){
-         return this.creep.carry.energy;
-      }else if(this.polarity === 'positive'){
-         return this.creep.carryCapacity - this.creep.carry.energy
-      }
-   }
-
-   getValueOfNotWorking(){
-      if(this.polarity === 'negative'){
-         return this.creep.carryCapacity - this.creep.carry.energy
-      }else if(this.polarity === 'positive'){
-         return this.creep.carry.energy
-      }
-   }
-
-   getDistanceToWork(){
-      return this.getDistanceToTarget(this.workTarget);
-   }
-
-   getDistanceToNonWorkTarget(){
-      return this.getDistanceToTarget(this.nonWorkTarget);
-   }
-
-   getDistanceToTarget(target){
-      return this.pathCalculator(this.creep, target);
+   static giveEnergyValueFunc(creep, target){
+      //we want to return the amount of energy the target can actually take
+      var targetEnergy = GetEnergyUtil.getCurrentEnergy(target);
+      var targetCapacity = GetEnergyUtil.getEnergyCapacity(target);
+      var capacityToReceive = targetCapacity - targetEnergy;
+      return capacityToReceive < creep.carry.energy ? capacityToReceive : creep.carry.energy;
    }
 }
 

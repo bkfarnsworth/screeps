@@ -28,57 +28,75 @@ class Harvester extends Worker{
 
 		if(status === 'complete'){
 			if(!super.doWork()){
-
-				var depositFunc;
-
-				if(creep.room.energyAvailable < creep.room.energyCapacityAvailable){
-					depositFunc = util.giveEnergyToBestRecipient.bind(util, creep, {
-						allowStructures  : true,
-						allowTowers      : false,
-						allowStorage     : false,
-						allowLink        : false,
-						creepTypes       : [] 
-					});
-				}else{
-					depositFunc = util.depositEnergyForWork.bind(util, creep)
-				}
-
-				util.doWorkOtherwise(creep, {
-					workTarget    : this.source,
-					workFunc      : util.harvest.bind(util, creep, creepOpts),
-					otherwiseFunc : depositFunc,
-					polarity      : 'positive'
-				});
+				this.harvestThenDepositForWorkers();
 			}
 		}else{
 			this.doIncompleteStatusWork();
 		}
-
 	}
 
 	doIncompleteStatusWork(){
 		var creep = this.creep;
 		var creepOpts = this.creepOpts;
-		// if(!super.doIncompleteStatusWork()){
-			//get energy from storage if there IS energy in storage.  other wise we just need to harvest
-			var storage = util.getClosestStorageWithEnergy(this.creep);
+		var storage = util.getClosestStorageWithEnergy(this.creep);
+		if(storage){
+			this.getEnergyFromStorageThenDepositEnergyForSpawning(storage);
+		}else{
+			this.harvestThenDepositForSpawning();
+		}
+	}
 
-			if(storage){
-				util.doWorkOtherwise(creep, {
-					workTarget    : storage,
-					workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
-					otherwiseFunc : util.depositEnergyForSpawning.bind(util, this.creep),
-					polarity      : 'positive'
-				});
-			}else{
-				util.doWorkOtherwise(creep, {
-					workTarget    : this.source,
-					workFunc      : util.harvest.bind(util, creep, creepOpts),
-					otherwiseFunc : util.depositEnergyForSpawning.bind(util, this.creep),
-					polarity      : 'positive'
-				});
-			}
-		// }
+	harvestThenDepositForWorkers(){
+		var creep = this.creep;
+		var creepOpts = this.creepOpts;
+
+      var bestEnergyRecipientForSpawning = util.getBestRecipientForSpawning(this.creep);
+      var bestEnergyRecipientForWork = util.getBestEnergyRecipient(this.creep);
+
+		if(creep.room.energyAvailable < creep.room.energyCapacityAvailable){
+			util.doWorkOtherwise(creep, {
+				workTarget    : this.source,
+				workFunc      : util.harvest.bind(util, creep, creepOpts),
+				otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipientForSpawning),
+				otherwiseTarget: bestEnergyRecipientForSpawning,
+				polarity      : 'positive'
+			});
+		}else{
+			util.doWorkOtherwise(creep, {
+				workTarget    : this.source,
+				workFunc      : util.harvest.bind(util, creep, creepOpts),
+				otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipientForWork),
+				otherwiseTarget: bestEnergyRecipientForWork,
+				polarity      : 'positive'
+			});
+		}
+	}
+
+	getEnergyFromStorageThenDepositEnergyForSpawning(storage){
+		var creep = this.creep;
+      var bestEnergyRecipientForSpawning = util.getBestRecipientForSpawning(this.creep);
+		util.doWorkOtherwise(creep, {
+			workTarget    : storage,
+			workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
+			otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
+			otherwiseTarget: bestEnergyRecipientForSpawning,
+			polarity      : 'positive'
+		});
+	}
+
+	harvestThenDepositForSpawning(){
+
+      var bestEnergyRecipientForSpawning = util.getBestRecipientForSpawning(this.creep);
+
+		var creep = this.creep;
+		var creepOpts = this.creepOpts;
+		util.doWorkOtherwise(creep, {
+			workTarget    : this.source,
+			workFunc      : util.harvest.bind(util, creep, creepOpts),
+			otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
+			otherwiseTarget: bestEnergyRecipientForSpawning,
+			polarity      : 'positive'
+		});
 	}
 }
 

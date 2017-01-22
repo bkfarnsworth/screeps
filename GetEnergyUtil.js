@@ -7,7 +7,7 @@ class GetEnergyUtil {
       }else if(target instanceof Creep){
          currentEnergy = 'carry[' + RESOURCE_ENERGY + ']';
       }else if(target instanceof Resource){
-         currentEnergy = target.amount;
+         currentEnergy = 'amount';
       }else{
          currentEnergy = 'energy';
       }
@@ -23,7 +23,7 @@ class GetEnergyUtil {
       }else if(target instanceof Creep){
          energyCapacity = 'carryCapacity';
       }else if(target instanceof Resource){
-         energyCapacity = target.amount;//for dropped resources, it's always 100% of what it is
+         energyCapacity = 'amount';//for dropped resources, it's always 100% of what it is
       }else{
          energyCapacity = 'energyCapacity';
       }
