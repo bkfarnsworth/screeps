@@ -158,8 +158,14 @@ module.exports = {
             });
         },
         getClosestDroppedEnergy: function(creep, filter=this.returnAllFilter){
-            return creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, {
-                filter: filter
+
+            //HACK BECAUSE FOR SOME REASON IT WAS LETTING ME CALCULATE PATHS TO OUTSIDE MY WALLS
+            newFilter = (e) => {
+                return filter(e) && e.pos.x !== 1
+            }
+
+            return creep.pos.findClosestByPathUsingCache(FIND_DROPPED_ENERGY, {
+                filter: newFilter
             });
         },
         getClosestCreep: function(creep, opts={}){

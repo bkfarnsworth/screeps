@@ -30,7 +30,7 @@ class E57N86RoomController extends RoomController {
          var clone = _.clone(this.standardCreepTypes.upgrader);
          return _.extend(clone, {
             extraTask: {
-               condition: this.tower.energy < this.tower.energyCapacity * 0.7,
+               condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
                work: this.useUpgraderToFillTower.bind(this)
             }
          });
@@ -89,8 +89,20 @@ class E57N86RoomController extends RoomController {
       return opts.map(obj => super.createCreepType(obj));
    }
 
-   get tower(){
+   get tower1(){
       return Game.structures['587db205bc1d5f961f75421c'];
+   }
+
+   get tower2(){
+      return Game.structures['5883ccf09d596dcc20aca8fe'];
+   }
+
+   get towers(){
+      return [this.tower1, this.tower2];
+   }
+
+   towerNeedsEnergy(tower){
+      return tower.energy < tower.energyCapacity * 0.7;
    }
 
    runLinks(){
@@ -99,15 +111,20 @@ class E57N86RoomController extends RoomController {
 
    runTowers(){
       if(_.random(1, 3) === 3 || this.roomIsUnderAttack()){
-         Tower(this.tower);
+         Tower(this.tower1);
+      }
+
+      if(this.roomIsUnderAttack()){
+         Tower(this.tower2);
       }
    }
 
    useUpgraderToFillTower(creep){
+      var towerWithLeast = _.min(this.towers, 'energy');
       util.doWorkOrGatherEnergy(creep, {
          status: this.status,
-         workTarget: this.tower,
-         workFunc: util.giveEnergyToRecipient.bind(util, creep, this.tower)
+         workTarget: towerWithLeast,
+         workFunc: util.giveEnergyToRecipient.bind(util, creep, towerWithLeast)
       });
    }
 }
