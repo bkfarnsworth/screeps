@@ -54,7 +54,10 @@ class E57N86RoomController extends RoomController {
          }),
          _.extend(upgrader(), {name: 'upgrader1'}),
          _.extend(builder(),  {name: 'builder1'}),
-         _.extend(repairer(), {name: 'repairer1'}),
+         _.extend(repairer(), {
+            name: 'repairer1  ',
+            condition: this.roomIsUnderAttack()
+         }),
          _.extend(upgrader(), {name: 'upgrader2' }),
          _.extend(builder(),  {name: 'builder2'}),
          _.extend(upgrader(), {name: 'upgrader3' }),
@@ -105,10 +108,6 @@ class E57N86RoomController extends RoomController {
       return tower.energy < tower.energyCapacity * 0.7;
    }
 
-   runLinks(){
-
-   }
-
    runTowers(){
       if(_.random(1, 3) === 3 || this.roomIsUnderAttack()){
          Tower(this.tower1);
@@ -126,6 +125,18 @@ class E57N86RoomController extends RoomController {
          workTarget: towerWithLeast,
          workFunc: util.giveEnergyToRecipient.bind(util, creep, towerWithLeast)
       });
+   }
+
+   get westLink(){
+      return Game.structures['5883e591435d078c5a036fd1'];
+   }
+
+   get centralLink(){
+      return Game.structures['5883d0e3443baf673cd0d1d3'];
+   }
+
+   runLinks(){
+      this.centralLink.transferEnergy(this.westLink);
    }
 }
 
