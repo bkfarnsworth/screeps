@@ -58,10 +58,10 @@ class E57N86RoomController extends RoomController {
             name: 'repairer1  ',
             condition: this.roomIsUnderAttack()
          }),
-         _.extend(upgrader(), {name: 'upgrader2' }),
-         _.extend(builder(),  {name: 'builder2'}),
-         _.extend(upgrader(), {name: 'upgrader3' }),
-         _.extend(upgrader(), {name: 'upgrader4' }),
+         // _.extend(upgrader(), {name: 'upgrader2' }),
+         // _.extend(builder(),  {name: 'builder2'}),
+         // _.extend(upgrader(), {name: 'upgrader3' }),
+         // _.extend(upgrader(), {name: 'upgrader4' }),
 
          //for now, instead of attackers, let's just strengthen the wall a ton if we are under attack
          _.extend(repairer(), {
