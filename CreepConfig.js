@@ -1,6 +1,6 @@
 var util = require('util')
 
-function CreepType(opts={}){
+function CreepConfig(opts={}){
 
     _.defaults(opts, {
         condition: true,
@@ -12,7 +12,7 @@ function CreepType(opts={}){
     return this;
 }
 
-CreepType.prototype.getMatchingCreeps = function(){
+CreepConfig.prototype.getMatchingCreeps = function(){
 
     var roleFilter = (creep) => {
         return creep.memory.role == this.role 
@@ -26,15 +26,15 @@ CreepType.prototype.getMatchingCreeps = function(){
 }
 
 // Spawn time = 3 ticks per each body part
-CreepType.prototype.ticksToSpawn = function(){
+CreepConfig.prototype.ticksToSpawn = function(){
     return this.bodyParts.length * 3;
 }
 
-CreepType.prototype.isSpawning = function() {
+CreepConfig.prototype.isSpawning = function() {
     return this.getMatchingCreeps().length && this.getMatchingCreeps()[0].spawning;
 };
 
-CreepType.prototype.needsSpawning = function() {
+CreepConfig.prototype.needsSpawning = function() {
     var needsSpawning;
 
     if(!this.condition){
@@ -57,9 +57,9 @@ CreepType.prototype.needsSpawning = function() {
     return needsSpawning;
 };
 
-CreepType.prototype.getEnergyRequired = function() {
+CreepConfig.prototype.getEnergyRequired = function() {
     var bodyPartEnergyMap = util.bodyPartEnergyMap;
     return _.sum(this.bodyParts.map(bp => bodyPartEnergyMap[bp.toString().toUpperCase()]));
 };
 
-module.exports = CreepType;
+module.exports = CreepConfig;

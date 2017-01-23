@@ -7,7 +7,7 @@ var healer = require('Healer')
 var Builder = require('Builder')
 var Repairer = require('Repairer')
 var Carrier = require('Carrier')
-var CreepType = require('CreepType');
+var CreepConfig = require('CreepConfig');
 var Worker = require('Worker');
 var Tower = require('Tower');
 var BodyPartEffectCalculator = require('BodyPartEffectCalculator');
@@ -46,84 +46,118 @@ class RoomController {
 		console.log(opts.throttle ? 'throttled' : 'NOT throttled')
 	}
 
-	get standardCreepTypes(){
-		return {
-			backUpHarvester: {
-				name: 'backUpHarvester',
-				role: 'harvester',    
-				condition: this.getHarvesters().length === 0, 
-				stopOperation: true,
-				bodyParts: util.getBodyPartsArray({
-					WORK: 1,
-					MOVE: 1,
-					CARRY: 1
-				})
-			},
-			harvester: {
-				role: 'harvester',          
-				stopOperation: true,
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 1,
-					movePercent  : 1/6,
-					carryPercent : 1/6,
-					workPercent  : 2/3
-				})
-			},
-			guard: { 
-				role: 'guard',          
-				stopOperation: true,
-				condition: this.roomIsUnderAttack(),
-				// bodyParts: util.getBodyPartsArray({
-				// 	TOUGH: 3,
-				// 	MOVE: 3,
-				// 	ATTACK: 3
-				// })
-			},
-			upgrader: {
-				role: 'upgrader',
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 1,
-					movePercent  : 1/3,
-					carryPercent : 1/3,
-					workPercent  : 1/3
-				})
-			},
-			repairer: {
-				role: 'repairer',
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 1,
-					movePercent  : 1/3,
-					carryPercent : 1/3,
-					workPercent  : 1/3
-				})
-			},
-			builder: {
-				role: 'builder',            
-				condition: this.getMyConstructionSites().length > 0,
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 1,
-					movePercent  : 1/3,
-					carryPercent : 1/3,
-					workPercent  : 1/3
-				})
-			},
-			carrier: {
-				role: 'carrier',
-				bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
-					percentOfSpawningPotential: 1,
-					movePercent  : 0.5,
-					carryPercent : 0.5
-				})
-			},
-			demoman: {
-				role: 'demoman',
-				bodyParts: util.getBodyPartsArray({
-					WORK: 4,
-					MOVE: 4,
-					CARRY: 4
-				})
-			}
-		}
+	getBackUpHarvesterConfig(creepConfig={}, opts={}){
+
+		_.defaults(opts, {
+
+		});
+
+		return _.defaults(creepConfig, {
+			name: 'backUpHarvester',
+			role: 'harvester',
+			condition: this.getHarvesters().length === 0, 
+			stopOperation: true,
+			bodyParts: util.getBodyPartsArray({
+				WORK: 1,
+				MOVE: 1,
+				CARRY: 1
+			})
+		})
+	}
+
+	getHarvesterConfig(creepConfig={}, opts={}){
+
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'harvester',          
+			stopOperation: true,
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/6,
+				carryPercent : 1/6,
+				workPercent  : 2/3
+			})
+		})
+	}
+
+	getUpgraderConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'upgrader',
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/3,
+				carryPercent : 1/3,
+				workPercent  : 1/3
+			})
+		})
+	}
+
+	getRepairerConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'repairer',
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/3,
+				carryPercent : 1/3,
+				workPercent  : 1/3
+			})
+		})
+	}
+
+	getBuilderConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'builder',
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/3,
+				carryPercent : 1/3,
+				workPercent  : 1/3
+			})
+		})
+	}
+
+	getCarrierConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'carrier',
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 0.5,
+				carryPercent : 0.5
+			})
+		})
+	}
+
+	getDemomanConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'demoman',
+			bodyParts: util.getBodyPartsArray({
+				WORK: 4,
+				MOVE: 4,
+				CARRY: 4
+			})
+		})
 	}
 
 	get room(){
@@ -134,12 +168,12 @@ class RoomController {
 		throw new Error('Must be overwritten')
 	}
 
-	get creepTypes(){
+	get creepConfigs(){
 		throw new Error('Must be overwritten')
 	}
 
-	get creepTypesByName(){
-	   return _.indexBy(this.creepTypes, 'name');
+	get creepConfigsByName(){
+	   return _.indexBy(this.creepConfigs, 'name');
 	}
 
 	runLinks(){
@@ -159,8 +193,8 @@ class RoomController {
 
 	setRoomStatus(){
 		var spawningEnergyRatio = 1;
-		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
-		var isPriorityCreep = nextCreepTypeToSpawn && nextCreepTypeToSpawn.stopOperation;
+		var nextCreepConfigToSpawn = this.getNextCreepConfigToSpawn();
+		var isPriorityCreep = nextCreepConfigToSpawn && nextCreepConfigToSpawn.stopOperation;
 		var spawningEnergyNotFull = this.getEnergyAvailableForSpawning() < this.getEnergyCapacityForSpawning() * spawningEnergyRatio;
 
 		// if(isPriorityCreep || spawningEnergyNotFull){
@@ -172,16 +206,16 @@ class RoomController {
 	}
 
 	printCreeps(){
-		this.creepTypes.forEach(creepType => {
-			if(creepType.isSpawning()){
-				util.printWithSpacing(creepType.name + ': Spawning (' + creepType.getEnergyRequired() + ')');
-			}else if(creepType.needsSpawning() && creepType.condition){
-				util.printWithSpacing(creepType.name + ': Queued (' + creepType.getEnergyRequired() + ')');
-			}else if(!creepType.condition){
-				util.printWithSpacing(creepType.name + ': Condition not met (' + creepType.getEnergyRequired() + ')');
-			}else if(!creepType.needsSpawning()){
-				var timeToDeath = creepType.getMatchingCreeps()[0].ticksToLive;
-				util.printWithSpacing(creepType.name + ': ' + timeToDeath + ' (' + creepType.getEnergyRequired() + ')');
+		this.creepConfigs.forEach(creepConfig => {
+			if(creepConfig.isSpawning()){
+				util.printWithSpacing(creepConfig.name + ': Spawning (' + creepConfig.getEnergyRequired() + ')');
+			}else if(creepConfig.needsSpawning() && creepConfig.condition){
+				util.printWithSpacing(creepConfig.name + ': Queued (' + creepConfig.getEnergyRequired() + ')');
+			}else if(!creepConfig.condition){
+				util.printWithSpacing(creepConfig.name + ': Condition not met (' + creepConfig.getEnergyRequired() + ')');
+			}else if(!creepConfig.needsSpawning()){
+				var timeToDeath = creepConfig.getMatchingCreeps()[0].ticksToLive;
+				util.printWithSpacing(creepConfig.name + ': ' + timeToDeath + ' (' + creepConfig.getEnergyRequired() + ')');
 			}
 		});
 	}
@@ -223,21 +257,21 @@ class RoomController {
 		return this.room.find(FIND_MY_CONSTRUCTION_SITES);
 	}
 
-	createCreepType(opts={}){
+	createCreepConfig(opts={}){
 		opts.assignedRoom = this.room.name;
 
 		if(!opts.name.includes(this.room.name)){
 			opts.name = opts.name + '(' + this.room.name + ')';
 		}
-		return new CreepType(opts);
+		return new CreepConfig(opts);
 	}
 
 	runCreeps(){
 		var seeCPU = false;
 		var tempCpuUsed = Game.cpu.getUsed();
 		this.getMyCreeps().forEach(creep => {
-			var creepType = this.creepTypesByName[creep.name];
-			this.runCreep(creep, creepType);
+			var creepConfig = this.creepConfigsByName[creep.name];
+			this.runCreep(creep, creepConfig);
 			if(seeCPU){
 				console.log('creep.memory.role: ', creep.memory.role);
 				console.log('CPU used: ' + _.round(Game.cpu.getUsed() - tempCpuUsed, 2));
@@ -246,7 +280,7 @@ class RoomController {
 		});
 	}
 
-	runCreep(creep, creepType){
+	runCreep(creep, creepConfig){
 
 		// if(util.runFromInvader(creep)){
 		// 	return;
@@ -255,46 +289,46 @@ class RoomController {
 		var worker = new Worker(creep); 
 
 		if(creep.memory.role == 'carrier') {
-			worker = new Carrier(creep, creepType);
+			worker = new Carrier(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'harvester') {
-			worker = new Harvester(creep, creepType);
+			worker = new Harvester(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'upgrader') {
 			if(this.roomIsUnderAttack()){
-				worker = new Repairer(creep, creepType);
+				worker = new Repairer(creep, creepConfig);
 			}else{
-				worker = new Upgrader(creep, creepType);
+				worker = new Upgrader(creep, creepConfig);
 			}
 		}
 
 		if(creep.memory.role == 'repairer') {
 			if(this.roomIsUnderAttack()){
-				worker = new Repairer(creep, creepType);
+				worker = new Repairer(creep, creepConfig);
 			}else{
-				worker = new Upgrader(creep, creepType);
+				worker = new Upgrader(creep, creepConfig);
 			}
 		}
 
 		if(creep.memory.role == 'guard') {
-			worker = new Guard(creep, creepType);
+			worker = new Guard(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'demoman') {
-			worker = new Demoman(creep, creepType);
+			worker = new Demoman(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'builder') {
-			worker = new Builder(creep, creepType);
+			worker = new Builder(creep, creepConfig);
 		}
 
 		worker.doWork(this.status);
 	}
 
-	getNextCreepTypeToSpawn(){
-		var creepsThatNeedSpawning = this.creepTypes.filter(creepType => creepType.needsSpawning());
+	getNextCreepConfigToSpawn(){
+		var creepsThatNeedSpawning = this.creepConfigs.filter(creepConfig => creepConfig.needsSpawning());
 		//spawn the top priority one, else if spawning, do the next highest one
 		var creepToSpawn;
 		if(this.spawn.spawning){
@@ -307,35 +341,35 @@ class RoomController {
 
 
 	spawnCreeps(){
-		var nextCreepTypeToSpawn = this.getNextCreepTypeToSpawn();
-		if(nextCreepTypeToSpawn){
-			this.spawnCreep(nextCreepTypeToSpawn);
+		var nextCreepConfigToSpawn = this.getNextCreepConfigToSpawn();
+		if(nextCreepConfigToSpawn){
+			this.spawnCreep(nextCreepConfigToSpawn);
 		}
 	}
 
-	spawnCreep(creepTypeToSpawn){
-		if(creepTypeToSpawn){
-			console.log('Next creep to be spawned: ', creepTypeToSpawn.role);
+	spawnCreep(creepConfigToSpawn){
+		if(creepConfigToSpawn){
+			console.log('Next creep to be spawned: ', creepConfigToSpawn.role);
 		}else{
 			console.log('All Screeps are spawned!');
 			return;
 		}
 
-		var creepName = creepTypeToSpawn.name;
-		var energyRequired = creepTypeToSpawn.getEnergyRequired();
+		var creepName = creepConfigToSpawn.name;
+		var energyRequired = creepConfigToSpawn.getEnergyRequired();
 		var memoryOpts = {
-			role: creepTypeToSpawn.role,
-			assignedRoom: creepTypeToSpawn.assignedRoom
+			role: creepConfigToSpawn.role,
+			assignedRoom: creepConfigToSpawn.assignedRoom
 		}
 
-		var assignedSpawn = util.getSpawnForRoom(creepTypeToSpawn.assignedRoom);
+		var assignedSpawn = util.getSpawnForRoom(creepConfigToSpawn.assignedRoom);
 
 		//we already put a default else where
 		if(!assignedSpawn){
 			assignedSpawn = util.getSpawnForRoom(util.northRoomName);
 		}
 
-		var errCode = assignedSpawn.createCreep(creepTypeToSpawn.bodyParts, creepName, memoryOpts);
+		var errCode = assignedSpawn.createCreep(creepConfigToSpawn.bodyParts, creepName, memoryOpts);
 
 		if(errCode === ERR_NAME_EXISTS){
 			//then delete it from memory

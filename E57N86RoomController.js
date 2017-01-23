@@ -17,90 +17,83 @@ class E57N86RoomController extends RoomController {
       return Game.spawns.Spawn1;
    }
 
-   get creepTypes(){
+   getHarvesterConfig(creepConfig={}, opts={}){
+      _.defaults(opts, {
+      });
 
-      //I'm not sure why this are all anon functions, but I think I had to for some reason
-      let backUpHarvester = () => _.clone(this.standardCreepTypes.backUpHarvester);
-      let guard = () => _.clone(this.standardCreepTypes.guard);
-      let builder = () => _.clone(this.standardCreepTypes.builder);
-      let carrier = () => _.clone(this.standardCreepTypes.carrier);
-      let demoman = () => _.clone(this.standardCreepTypes.demoman);
+      _.defaults(creepConfig, {
+         extraTask: {
+            condition: this.thereIsDroppedEnergy(),
+            work: this.useHarvesterToGetDroppedEnergy.bind(this)
+         }
+      });
 
-      let harvester = () => {
-         var clone = _.clone(this.standardCreepTypes.harvester);
-         return _.extend(clone, {
-            extraTask: {
-               condition: this.thereIsDroppedEnergy(),
-               work: this.useHarvesterToGetDroppedEnergy.bind(this)
-            }
-         });
-      }
+      return super.getHarvesterConfig(creepConfig, opts);
+   }
 
-      //EVEN THOUGH THE CREEPS ARE MORE EFFECIENT AT REPAIRING, WE WANT TO REPAIR AS MANY POINTS AS WE CAN PER TICK
-      let upgrader = () => {
-         var clone = _.clone(this.standardCreepTypes.upgrader);
-         return _.extend(clone, {
-            extraTask: {
-               condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
-               work: this.useCreepToFillTower.bind(this)
-            }
-         });
-      }
+   getUpgraderConfig(creepConfig={}, opts={}){
+      _.defaults(opts, {
+      });
 
-      let repairer = () => {
-         var clone = _.clone(this.standardCreepTypes.repairer);
-         return _.extend(clone, {
-            extraTask: {
-               condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
-               work: this.useCreepToFillTower.bind(this)
-            }
-         });
-      }
+      _.defaults(creepConfig, {
+         //EVEN THOUGH THE CREEPS ARE MORE EFFECIENT AT REPAIRING, WE WANT TO REPAIR AS MANY POINTS AS WE CAN PER TICK
+         extraTask: {
+            condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
+            work: this.useCreepToFillTower.bind(this)
+         }
+      })
 
-      var opts = [ 
-         _.extend(backUpHarvester(), {name: 'backUpHarvester'}),
-         _.extend(harvester(), {
+      return super.getUpgraderConfig(creepConfig, opts);
+   }
+
+   getRepairerConfig(creepConfig={}, opts={}){
+      _.defaults(opts, {
+      });
+
+      _.defaults(creepConfig, {
+         extraTask: {
+            condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
+            work: this.useCreepToFillTower.bind(this)
+         }
+      })
+
+      return super.getRepairerConfig(creepConfig, opts);
+   }
+
+   get creepConfigs(){
+
+      var creepConfigs = [ 
+         this.getBackUpHarvesterConfig({name: 'backUpHarvester'}),
+         this.getHarvesterConfig({
             name: 'harvester1'
          }),
-         _.extend(harvester(), {
+         this.getHarvesterConfig({
             name: 'harvester2',
             sourceIndex: 1
          }),
-         _.extend(harvester(), {
+         this.getHarvesterConfig({
             name: 'harvester3',
             sourceIndex: 1
          }),
-         _.extend(upgrader(), {name: 'upgrader1'}),
-         _.extend(builder(),  {name: 'builder1'}),
-         _.extend(demoman(),  {name: 'demoman1'}),
-         _.extend(repairer(), {
+         this.getUpgraderConfig({name: 'upgrader1'}),
+         this.getBuilderConfig({name: 'builder1'}),
+         this.getDemomanConfig({name: 'demoman1'}),
+         this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
          }),
-         // _.extend(upgrader(), {name: 'upgrader2' }),
-         // _.extend(builder(),  {name: 'builder2'}),
-         // _.extend(upgrader(), {name: 'upgrader3' }),
-         // _.extend(upgrader(), {name: 'upgrader4' }),
-
-         //for now, instead of attackers, let's just strengthen the wall a ton if we are under attack
-         _.extend(repairer(), {
+         this.getRepairerConfig({
             name: 'repairer2',
             condition: this.roomIsUnderAttack()
          }),
-
-
-         // _.extend(carrier(), {
-         //    name: 'carrier1'
-         // })
-
          //cheap builder
-         // _.extend(builder(),  {
+         // this.getBuilderConfig(builder(),  {
          //    name: 'builder1',
          //    bodyParts: [WORK, MOVE, CARRY]
          // }),
       ]
 
-      return opts.map(obj => super.createCreepType(obj));
+      return creepConfigs.map(obj => super.createCreepConfig(obj));
    }
 
    get tower1(){

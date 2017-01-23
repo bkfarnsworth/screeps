@@ -773,8 +773,8 @@ module.exports = {
                 TOP_LEFT,
             ];
         },
-        creepIsAboutToDie(creep, creepType){
-            return creep.ticksToLive <= creepType.ticksToSpawn();
+        creepIsAboutToDie(creep, creepConfig){
+            return creep.ticksToLive <= creepConfig.ticksToSpawn();
         },
         throwIfMissing(prop, propName) {
             if(_.isUndefined(prop)){

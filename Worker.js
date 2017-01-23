@@ -1,5 +1,5 @@
 var util = require('util')
-var CreepType = require('CreepType');
+var CreepConfig = require('CreepConfig');
 
 class Worker {
 
