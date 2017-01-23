@@ -19,6 +19,7 @@ class E57N86RoomController extends RoomController {
 
    getHarvesterConfig(creepConfig={}, opts={}){
       _.defaults(opts, {
+         percentOfSpawningPotential: 0.7
       });
 
       _.defaults(creepConfig, {
