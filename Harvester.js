@@ -75,13 +75,15 @@ class Harvester extends Worker{
 	getEnergyFromStorageThenDepositEnergyForSpawning(storage){
 		var creep = this.creep;
       var bestEnergyRecipientForSpawning = util.getBestRecipientForSpawning(this.creep);
-		util.doWorkOtherwise(creep, {
-			workTarget    : storage,
-			workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
-			otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
-			otherwiseTarget: bestEnergyRecipientForSpawning,
-			polarity      : 'positive'
-		});
+      if(bestEnergyRecipientForSpawning){
+			util.doWorkOtherwise(creep, {
+				workTarget    : storage,
+				workFunc      : util.getEnergyFromStorage.bind(util, this.creep),
+				otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
+				otherwiseTarget: bestEnergyRecipientForSpawning,
+				polarity      : 'positive'
+			});
+      }
 	}
 
 	harvestThenDepositForSpawning(){
