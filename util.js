@@ -539,14 +539,18 @@ module.exports = {
         },
         harvest(creep, opts){
 
-            _.defaults(opts, {
-                sourceIndex: 0,
-            });
+            if(!_.isUndefined(opts.source) && !_.isUndefined(opts.sourceIndex)){
+                throw new Error('source and sourceIndex provided');
+            }
 
-            var sources = creep.room.find(FIND_SOURCES);
-            var errCode = creep.harvest(sources[opts.sourceIndex]);
+            if(opts.sourceIndex){
+                var sources = creep.room.find(FIND_SOURCES);
+                opts.source = sources[opts.sourceIndex];
+            }   
+
+            var errCode = creep.harvest(opts.source);
             if(errCode === ERR_NOT_IN_RANGE || errCode === ERR_NOT_ENOUGH_RESOURCES) {
-                creep.moveToUsingCache(sources[opts.sourceIndex]);
+                creep.moveToUsingCache(opts.source);
             } 
         },
         getCreepsOfType: function(types=[], room){

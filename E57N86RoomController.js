@@ -69,8 +69,7 @@ class E57N86RoomController extends RoomController {
             name: 'harvester1'
          }),
          this.getHarvesterConfig({
-            name: 'harvester2',
-            sourceIndex: 1
+            name: 'harvester2'
          }),
          this.getHarvesterConfig({
             name: 'harvester3',

@@ -18,6 +18,12 @@ class Harvester extends Worker{
 		}else{
 			var sources = this.creep.room.find(FIND_SOURCES);
 			this._source = sources[this.creepOpts.sourceIndex];
+
+			//if this source is empty, use the other source if there is one
+			if(this._source.energy === 0){
+				this._source = sources.find(s => s.id !== this._source.id) || this._source;
+			}
+
 			return this._source; 
 		}
 	}
@@ -56,7 +62,7 @@ class Harvester extends Worker{
 		if(creep.room.energyAvailable < creep.room.energyCapacityAvailable){
 			util.doWorkOtherwise(creep, {
 				workTarget    : this.source,
-				workFunc      : util.harvest.bind(util, creep, creepOpts),
+				workFunc      : util.harvest.bind(util, creep, {source: this.source}),
 				otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipientForSpawning),
 				otherwiseTarget: bestEnergyRecipientForSpawning,
 				polarity      : 'positive'
@@ -64,7 +70,7 @@ class Harvester extends Worker{
 		}else{
 			util.doWorkOtherwise(creep, {
 				workTarget    : this.source,
-				workFunc      : util.harvest.bind(util, creep, creepOpts),
+				workFunc      : util.harvest.bind(util, creep, {source: this.source}),
 				otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipientForWork),
 				otherwiseTarget: bestEnergyRecipientForWork,
 				polarity      : 'positive'
@@ -94,7 +100,7 @@ class Harvester extends Worker{
 		var creepOpts = this.creepOpts;
 		util.doWorkOtherwise(creep, {
 			workTarget    : this.source,
-			workFunc      : util.harvest.bind(util, creep, creepOpts),
+			workFunc      : util.harvest.bind(util, creep, {source: this.source}),
 			otherwiseFunc : util.giveEnergyToRecipient.bind(util, this.creep, bestEnergyRecipientForSpawning),
 			otherwiseTarget: bestEnergyRecipientForSpawning,
 			polarity      : 'positive'
