@@ -21,7 +21,7 @@ function repair(tower){
         var hitsBelowStructureMax = struct.hits < struct.hitsMax - 800;
         var hitsBelowSpecifiedMax = struct.hits < maxHits;
 
-        return hitsBelowStructureMax && hitsBelowSpecifiedMax;
+        return hitsBelowStructureMax && hitsBelowSpecifiedMax && struct !== util.getHarvestWall(tower.room);
     };
 
     var structures = tower.room.find(FIND_STRUCTURES, {

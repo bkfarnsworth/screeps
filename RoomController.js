@@ -114,6 +114,14 @@ class RoomController {
 					movePercent  : 0.5,
 					carryPercent : 0.5
 				})
+			},
+			demoman: {
+				role: 'demoman',
+				bodyParts: util.getBodyPartsArray({
+					WORK: 4,
+					MOVE: 4,
+					CARRY: 4
+				})
 			}
 		}
 	}

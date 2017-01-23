@@ -14,6 +14,9 @@ module.exports = {
         room1: Game.rooms['E57N86'],
         milesUsername: 'Nephite135',
         dcn: 'superHarvester(E77S47)',//debugCreepName
+        getHarvestWall(room){
+            return room.find(FIND_STRUCTURES).find(s => s.id === '587bfd3b4b6494df253b4f21');
+        },
         findMyCreeps: function(filterObj){
             return _.values(Game.creeps).filter(filterObj.filter);
         },
@@ -404,28 +407,30 @@ module.exports = {
                 //positive means doing work gains energy, eg harvesters
                 //negative means doing work loses energy, eg upgraders
                 polarity        : 'positive',
+                workValueFunc   : (creep, target) => {
+                    if(opts.polarity === 'positive'){
+                        return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
+                    }else if(opts.polarity === 'negative'){
+                        return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
+                    }
+                },
+                otherwiseValueFunc : (creep, target) => {
+                    if(opts.polarity === 'positive'){
+                        return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
+                    }else if(opts.polarity === 'negative'){
+                        return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
+                    }
+                }
             });
 
             var distanceValuePossibilities = [
                 {
                     target: opts.workTarget,
-                    valueFunc: (creep, target) => {
-                        if(opts.polarity === 'positive'){
-                            return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
-                        }else if(opts.polarity === 'negative'){
-                            return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
-                        }
-                    }
+                    valueFunc: opts.workValueFunc
                 },
                 {
                     target: opts.otherwiseTarget,
-                    valueFunc: (creep, target) => {
-                        if(opts.polarity === 'positive'){
-                            return DistanceValueCalculator.giveEnergyValueFunc(creep, target);
-                        }else if(opts.polarity === 'negative'){
-                            return DistanceValueCalculator.fillUpOnEnergyValueFunc(creep, target);
-                        }
-                    }
+                    valueFunc: opts.otherwiseValueFunc
                 }
             ];
 

@@ -5,16 +5,12 @@ class Demoman extends Worker{
 
 	constructor(creep, creepOpts){
 		super(creep, creepOpts);
-		this.targetRoomName = util.milesRoomName;
+		this.targetRoomName = util.room1.name;
 
 		//list of targets
-		var wallPoint = new RoomPosition(7, 5, this.targetRoomName);
-		// var wallPoint = new RoomPosition(27, 47, this.targetRoomName);
-		var tower = new RoomPosition(31, 29, this.targetRoomName);
-
+		var wall = util.getHarvestWall(creep.room);
 		this.targets = [
-			wallPoint,
-			tower
+			wall
 		];
 	}
 
@@ -24,7 +20,7 @@ class Demoman extends Worker{
 			util.goToRoom(this.targetRoomName, creep);
 		}else{
 			this.goToAndDismantleTarget();
-		}
+		}	
 	}
 
 	goToAndDismantleTarget(){
@@ -36,16 +32,31 @@ class Demoman extends Worker{
 	}
 
 	dismantleTargetIfExists(target, creep){
-		var structToDismantle = target.lookFor(LOOK_STRUCTURES)[0];
-		if(structToDismantle){
-			var errCode = creep.dismantle(structToDismantle);
-			if(errCode === ERR_NOT_IN_RANGE){
-				creep.moveToUsingCache(target);
+
+		var structToDismantle = target;
+		var bestEnergyRecipient = util.getBestEnergyRecipient(creep);
+		var exists = false
+		var work = () => {
+			if(structToDismantle){
+				var errCode = creep.dismantle(structToDismantle);
+				console.log('structToDismantle: ', structToDismantle);
+				console.log('structToDismantle.hits: ', structToDismantle.hits);
+				if(errCode === ERR_NOT_IN_RANGE){
+					creep.moveToUsingCache(target);
+				}
+				exists = true
 			}
-			return true
-		}else{
-			return false;
 		}
+
+		util.doWorkOtherwise(creep, {
+			workTarget    : structToDismantle,
+			workFunc      : work,
+			otherwiseFunc : util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipient),
+			otherwiseTarget: bestEnergyRecipient,
+			polarity      : 'positive'
+		});
+
+		return exists;
 	}
 }
 

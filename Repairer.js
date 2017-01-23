@@ -15,7 +15,7 @@ class Repairer extends Worker {
         var assignedRoomRoom = Game.rooms[assignedRoom];
         
         //find the structure with the least hit points, as long as that structure is not at its max
-        assignedRoomRoom.find(FIND_STRUCTURES).forEach(function(structure){
+        assignedRoomRoom.find(FIND_STRUCTURES).filter(s => s !== util.getHarvestWall(creep.room)).forEach(function(structure){
             if(!target){
                 target = structure;
             }else{

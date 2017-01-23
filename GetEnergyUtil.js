@@ -8,6 +8,8 @@ class GetEnergyUtil {
          currentEnergy = 'carry[' + RESOURCE_ENERGY + ']';
       }else if(target instanceof Resource){
          currentEnergy = 'amount';
+      }else if(target instanceof StructureWall){
+         currentEnergy = 'hits';
       }else{
          currentEnergy = 'energy';
       }
@@ -24,6 +26,8 @@ class GetEnergyUtil {
          energyCapacity = 'carryCapacity';
       }else if(target instanceof Resource){
          energyCapacity = 'amount';//for dropped resources, it's always 100% of what it is
+      }else if(target instanceof StructureWall){
+         energyCapacity = 'hitsMax';
       }else{
          energyCapacity = 'energyCapacity';
       }

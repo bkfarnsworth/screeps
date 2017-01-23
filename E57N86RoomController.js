@@ -24,6 +24,7 @@ class E57N86RoomController extends RoomController {
       let guard = () => _.clone(this.standardCreepTypes.guard);
       let builder = () => _.clone(this.standardCreepTypes.builder);
       let carrier = () => _.clone(this.standardCreepTypes.carrier);
+      let demoman = () => _.clone(this.standardCreepTypes.demoman);
 
       let harvester = () => {
          var clone = _.clone(this.standardCreepTypes.harvester);
@@ -71,6 +72,7 @@ class E57N86RoomController extends RoomController {
          }),
          _.extend(upgrader(), {name: 'upgrader1'}),
          _.extend(builder(),  {name: 'builder1'}),
+         _.extend(demoman(),  {name: 'demoman1'}),
          _.extend(repairer(), {
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
