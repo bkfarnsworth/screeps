@@ -77,8 +77,7 @@ class E57N86RoomController extends RoomController {
             sourceIndex: 1
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
-         this.getBuilderConfig({name: 'builder1'}),
-         this.getDemomanConfig({name: 'demoman1'}),
+         this.getUpgraderConfig({name: 'upgrader2'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
@@ -87,6 +86,9 @@ class E57N86RoomController extends RoomController {
             name: 'repairer2',
             condition: this.roomIsUnderAttack()
          }),
+         this.getDemomanConfig({name: 'demoman1'}),
+         this.getBuilderConfig({name: 'builder1'}),
+         this.getBuilderConfig({name: 'builder2'}),
          //cheap builder
          // this.getBuilderConfig(builder(),  {
          //    name: 'builder1',

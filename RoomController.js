@@ -122,6 +122,7 @@ class RoomController {
 
 		return _.defaults(creepConfig, {
 			role: 'builder',
+			condition: this.getMyConstructionSites().length > 0,
 			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
 				percentOfSpawningPotential: opts.percentOfSpawningPotential,
 				movePercent  : 1/3,
