@@ -271,7 +271,7 @@ class RoomController {
 		var seeCPU = false;
 		var tempCpuUsed = Game.cpu.getUsed();
 		this.getMyCreeps().forEach(creep => {
-			var creepConfig = this.creepConfigsByName[creep.name];
+			var creepConfig = this.creepConfigsByName[creep.getBfSimpleName()];
 			this.runCreep(creep, creepConfig);
 			if(seeCPU){
 				console.log('creep.memory.role: ', creep.memory.role);
@@ -370,11 +370,12 @@ class RoomController {
 			assignedSpawn = util.getSpawnForRoom(util.northRoomName);
 		}
 
-		var errCode = assignedSpawn.createCreep(creepConfigToSpawn.bodyParts, creepName, memoryOpts);
-
+		//to allow us to Spawn the next creep near the end of the current ones life, we do the A or B version
+		var creepNameWithLetter = creepName + 'A';
+		var errCode = assignedSpawn.createCreep(creepConfigToSpawn.bodyParts, creepNameWithLetter, memoryOpts);
 		if(errCode === ERR_NAME_EXISTS){
-			//then delete it from memory
-			delete Memory.creeps[creepName];
+			creepNameWithLetter = creepName + 'B';
+			assignedSpawn.createCreep(creepConfigToSpawn.bodyParts, creepNameWithLetter, memoryOpts);
 		}
 	} 
 

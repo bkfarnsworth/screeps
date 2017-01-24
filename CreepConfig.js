@@ -17,7 +17,7 @@ CreepConfig.prototype.getMatchingCreeps = function(){
     var roleFilter = (creep) => {
         return creep.memory.role == this.role 
         && creep.memory.assignedRoom === this.assignedRoom
-        && creep.name === this.name;
+        && creep.getBfSimpleName() === this.name;
     }
 
     //cache result

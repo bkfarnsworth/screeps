@@ -31,6 +31,8 @@ module.exports.loop = function () {
 
     clearPathsHash();
 
+    clearDeadCreepsFromMemory();
+
     doTracking();
 
     sendEmailReport();
@@ -65,6 +67,16 @@ function clearPathsHash(){
     //every n ticks, clear the paths hash
     if(_.random(1, 500) === 1){
         delete Memory.pathsHash;
+    }
+}
+
+function clearDeadCreepsFromMemory(){
+    if(_.random(1, 500) === 1){
+        _.forOwn(Memory.creeps, function(creep, creepName) {
+            if(!Game.creeps[creepName]){
+                delete Memory.creeps[creepName];
+            }
+        });
     }
 }
 
@@ -113,7 +125,17 @@ function runTests(){
 //
 //
 
-Creep.prototype.getName = function(){
+Creep.prototype.getBfSimpleName = function(){
+    var lastChar = this.name[this.name.length - 1];
+
+    if(lastChar === 'A' || lastChar === 'B'){
+        return this.name.slice(0, this.name.length - 1);
+    }else{
+        return this.name;
+    }
+}
+
+Creep.prototype.getBfFullName = function(){
     return this.name;
 }
 
