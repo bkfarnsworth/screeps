@@ -19,7 +19,7 @@ class E57N86RoomController extends RoomController {
 
    getHarvesterConfig(creepConfig={}, opts={}){
       _.defaults(opts, {
-         percentOfSpawningPotential: 0.7
+         percentOfSpawningPotential: 0.85
       });
 
       _.defaults(creepConfig, {
@@ -77,6 +77,7 @@ class E57N86RoomController extends RoomController {
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
          this.getUpgraderConfig({name: 'upgrader2'}),
+         this.getUpgraderConfig({name: 'upgrader3'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
