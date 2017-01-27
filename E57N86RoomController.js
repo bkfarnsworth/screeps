@@ -19,7 +19,7 @@ class E57N86RoomController extends RoomController {
 
    getHarvesterConfig(creepConfig={}, opts={}){
       _.defaults(opts, {
-         percentOfSpawningPotential: 0.85
+         percentOfSpawningPotential: 0.6
       });
 
       _.defaults(creepConfig, {
@@ -159,8 +159,13 @@ class E57N86RoomController extends RoomController {
       return Game.structures['5883d0e3443baf673cd0d1d3'];
    }
 
+   get eastLink(){
+      return Game.structures['588b6c38818f47dd63ad2dc0'];
+   }
+
    runLinks(){
       this.centralLink.transferEnergy(this.westLink);
+      this.eastLink.transferEnergy(this.westLink);
    }
 }
 
