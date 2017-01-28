@@ -18,11 +18,16 @@ class E57N86RoomController extends RoomController {
    }
 
    getHarvesterConfig(creepConfig={}, opts={}){
-      _.defaults(opts, {
-         percentOfSpawningPotential: 0.6
-      });
+      // _.defaults(opts, {
+      //    percentOfSpawningPotential: 0.6
+      // });
 
       _.defaults(creepConfig, {
+         bodyParts: util.getBodyPartsArray({
+            WORK: 4,
+            MOVE: 4,
+            CARRY: 4
+         }),
          extraTask: {
             condition: this.thereIsDroppedEnergy(),
             work: this.useHarvesterToGetDroppedEnergy.bind(this)
@@ -34,6 +39,7 @@ class E57N86RoomController extends RoomController {
 
    getUpgraderConfig(creepConfig={}, opts={}){
       _.defaults(opts, {
+         percentOfSpawningPotential: 0.7
       });
 
       _.defaults(creepConfig, {
@@ -49,6 +55,7 @@ class E57N86RoomController extends RoomController {
 
    getRepairerConfig(creepConfig={}, opts={}){
       _.defaults(opts, {
+         percentOfSpawningPotential: 0.7
       });
 
       _.defaults(creepConfig, {
@@ -59,6 +66,14 @@ class E57N86RoomController extends RoomController {
       })
 
       return super.getRepairerConfig(creepConfig, opts);
+   }
+
+   getBuilderConfig(creepConfig={}, opts={}){
+      _.defaults(opts, {
+         percentOfSpawningPotential: 0.7
+      });
+
+      return super.getBuilderConfig(creepConfig, opts);
    }
 
    get creepConfigs(){
@@ -77,7 +92,6 @@ class E57N86RoomController extends RoomController {
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
          this.getUpgraderConfig({name: 'upgrader2'}),
-         this.getUpgraderConfig({name: 'upgrader3'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
