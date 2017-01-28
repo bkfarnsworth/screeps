@@ -24,9 +24,9 @@ class E57N86RoomController extends RoomController {
 
       _.defaults(creepConfig, {
          bodyParts: util.getBodyPartsArray({
-            WORK: 4,
-            MOVE: 4,
-            CARRY: 4
+            WORK: 3,
+            MOVE: 3,
+            CARRY: 3
          }),
          extraTask: {
             condition: this.thereIsDroppedEnergy(),
@@ -90,8 +90,12 @@ class E57N86RoomController extends RoomController {
             name: 'harvester3',
             sourceIndex: 1
          }),
+         this.getHarvesterConfig({
+            name: 'harvester4',
+            sourceIndex: 1
+         }),
          this.getUpgraderConfig({name: 'upgrader1'}),
-         this.getUpgraderConfig({name: 'upgrader2'}),
+         // this.getUpgraderConfig({name: 'upgrader2'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
