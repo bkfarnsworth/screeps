@@ -15,7 +15,7 @@ module.exports = {
         milesUsername: 'Nephite135',
         dcn: 'superHarvester(E77S47)',//debugCreepName
         getHarvestWall(room){
-            return room.find(FIND_STRUCTURES).find(s => s.id === '587bfd3b4b6494df253b4f21');
+            return room.find(FIND_STRUCTURES).find(s => s.id === '587bfd33f5aa63cc3611fb3d' || s.id === '587bfd42eb118e11028c9a06');
         },
         findMyCreeps: function(filterObj){
             return _.values(Game.creeps).filter(filterObj.filter);

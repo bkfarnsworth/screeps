@@ -9,9 +9,9 @@ class Demoman extends Worker{
 
 		//list of targets
 		var wall = util.getHarvestWall(creep.room);
-		this.targets = [
+		this.targets = _.compact([
 			wall
-		];
+		]);
 	}
 
 	doWork(){ 

@@ -104,7 +104,10 @@ class E57N86RoomController extends RoomController {
             name: 'repairer2',
             condition: this.roomIsUnderAttack()
          }),
-         // this.getDemomanConfig({name: 'demoman1'}),
+         this.getDemomanConfig({
+            name: 'demoman1',
+            condition: Boolean(util.getHarvestWall(this.room))
+         }),
          this.getBuilderConfig({name: 'builder1'}),
          this.getBuilderConfig({name: 'builder2'}),
          //cheap builder
