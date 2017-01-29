@@ -10,6 +10,7 @@ var Carrier = require('Carrier')
 var CreepConfig = require('CreepConfig');
 var Worker = require('Worker');
 var Tower = require('Tower');
+var Miner = require('Miner');
 var BodyPartEffectCalculator = require('BodyPartEffectCalculator');
 
 var printQueue = true;
@@ -128,6 +129,25 @@ class RoomController {
 				movePercent  : 1/3,
 				carryPercent : 1/3,
 				workPercent  : 1/3
+			})
+		})
+	}
+
+	getMinerConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 0.8
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'miner',
+			source: this.mineralSource,
+			terminal: this.terminal, 
+			storage: this.storage,
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/6,
+				carryPercent : 1/6,
+				workPercent  : 2/3
 			})
 		})
 	}
@@ -325,6 +345,10 @@ class RoomController {
 			worker = new Builder(creep, creepConfig);
 		}
 
+		if(creep.memory.role == 'miner') {
+			worker = new Miner(creep, creepConfig);
+		}		
+
 		worker.doWork(this.status);
 	}
 
@@ -421,6 +445,18 @@ class RoomController {
 
 	get towers(){
 		return [];
+	}
+
+	get mineralSource(){
+		return this.room.find(FIND_MINERALS)[0];
+	}
+
+	get terminal(){
+      return this.room.terminal;
+	}
+
+	get storage(){
+      return this.room.storage;
 	}
 
 	getExtraEnergy(){

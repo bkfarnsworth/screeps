@@ -13,7 +13,7 @@ module.exports = {
         farNorthRoom: Game.rooms['E77S44'],
         room1: Game.rooms['E57N86'],
         milesUsername: 'Nephite135',
-        dcn: 'superHarvester(E77S47)',//debugCreepName
+        dcid: '588e36de7b301c245ac66cd0',//debugCreepId
         getHarvestWall(room){
             return room.find(FIND_STRUCTURES).find(s => s.id === '587bfd33f5aa63cc3611fb3d' || s.id === '587bfd42eb118e11028c9a06');
         },
@@ -388,14 +388,17 @@ module.exports = {
                 return !_.contains(opts.usersToIgnore, hostile.owner.username);
             });
         },
-        giveEnergyToRecipient(creep, recipient){
-            errCode = creep.transfer(recipient, RESOURCE_ENERGY);
+        giveToRecipient(creep, recipient, resourceType){
+            errCode = creep.transfer(recipient, resourceType);
 
             if(errCode == ERR_NOT_IN_RANGE) {
                 creep.moveToUsingCache(recipient);              
             }
 
             return errCode;
+        },
+        giveEnergyToRecipient(creep, recipient){
+            return this.giveToRecipient(creep, recipient, RESOURCE_ENERGY);
         },
         doWorkOtherwise(creep, opts={}){
 
@@ -461,7 +464,7 @@ module.exports = {
                 otherwiseFunc = this.getEnergyFromRoomObject.bind(this, creep, otherwiseTarget);
             }else{
                 otherwiseTarget = creep.room.find(FIND_SOURCES)[0]
-                otherwiseFunc = this.harvest.bind(this, creep, {sourceIndex: 0});
+                otherwiseFunc = this.harvest.bind(this, creep, creep.room.find(FIND_SOURCES)[0]);
             }
 
             this.doWorkOtherwise(creep, {
@@ -472,50 +475,6 @@ module.exports = {
                 polarity      : 'negative'
             });
         },
-        // doWorkOrDepositEnergy(creep, opts={}){
-
-        //     _.defaults(opts, {
-        //         workFunc   : undefined,
-        //         workTarget : undefined
-        //     });
-
-        //     this.doWorkOtherwise(creep, {
-        //         workTarget    : opts.workTarget,
-        //         workFunc      : opts.workFunc,
-        //         //I don't think that is the method we want
-        //         // otherwiseFunc : this.giveEnergyToBestRecipient.bind(this, creep),
-        //         polarity      : 'negative'
-        //     });
-        // },
-        // collectEnergyForWork(){
-        //     _.defaults(opts, {
-        //         harvest: true
-        //     });
-
-        //     if(opts.harvest){
-        //         //harvest from source
-        //     }else{
-        //         //get from harveser, then storage if need be
-        //     }
-        // },
-
-        //the distance value stuff should: 
-        // [ ] I should generalize the distance formala futher, so that I can get the distanceValue of any item.  That is how it will find the ‘closest item’ too.  IT would be cool if it also took into account energy sources nearby
-
-
-        // collectEnergyForSpawning(){
-
-        //     _.defaults(opts, {
-        //         harvest: true
-        //     });
-
-        //     if(opts.harvest){
-        //         //harvest from source
-        //     }else{
-        //         //pull from storage, containers
-        //         //get from harvesters
-        //     }
-        // },
         getBestRecipientForSpawning(creep){
             return this.getBestEnergyRecipient(creep, {
                 allowStructures  : true,
@@ -539,14 +498,9 @@ module.exports = {
         },
         harvest(creep, opts){
 
-            if(!_.isUndefined(opts.source) && !_.isUndefined(opts.sourceIndex)){
-                throw new Error('source and sourceIndex provided');
-            }
-
-            if(opts.sourceIndex){
-                var sources = creep.room.find(FIND_SOURCES);
-                opts.source = sources[opts.sourceIndex];
-            }   
+            _.defaults(opts, {
+                source: this.throwIfMissing(opts.source, 'source')
+            });
 
             var errCode = creep.harvest(opts.source);
             if(errCode === ERR_NOT_IN_RANGE || errCode === ERR_NOT_ENOUGH_RESOURCES) {

@@ -81,18 +81,23 @@ class E57N86RoomController extends RoomController {
       var creepConfigs = [ 
          this.getBackUpHarvesterConfig({name: 'backUpHarvester'}),
          this.getHarvesterConfig({
-            name: 'harvester1'
+            name: 'harvester1',
+            source: this.westEnergySource
          }),
          this.getHarvesterConfig({
-            name: 'harvester2'
+            name: 'harvester2',
+            source: this.westEnergySource
          }),
          this.getHarvesterConfig({
             name: 'harvester3',
-            sourceIndex: 1
+            source: this.eastEnergySource
          }),
          this.getHarvesterConfig({
             name: 'harvester4',
-            sourceIndex: 1
+            source: this.eastEnergySource
+         }),
+         this.getMinerConfig({
+            name: 'miner1'
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
          // this.getUpgraderConfig({name: 'upgrader2'}),
@@ -118,6 +123,14 @@ class E57N86RoomController extends RoomController {
       ]
 
       return creepConfigs.map(obj => super.createCreepConfig(obj));
+   }
+
+   get westEnergySource(){
+      return Game.getObjectById('5873bda811e3e4361b4d9938');
+   }
+
+   get eastEnergySource(){
+      return Game.getObjectById('5873bda811e3e4361b4d9939');
    }
 
    get tower1(){

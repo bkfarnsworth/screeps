@@ -4,23 +4,18 @@ var Worker = require('Worker');
 class Harvester extends Worker{
 
 	constructor(creep, creepOpts={}){
-
 		super(creep, creepOpts);
-
-		_.defaults(this.creepOpts, {
-			sourceIndex: 0,
-		});
 	}
 
 	get source(){
 		if(this._source){
 			return this._source;
 		}else{
-			var sources = this.creep.room.find(FIND_SOURCES);
-			this._source = sources[this.creepOpts.sourceIndex];
+			this._source = this.creepOpts.source;
 
 			//if this source is empty, use the other source if there is one
 			if(this._source.energy === 0){
+				var sources = this.creep.room.find(FIND_SOURCES);
 				this._source = sources.find(s => s.id !== this._source.id) || this._source;
 			}
 
