@@ -135,21 +135,29 @@ class RoomController {
 
 	getMinerConfig(creepConfig={}, opts={}){
 		_.defaults(opts, {
-			percentOfSpawningPotential: 0.8
+			percentOfSpawningPotential: 1
 		});
 
-		return _.defaults(creepConfig, {
+		var config = _.defaults(creepConfig, {
 			role: 'miner',
 			source: this.mineralSource,
 			terminal: this.terminal, 
 			storage: this.storage,
 			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
 				percentOfSpawningPotential: opts.percentOfSpawningPotential,
-				movePercent  : 1/6,
-				carryPercent : 1/6,
-				workPercent  : 2/3
+				requiredParts: util.getBodyPartsArray({
+					CARRY: 2
+				}),
+				//good ratio is 6 moves to 18 works
+				//but that is 300 move energy to 
+				//1800 work energy, so the ratio is
+				//3-18
+				movePercent  : 1/7,
+				workPercent  : 6/7
 			})
 		})
+
+		return config;
 	}
 
 	getCarrierConfig(creepConfig={}, opts={}){

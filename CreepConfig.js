@@ -58,8 +58,7 @@ CreepConfig.prototype.needsSpawning = function() {
 };
 
 CreepConfig.prototype.getEnergyRequired = function() {
-    var bodyPartEnergyMap = util.bodyPartEnergyMap;
-    return _.sum(this.bodyParts.map(bp => bodyPartEnergyMap[bp.toString().toUpperCase()]));
+    return util.getCostForBodyPartArray(this.bodyParts);
 };
 
 module.exports = CreepConfig;

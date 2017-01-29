@@ -558,10 +558,14 @@ module.exports = {
 
             return array;
         },
+        getCostForBodyPartArray(bodyParts){
+            return _.sum(bodyParts.map(bp => this.bodyPartEnergyMap[bp.toString().toUpperCase()]));
+        },
         convertRatiosToBodyPartArray(opts={}){
 
             _.defaults(opts, {
                 energyToUseForBodyParts    : 0,
+                requiredParts              : [],
                 attackPercent              : 0,
                 movePercent                : 0,
                 carryPercent               : 0,
@@ -574,9 +578,14 @@ module.exports = {
 
             //throw error if not enough energy or something
 
+            //do requiredPartsFirst
+            var costOfRequiredParts = this.getCostForBodyPartArray(opts.requiredParts);
+            opts.energyToUseForBodyParts -= costOfRequiredParts;
+            bodyPartsArray = opts.requiredParts;
+
             //calculate each percent
             //if there is any left over, we are not going to try and do anything special with that energy
-            return this.getBodyPartsArray({
+            bodyPartsArray.push(...this.getBodyPartsArray({
                 MOVE           : Math.floor((opts.movePercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
                 WORK           : Math.floor((opts.workPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
                 CARRY          : Math.floor((opts.carryPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
@@ -585,7 +594,9 @@ module.exports = {
                 HEAL           : Math.floor((opts.healPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
                 TOUGH          : Math.floor((opts.toughPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
                 CLAIM          : Math.floor((opts.claimPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
-            });
+            }));
+
+            return bodyPartsArray;
         },
         returnAllFilter: function(){
             return true;
