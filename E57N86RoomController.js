@@ -100,7 +100,7 @@ class E57N86RoomController extends RoomController {
             name: 'miner1'
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
-         // this.getUpgraderConfig({name: 'upgrader2'}),
+         this.getUpgraderConfig({name: 'upgrader2'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
