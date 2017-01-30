@@ -140,6 +140,7 @@ class RoomController {
 
 		var config = _.defaults(creepConfig, {
 			role: 'miner',
+			condition: this.mineralSource.mineralAmount > 0,
 			source: this.mineralSource,
 			terminal: this.terminal, 
 			storage: this.storage,
