@@ -451,20 +451,27 @@ module.exports = {
             _.defaults(opts, {
                 workFunc   : this.throwIfMissing(opts.workFunc, 'workFunc'),
                 workTarget : this.throwIfMissing(opts.workTarget, 'workTarget'),
-                status     : this.throwIfMissing(opts.status, 'status'),
+                takeFromStorage: true,
+                takeFromSpawningSources: true,
+                harvest: true
             });
 
             var otherwiseFunc;
             var otherwiseTarget;
-            if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 0){
+
+            if(creep.room.storage && opts.takeFromStorage){
                 otherwiseTarget = this.getBestNonSpawningEnergySource(creep);
                 otherwiseFunc = this.getEnergyFromRoomObject.bind(this, creep, otherwiseTarget);
-            }else if(opts.status === 'complete'){
-                otherwiseTarget = this.getBestEnergySource(creep);
+            }else if(opts.takeFromSpawningSources){
+                otherwiseTarget = this.getBestEnergySource(creep, {
+                    takeFromStorage: false
+                });
                 otherwiseFunc = this.getEnergyFromRoomObject.bind(this, creep, otherwiseTarget);
-            }else{
+            }else if(opts.harvest){
                 otherwiseTarget = creep.room.find(FIND_SOURCES)[0]
-                otherwiseFunc = this.harvest.bind(this, creep, creep.room.find(FIND_SOURCES)[0]);
+                otherwiseFunc = this.harvest.bind(this, creep, {
+                    source: creep.room.find(FIND_SOURCES)[0]
+                });
             }
 
             this.doWorkOtherwise(creep, {

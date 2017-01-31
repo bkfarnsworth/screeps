@@ -5,33 +5,19 @@ class Guard extends Worker{
 
 	constructor(creep, creepOpts){
 		super(creep, creepOpts);
+		this.attackTarget = creepOpts.attackTarget;
 	}
 
 	doWork(){
+
+		console.log('Guard.js::13 :: ');
+
 		var creep = this.creep;
-		var targets = util.findHostiles(creep.room);
-		var closestTarget = creep.pos.findClosestByPathUsingCache(targets);
 
-		if(closestTarget) {
+		console.log('this.attackTarget: ', this.attackTarget);
 
-			if(this.attack(closestTarget) == ERR_NOT_IN_RANGE) {
-				creep.moveToUsingCache(closestTarget);
-			}
-
-		//move to a specific position
-		}else {
-			//have roomcontroller pass in a location
-		}
-	}
-
-	attack(target){
-		var creep = this.creep;
-		var body = creep.body;
-		var canRangeAttack = _.any(body, part => part.type === RANGED_ATTACK && part.hits > 0);
-		if(canRangeAttack){
-			return creep.rangedAttack(target);
-		}else{
-			return creep.attack(target);
+		if(creep.attack(this.attackTarget) == ERR_NOT_IN_RANGE) {
+			creep.moveToUsingCache(this.attackTarget);
 		}
 	}
 }

@@ -35,7 +35,7 @@ module.exports.loop = function () {
 
     doTracking();
 
-    sendEmailReport();
+    // sendEmailReport();
 
     // runTests();
 }

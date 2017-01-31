@@ -18,8 +18,7 @@ var printQueue = true;
 class RoomController {
 
 	constructor(){
-		this.defenseManager = new DefenseManager();
-		this.bodyPartEffectCalculator = new BodyPartEffectCalculator();
+		this.defenseManager = new DefenseManager(this.room);
 	}
 
 	runRoom(opts={}){
@@ -43,6 +42,8 @@ class RoomController {
 			this.runCreeps();
 		}
 		
+		this.defenseManager.logDefenseStats()
+
 		console.log('STATUS: ' + this.status);
 		console.log(opts.throttle ? 'throttled' : 'NOT throttled')
 	}
@@ -190,6 +191,27 @@ class RoomController {
 		})
 	}
 
+	getGuardConfig(creepConfig={}, opts={}){
+		_.defaults(opts, {
+			percentOfSpawningPotential: 1
+		});
+
+		return _.defaults(creepConfig, {
+			role: 'guard',
+			condition: this.enemyHealRateIsTooHigh(),
+			bodyParts: this.convertRatiosToBodyPartArrayWithRoomCapactiy({
+				percentOfSpawningPotential: opts.percentOfSpawningPotential,
+				movePercent  : 1/7,
+				attackPercent : 6/7
+			})
+		});
+	}
+
+	//keep spawning guards if my attack per ticks isn't at least 100 more than the enemies heal rate
+	enemyHealRateIsTooHigh(){
+		return this.defenseManager.getMyAdjustedAttackRate() < this.defenseManager.getEnemyHealRate() + 100
+	}
+
 	get room(){
 		throw new Error('Must be overwritten')
 	}
@@ -278,6 +300,14 @@ class RoomController {
 		});
 	}
 
+	getGuards(){
+		return this.getMyCreeps({
+			filter: creep => {
+				return _.get(creep, 'memory.role') === 'guard';
+			}
+		});
+	}
+
 	roomIsUnderAttack(){
 		var hostiles = util.findHostiles(this.room);
 		return hostiles.length > 0;
@@ -327,19 +357,11 @@ class RoomController {
 		}
 
 		if(creep.memory.role == 'upgrader') {
-			if(this.roomIsUnderAttack()){
-				worker = new Repairer(creep, creepConfig);
-			}else{
-				worker = new Upgrader(creep, creepConfig);
-			}
+			worker = new Upgrader(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'repairer') {
-			if(this.roomIsUnderAttack()){
-				worker = new Repairer(creep, creepConfig);
-			}else{
-				worker = new Upgrader(creep, creepConfig);
-			}
+			worker = new Repairer(creep, creepConfig);
 		}
 
 		if(creep.memory.role == 'guard') {
@@ -491,9 +513,15 @@ class RoomController {
 	}
 
 	activateSafeModeIfNecessary(){
-		if(this.spawn.hits < this.spawn.hitsMax){
+
+		var conditions = [
+			this.towers.some(tower => tower.hits < tower.hitsMax),
+			this.spawn.hits < this.spawn.hitsMax
+		]
+
+		if(conditions.some(c => c === true)){
 			Game.notify('ACTIVATING SAFE MODE, SPAWN IS UNDER ATTACK');
-			this.room.controller.activateSafeMode();
+			// this.room.controller.activateSafeMode();
 		}
 	}
 
@@ -504,64 +532,83 @@ class RoomController {
 
 class DefenseManager{
 
-	getDefenseStrategy(roomController){
-
-		var debugMode = true;
-
-		var enemyHealRate = this.getEnemyHealRate(roomController);
-		var myAttackRate = this.getMyAttackRate(roomController);
-		var enemyToughBoost = this.getEnemyToughBoost(roomController);
-		var myAdjustedAttackRate = myAttackRate * enemyToughBoost;
-
-		if(debugMode){
-			console.log('enemyHealRate: ', enemyHealRate);
-			console.log('myAttackRate: ', myAttackRate);
-			console.log('enemyToughBoost: ', enemyToughBoost);
-			console.log('myAdjustedAttackRate: ', myAdjustedAttackRate);
-		}
-
-		if(myAdjustedAttackRate - enemyHealRate > 100){
-			if(debugMode){console.log('ATTACK');}
-			return 'attack';
-		}else{
-			if(debugMode){console.log('REPAIR');}
-			return 'repair';
-		}
+	constructor(room){
+		this.room = room;
+		this.bodyPartEffectCalculator = new BodyPartEffectCalculator();
 	}
 
-	getEnemyHealRate(roomController){
+	logDefenseStats(){
+		var enemyHealRate = this.getEnemyHealRate();
+		var myAttackRate = this.getMyAttackRate();
+		var enemyToughBoost = this.getEnemyToughBoost();
+		var myAdjustedAttackRate = this.getMyAdjustedAttackRate();
+
+		console.log('enemyHealRate: ', enemyHealRate);
+		console.log('myAttackRate: ', myAttackRate);
+		console.log('enemyToughBoost: ', enemyToughBoost);
+		console.log('myAdjustedAttackRate: ', myAdjustedAttackRate);
+	}
+
+	getHostiles(){
+		return util.findHostiles(this.room);
+	}
+
+	getGuards(){
+		var arr = this.room.find(FIND_MY_CREEPS).filter(c => c.memory.role === 'guard');	
+		return arr
+	}
+
+	getTowers(){
+		return this.room.find(FIND_MY_STRUCTURES).filter(s => s instanceof StructureTower);
+	}
+
+	getEnemyHealRate(){
 
 		var enemeyHealPointsPerTick = 0;
-		roomController.getHostiles().forEach(h => {
+		this.getHostiles().forEach(h => {
 			h.body.filter(bp => bp.type === HEAL && bp.hits > 0).forEach(bp => {
-				enemeyHealPointsPerTick += roomController.bodyPartEffectCalculator.getEffect(bp, 'heal');
+				enemeyHealPointsPerTick += this.bodyPartEffectCalculator.getEffect(bp, 'heal');
 			});
 		});
 
 		return enemeyHealPointsPerTick;
 	}
 
-	getMyAttackRate(roomController){
-		//for now just towers, but eventually all creeps
+	//factors in toughness of enemy
+	getMyAdjustedAttackRate(){
+		return this.getMyAttackRate() * this.getEnemyToughBoost();
+	}
+
+	getMyAttackRate(){
 		var myAttackPointsPerTick = 0;
 
-		roomController.towers.forEach(t => {
+		this.getTowers().forEach(t => {
 			myAttackPointsPerTick += TOWER_POWER_ATTACK
+		});
+
+		this.getGuards().forEach(guard => {
+
+			guard.body.filter(bp => bp.type === ATTACK && bp.hits > 0).forEach(bodyPart => {
+
+				myAttackPointsPerTick += this.bodyPartEffectCalculator.getEffect(bodyPart, 'attack');
+
+				// console.log('myAttackPointsPerTick: ', myAttackPointsPerTick);
+			});
 		});
 
 		return myAttackPointsPerTick;
 	}
 
-	getEnemyToughBoost(roomController){
+	getEnemyToughBoost(){
 
 		const nonBoostedMultiplier = 1;		
 
 		//low means they take less damage
 		var lowestToughMultiplier = nonBoostedMultiplier;
 
-		_.forEach(roomController.getHostiles(), h => {
+		_.forEach(this.getHostiles(), h => {
 			_.forEach(h.body, bp => {
-				var toughMultiplier = bp.type === TOUGH ? roomController.bodyPartEffectCalculator.getEffect(bp, 'damage') : nonBoostedMultiplier;
+				var toughMultiplier = bp.type === TOUGH ? this.bodyPartEffectCalculator.getEffect(bp, 'damage') : nonBoostedMultiplier;
 				lowestToughMultiplier = _.min([toughMultiplier, lowestToughMultiplier]);
 			});
 		})

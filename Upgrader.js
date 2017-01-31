@@ -1,10 +1,12 @@
 var util = require('util')
 var Worker = require('Worker');
+var EnergyConsumerMixin = require('EnergyConsumerMixin');
 
 class Upgrader extends Worker {
 
 	constructor(creep, creepOpts){
 		super(creep, creepOpts);
+		this.energyConsumerMixin = new EnergyConsumerMixin(creepOpts.energyCollectionStrategy);
 	}
 
 	doWork(status){
@@ -15,8 +17,7 @@ class Upgrader extends Worker {
 
 	upgradeController(status){
 		var creep = this.creep;
-		util.doWorkOrGatherEnergy(creep, { 
-			status,
+		this.energyConsumerMixin.doWorkOrGatherEnergyAccordingToStrategy(creep, {
 			workTarget: creep.room.controller,
 			workFunc: () => {
 				var errCode = creep.upgradeController(creep.room.controller)

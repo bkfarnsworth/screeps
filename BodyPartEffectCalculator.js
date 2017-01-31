@@ -4,6 +4,7 @@ class BodyPartEffectCalculator {
       var map = new Map();
       map.set(HEAL, HEAL_POWER);
       map.set(TOUGH, 1);//kind of faking tough because there is no base power for it
+      map.set(ATTACK, ATTACK_POWER);
       return map;
    }
 
