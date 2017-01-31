@@ -101,6 +101,7 @@ class E57N86RoomController extends RoomController {
          }),
          this.getUpgraderConfig({name: 'upgrader1'}),
          this.getUpgraderConfig({name: 'upgrader2'}),
+         this.getUpgraderConfig({name: 'upgrader3'}),
          this.getRepairerConfig({
             name: 'repairer1',
             condition: this.roomIsUnderAttack()
