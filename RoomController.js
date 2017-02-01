@@ -521,7 +521,8 @@ class RoomController {
 
 		if(conditions.some(c => c === true)){
 			Game.notify('ACTIVATING SAFE MODE, SPAWN IS UNDER ATTACK');
-			// this.room.controller.activateSafeMode();
+			console.log('ACTIVATING SAFE MODE, SPAWN IS UNDER ATTACK');
+			this.room.controller.activateSafeMode();
 		}
 	}
 
