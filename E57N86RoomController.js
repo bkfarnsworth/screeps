@@ -142,7 +142,11 @@ class E57N86RoomController extends RoomController {
             name: 'guard5',
             attackTarget: this.attackTarget
          }),
-         this.getUpgraderConfig({name: 'upgrader3'}),
+         //only spawn the extra upgrader if we are getting too much extra energy
+         this.getUpgraderConfig({
+            name: 'upgrader3',
+            condition: this.storage.store[RESOURCE_ENERGY] > 300000
+         }),
          this.getGuardConfig({
             name: 'guard6',
             attackTarget: this.attackTarget
