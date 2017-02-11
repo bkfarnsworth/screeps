@@ -583,27 +583,34 @@ module.exports = {
                 claimPercent               : 0
             });
 
-            //throw error if not enough energy or something
-
-            //do requiredPartsFirst
+            //subtract the cost of required parts first
             var costOfRequiredParts = this.getCostForBodyPartArray(opts.requiredParts);
             opts.energyToUseForBodyParts -= costOfRequiredParts;
-            bodyPartsArray = opts.requiredParts;
 
-            //calculate each percent
+            //create a function for calculating each percent
             //if there is any left over, we are not going to try and do anything special with that energy
-            bodyPartsArray.push(...this.getBodyPartsArray({
-                MOVE           : Math.floor((opts.movePercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
-                WORK           : Math.floor((opts.workPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
-                CARRY          : Math.floor((opts.carryPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
-                ATTACK         : Math.floor((opts.attackPercent       * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['ATTACK']),
-                RANGED_ATTACK  : Math.floor((opts.rangedAttackPercent * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['RANGED_ATTACK']),
-                HEAL           : Math.floor((opts.healPercent         * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
-                TOUGH          : Math.floor((opts.toughPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
-                CLAIM          : Math.floor((opts.claimPercent        * opts.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
-            }));
+            var getBodyPartsArrayFromOptions = (options) => {
+                return this.getBodyPartsArray({
+                    MOVE           : Math.floor((options.movePercent         * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['MOVE']),
+                    WORK           : Math.floor((options.workPercent         * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['WORK']),
+                    CARRY          : Math.floor((options.carryPercent        * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['CARRY']),
+                    ATTACK         : Math.floor((options.attackPercent       * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['ATTACK']),
+                    RANGED_ATTACK  : Math.floor((options.rangedAttackPercent * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['RANGED_ATTACK']),
+                    HEAL           : Math.floor((options.healPercent         * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['HEAL']),
+                    TOUGH          : Math.floor((options.toughPercent        * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['TOUGH']),
+                    CLAIM          : Math.floor((options.claimPercent        * options.energyToUseForBodyParts) / this.bodyPartEnergyMap['CLAIM'])
+                })
+            }
 
-            return bodyPartsArray;
+            //get the remaining parts
+            var remainingParts = getBodyPartsArrayFromOptions(opts);
+            while(remainingParts.length + opts.requiredParts.length > 50){
+                opts.energyToUseForBodyParts -= 50;
+                remainingParts = getBodyPartsArrayFromOptions(opts);
+            }
+
+            var bodyParts = [...opts.requiredParts, ...remainingParts];
+            return bodyParts;
         },
         returnAllFilter: function(){
             return true;

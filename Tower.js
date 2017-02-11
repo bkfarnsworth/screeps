@@ -27,7 +27,7 @@ function repair(tower){
 
     var bestTowerTarget = (struct) => {
         //so we aren't wasting any of the tower's 800 repair
-        var hitsBelowStructureMax = struct.hits < struct.hitsMax - 800;
+        var hitsBelowStructureMax = struct.hits < struct.hitsMax - 2400;
         var hitsBelowSpecifiedMax = struct.hits < maxHits;
 
         return hitsBelowStructureMax && hitsBelowSpecifiedMax && struct !== util.getHarvestWall(tower.room);

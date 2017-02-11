@@ -66,7 +66,7 @@ class E57N86RoomController extends RoomController {
       _.defaults(creepConfig, {
          energyCollectionStrategy: this.getCollectionStrategyForEnergyConsumers(),
          extraTask: {
-            condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
+            condition: this.towers.some(t => this.towerNeedsEnergy(t)),
             work: this.useCreepToFillTower.bind(this)
          }
       })
@@ -81,7 +81,7 @@ class E57N86RoomController extends RoomController {
 
       _.defaults(creepConfig, {
          extraTask: {
-            condition: this.towerNeedsEnergy(this.tower1) || this.towerNeedsEnergy(this.tower2),
+            condition: this.towers.some(t => this.towerNeedsEnergy(t)),
             work: this.useCreepToFillTower.bind(this)
          }
       })
@@ -137,15 +137,14 @@ class E57N86RoomController extends RoomController {
             name: 'guard4',
             attackTarget: this.attackTarget
          }),
-         this.getUpgraderConfig({name: 'upgrader2'}),
+         //only spawn the extra upgrader if we are getting too much extra energy
+         this.getUpgraderConfig({
+            name: 'upgrader2',
+            condition: this.storage.store[RESOURCE_ENERGY] > 300000
+         }),
          this.getGuardConfig({
             name: 'guard5',
             attackTarget: this.attackTarget
-         }),
-         //only spawn the extra upgrader if we are getting too much extra energy
-         this.getUpgraderConfig({
-            name: 'upgrader3',
-            condition: this.storage.store[RESOURCE_ENERGY] > 300000
          }),
          this.getGuardConfig({
             name: 'guard6',
@@ -191,8 +190,12 @@ class E57N86RoomController extends RoomController {
       return Game.structures['5883ccf09d596dcc20aca8fe'];
    }
 
+   get tower3(){
+      return Game.structures['589e6c4a9238d58107c5c563'];
+   }
+
    get towers(){
-      return [this.tower1, this.tower2];
+      return [this.tower1, this.tower2, this.tower3];
    }
 
    towerNeedsEnergy(tower){
@@ -295,12 +298,27 @@ class E57N86RoomController extends RoomController {
    }
 
    get eastLink(){
-      return Game.structures['588b6c38818f47dd63ad2dc0'];
+      return Game.structures['589e7498e4822f7f2c8cdb4e'];
+   }
+
+   get southLink(){
+      return Game.structures['589e72d6dd2566f05a55c82d'];
    }
 
    runLinks(){
-      this.centralLink.transferEnergy(this.westLink);
-      this.eastLink.transferEnergy(this.westLink);
+      if(this.southLink.energy < this.southLink.energyCapacity - 100){
+         this.runLink(this.centralLink, this.southLink);
+         this.runLink(this.eastLink, this.southLink);   
+      }else if(this.westLink.energy < this.westLink.energyCapacity - 100){
+         this.runLink(this.centralLink, this.westLink);
+         this.runLink(this.eastLink, this.westLink);   
+      }
+   }
+
+   runLink(fromLink, toLink){
+      //transfer whatever is smaller - the energy in the fromLink, or the remaining energy capacity of the toLink
+      var energyToTransfer = Math.min(fromLink.energy, toLink.energyCapacity - toLink.energy);
+      return fromLink.transferEnergy(toLink, energyToTransfer);
    }
 }
 
