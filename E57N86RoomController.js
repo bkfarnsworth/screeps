@@ -115,7 +115,11 @@ class E57N86RoomController extends RoomController {
          }),
          this.getHarvesterConfig({
             name: 'harvester4',
-            source: this.eastEnergySource
+            source: this.eastEnergySource,
+            // extraTask: {
+            //    condition: true,
+            //    work: this.useHarvesterToFillTerminal.bind(this)
+            // }
          }),
          this.getGuardConfig({
             name: 'guard1',
@@ -285,6 +289,16 @@ class E57N86RoomController extends RoomController {
          workFunc: util.getEnergyFromRoomObject.bind(util, creep, energy),
          otherwiseTarget: bestEnergyRecipient,
          otherwiseFunc: util.giveEnergyToRecipient.bind(util, creep, bestEnergyRecipient),
+         polarity: 'positive'
+      })
+   }
+
+   useHarvesterToFillTerminal(creep){
+      util.doWorkOtherwise(creep, {
+         workTarget: this.southLink,
+         workFunc: util.getEnergyFromRoomObject.bind(util, creep, this.southLink),
+         otherwiseTarget: this.terminal,
+         otherwiseFunc: util.giveEnergyToRecipient.bind(util, creep, this.terminal),
          polarity: 'positive'
       })
    }

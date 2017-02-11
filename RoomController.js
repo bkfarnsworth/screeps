@@ -40,7 +40,8 @@ class RoomController {
 			this.runLinks();
 			this.runTowers();
 			this.runCreeps();
-		}
+			// this.runTerminal();
+		}	
 		
 		this.defenseManager.logDefenseStats()
 
@@ -264,7 +265,7 @@ class RoomController {
 			}else if(creepConfig.needsSpawning() && creepConfig.condition){
 				util.printWithSpacing(creepConfig.name + ': Queued (' + creepConfig.getEnergyRequired() + ')');
 			}else if(!creepConfig.condition){
-				util.printWithSpacing(creepConfig.name + ': Condition not met (' + creepConfig.getEnergyRequired() + ')');
+				// util.printWithSpacing(creepConfig.name + ': Condition not met (' + creepConfig.getEnergyRequired() + ')');
 			}else if(!creepConfig.needsSpawning()){
 				var timeToDeath = creepConfig.getMatchingCreeps()[0].ticksToLive;
 				util.printWithSpacing(creepConfig.name + ': ' + timeToDeath + ' (' + creepConfig.getEnergyRequired() + ')');
@@ -528,6 +529,110 @@ class RoomController {
 
 	getHostiles(){
 		return util.findHostiles(this.room);
+	}
+
+	runTerminal(){
+		var mm = new MarketManager(this.room);
+		mm.sellMineralForBestBuyOrder();
+	}
+}
+
+class MarketManager {
+
+	constructor(room){
+		this.room = room;
+	}
+
+	get mineralSource(){
+		return this.room.find(FIND_MINERALS)[0];
+	}
+
+	get mineralAmount(){
+		return this.room.terminal.store[this.mineralSource.mineralType]
+	}
+
+	get mineralType(){
+		return this.mineralSource.mineralType;
+	}
+
+	sellMineralForBestBuyOrder(){
+
+		//the scale is the same at whatever amount I sell it at. It does take CPU though.
+		if(this.mineralAmount > 0){
+			var bestOrder = this.getBestBuyOrder({
+				resourceType: this.mineralType,
+				resourceAmount: this.mineralAmount,
+				minPrice: 0.06,
+				maxDistance: 20
+			});
+
+			if(bestOrder){
+
+				var energyAvailableForTransactionCost = this.room.terminal.store.energy;
+				var amountICanBuyGivenTransactionCost = energyAvailableForTransactionCost / (Math.log(0.1*bestOrder.distanceToRoom + 0.9) + 0.1);
+				var amount = _.min([amountICanBuyGivenTransactionCost, this.mineralAmount, bestOrder.amount]);
+
+				console.log();
+				console.log('amount: ', amount);
+				console.log('BEST ORDER');
+				util.printObject(bestOrder);
+				console.log('transactionEnergy: ', Game.market.calcTransactionCost(amount, bestOrder.roomName, this.room.name));
+				console.log();
+				// var errCode = Game.market.deal(bestOrder.id, amount, this.room.name);
+				// console.log('errCode: ', errCode);
+			}else{
+				console.log('no order met requirements');
+			}
+		}else{
+			console.log('no more mineral');
+		}
+	}
+
+	getBestBuyOrder(opts={}){
+
+		var buyOrders = Game.market.getAllOrders()
+			.filter(o => o.type === ORDER_BUY)
+			.filter(o => o.resourceType === opts.resourceType)
+			.filter(o => o.price >= opts.minPrice)
+			.filter(o => {
+				var distanceToRoom = Game.map.getRoomLinearDistance(o.roomName, this.room.name);
+				o.distanceToRoom = distanceToRoom;
+				return distanceToRoom <= opts.maxDistance;
+			});
+
+		if(!buyOrders.length){
+			return null;
+		}
+
+		if(buyOrders.length === 1){
+			return buyOrders[0]
+		}
+
+		//maximize profit per mineral unit
+		return _.max(buyOrders, order => {
+
+			var amount = _.min([order.amount, opts.resourceAmount]);
+			var revenue = order.price * amount;
+
+			//subtract the trasaction cost
+			var transactionEnergy = Game.market.calcTransactionCost(amount, order.roomName, this.room.name);
+
+			var transactionCostInCredits;
+			//if this energy, the 'best price' will be the order we are going to take so use that in the maximize equation
+			if(opts.resourceType === RESOURCE_ENERGY){
+				transactionCostInCredits = order.price;
+			//else find the best price for energy and do the conversion
+			}else{
+				transactionCostInCredits = this.convertToCredits(transactionEnergy, RESOURCE_ENERGY);
+			}
+
+			return (revenue - transactionCostInCredits) / amount;
+		});
+	}
+
+	convertToCredits(amount, resourceType){
+		var bestOrder = this.getBestBuyOrder(resourceType, amount)
+		return _.get(bestOrder, 'price');
 	}
 }
 
